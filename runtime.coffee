@@ -34,6 +34,7 @@ Eval = (frame, ast) ->
       return (frame, params) -> Statement ast.children[0], frame
     if ast.parent.kind == "Op"
       return Op frame, ast.parent.value, ast.children
+    return frame[ast.parent.value]
 
 
 Op = (frame, op, children) ->
@@ -41,10 +42,6 @@ Op = (frame, op, children) ->
   operand2 = Eval frame, children[1]
   if op == '*'
     return operand1 * operand2
-
-Value = (ast) ->
-  return ast.value if ast.value?
-  return ast.parent.value
 
 Runtime =
   Block: (ast) ->
@@ -58,9 +55,7 @@ Runtime =
     frame[lhs] = rhs
 
   Call: (ast, frame) ->
-    method_name = Value(ast[0])
-    method = frame[method_name]
-    throw "unknown method #{method_name}" unless method?
+    method = Eval frame, ast[0]
     method frame, ast[1...ast.length]
 
 
