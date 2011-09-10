@@ -17,12 +17,15 @@ pp = (obj, description) ->
 
 # Frame is just a hash for now.  It's mostly used by Assign.  No notion
 # of closures yet.
-Frame = ->
+Frame = (params) ->
   # for now, all frames get the "builtins" hacked in, which is kind of ugly
   self =
     console: 
       log: (frame, parms) ->
         console.log Eval frame, parms[0]
+  for key of params
+    self[key] = params[key]
+  self
 
 Deref = (obj, accessors) ->
   result = obj
@@ -62,7 +65,7 @@ Op = (frame, op, children) ->
 
 Runtime =
   Block: (ast, param_values = {}) ->
-    frame = Frame()
+    frame = Frame param_values
     for stmt in ast
       Statement stmt, frame
 
