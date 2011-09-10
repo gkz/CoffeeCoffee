@@ -95,15 +95,18 @@ Op = (frame, op, children) ->
       return operand1 < operand2
     throw "unknown op #{op}"
 
+statements = (frame, code) ->
+  for stmt in code
+    if stmt.parent == "Return"
+      retval = Eval frame, stmt.children[0]
+      console.log "RETURN", retval
+      return retval
+    Statement stmt, frame
+
 Runtime =
   Block: (ast, frame, param_values = {}) ->
     frame = Frame param_values
-    for stmt in ast
-      if stmt.parent == "Return"
-        retval = Eval frame, stmt.children[0]
-        console.log "RETURN", retval
-        return retval
-      Statement stmt, frame
+    statements frame, ast
 
   Assign: (ast, frame) ->
     lhs = ast[0].value
@@ -120,8 +123,7 @@ Runtime =
     while true
       result = Eval frame, expr
       break if !result
-      for stmt in code
-        Statement stmt, frame
+      statements frame, code
       
   If: (ast, frame) ->
     expr = ast[0]
