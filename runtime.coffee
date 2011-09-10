@@ -15,11 +15,20 @@ pp = (obj, description) ->
   console.log description
   console.log JSON.stringify obj, null, "  "
 
+# Frame is just a hash for now.  It's mostly used by Assign.  No notion
+# of closures yet.
 Frame = ->
-  # gross
+  # for now, all frames get the "builtins" hacked in, which is kind of ugly
   self =
-    console: (frame, parms) ->
-      console.log Eval frame, parms[0]
+    console: 
+      log: (frame, parms) ->
+        console.log Eval frame, parms[0]
+
+Deref = (obj, accessors) ->
+  result = obj
+  for accessor in accessors
+    result = result[accessor.value]
+  result
 
 Eval = (frame, ast) ->
   if ast.value
@@ -34,7 +43,7 @@ Eval = (frame, ast) ->
       return (frame, params) -> Statement ast.children[0], frame
     if ast.parent.kind == "Op"
       return Op frame, ast.parent.value, ast.children
-    return frame[ast.parent.value]
+    return Deref frame[ast.parent.value], ast.children
 
 
 Op = (frame, op, children) ->
