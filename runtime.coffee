@@ -39,7 +39,7 @@ Function = (frame, ast, params) ->
     if child_ast.kind == "Param"
       param_values[child_ast.value] = Eval frame, params.shift()
     else if child_ast.parent == "Block"
-      Runtime.Block child_ast.children, param_values
+      Runtime.Block child_ast.children, frame, param_values
 
 Eval = (frame, ast) ->
   if ast.value
@@ -84,7 +84,7 @@ Op = (frame, op, children) ->
       throw "unknown op #{op}"
 
 Runtime =
-  Block: (ast, param_values = {}) ->
+  Block: (ast, frame, param_values = {}) ->
     frame = Frame param_values
     for stmt in ast
       Statement stmt, frame
