@@ -55,7 +55,7 @@ parse_line = (text) ->
     {kind: label, value: val}
   else
     text
-    
+   
 parse_indented_lines = (obj, indented_lines) ->
   while indented_lines.len() > 0
     line = indented_lines.shift()
@@ -83,17 +83,17 @@ pp = (data) ->
   console.log JSON.stringify(data, null, "  ")
 
 handle_data = (data) ->pp parse data
-  
-fs = require 'fs' 
-fn = process.argv[2] 
-if fn 
-  data = fs.readFileSync(fn).toString() 
-  handle_data(data) 
-else 
-  data = '' 
-  stdin = process.openStdin() 
-  stdin.on 'data', (buffer) -> 
-    data += buffer.toString() if buffer 
-  stdin.on 'end', -> 
+ 
+fs = require 'fs'
+fn = process.argv[2]
+if fn
+  data = fs.readFileSync(fn).toString()
+  handle_data(data)
+else
+  data = ''
+  stdin = process.openStdin()
+  stdin.on 'data', (buffer) ->
+    data += buffer.toString() if buffer
+  stdin.on 'end', ->
     handle_data(data)
 
