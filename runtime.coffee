@@ -88,6 +88,8 @@ Op = (frame, op, children) ->
     if op == '+'
       return operand1 + operand2
     if op == '==='
+      console.log frame
+      console.log 'Trequals', operand1, operand2
       return operand1 is operand2
     if op == '>>'
       return operand1 >> operand2
@@ -99,7 +101,8 @@ statements = (frame, code) ->
   for stmt in code
     if stmt.parent == "Return"
       retval = Eval frame, stmt.children[0]
-      console.log "RETURN", retval
+      # throw "RETURN: #{retval}"
+      console.log "RETURN: #{retval}"
       return retval
     Statement stmt, frame
 
@@ -120,22 +123,17 @@ Runtime =
   While: (ast, frame) ->
     expr = ast[0]
     code = ast[1].children
-    while true
-      result = Eval frame, expr
-      break if !result
-      statements frame, code
+    statements frame, code
       
   If: (ast, frame) ->
     expr = ast[0]
     if expr
       code = ast[1].children
-      for stmt in code
-        Statement stmt, frame
+      statements frame, code
     else
       if ast[2]
         code = ast[2].children
-        for stmt in code
-          Statement stmt, frame
+        statements frame, code
 
 handle_data = (data) ->
   program = JSON.parse data
