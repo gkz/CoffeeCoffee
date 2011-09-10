@@ -31,7 +31,7 @@ Eval = (frame, ast) ->
       return frame[ast.value]
   else
     if ast.parent == 'Code'
-      return ast.children[0]
+      return (frame, params) -> Statement ast.children[0], frame
     if ast.parent.kind == "Op"
       return Op frame, ast.parent.value, ast.children
 
@@ -61,10 +61,7 @@ Runtime =
     method_name = Value(ast[0])
     method = frame[method_name]
     throw "unknown method #{method_name}" unless method?
-    if method instanceof Function
-      method frame, ast[1...ast.length]
-      return
-    Statement(method)
+    method frame, ast[1...ast.length]
 
 
 handle_data = (data) ->
