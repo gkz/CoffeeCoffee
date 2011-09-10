@@ -4,7 +4,7 @@
 
 Statement = (ast, frame) ->
   method = Runtime[ast.parent]
-  # console.log "Statement", ast.parent
+  console.log "Statement", ast.parent
   if method
     method ast.children, frame
   else
@@ -30,6 +30,11 @@ Deref = (obj, accessors) ->
     result = result[accessor.value]
   result
 
+Function = (frame, ast, params) ->
+  for child_ast in ast
+    if child_ast.parent == "Block"
+      Statement child_ast, frame
+
 Eval = (frame, ast) ->
   if ast.value
     if ast.value.charAt(0) == '"'
@@ -40,7 +45,7 @@ Eval = (frame, ast) ->
       return frame[ast.value]
   else
     if ast.parent == 'Code'
-      return (frame, params) -> Statement ast.children[0], frame
+      return (frame, params) -> Function frame, ast.children, params
     if ast.parent.kind == "Op"
       return Op frame, ast.parent.value, ast.children
     return Deref frame[ast.parent.value], ast.children

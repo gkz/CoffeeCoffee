@@ -1,5 +1,5 @@
 (function() {
-  var Eval, Frame, Op, Runtime, Statement, Value, data, fn, fs, handle_data, pp, stdin;
+  var Deref, Eval, Frame, Op, Runtime, Statement, data, fn, fs, handle_data, pp, stdin;
   Statement = function(ast, frame) {
     var method;
     method = Runtime[ast.parent];
@@ -9,50 +9,58 @@
       return console.log("Statement not supported:", ast.parent);
     }
   };
-  pp = function(obj) {
+  pp = function(obj, description) {
     console.log("-----");
+    console.log(description);
     return console.log(JSON.stringify(obj, null, "  "));
   };
   Frame = function() {
     var self;
     return self = {
-      console: function(frame, parms) {
-        console.log("Logging stuff");
-        return console.log(Eval(frame, parms[0]));
+      console: {
+        log: function(frame, parms) {
+          return console.log(Eval(frame, parms[0]));
+        }
       }
     };
   };
-  Eval = function(frame, ast) {
-    if (ast.kind === "Value") {
-      console.log("Value", ast.value);
-      return JSON.parse(ast.value);
+  Deref = function(obj, accessors) {
+    var accessor, result, _i, _len;
+    result = obj;
+    for (_i = 0, _len = accessors.length; _i < _len; _i++) {
+      accessor = accessors[_i];
+      result = result[accessor.value];
     }
+    return result;
+  };
+  Eval = function(frame, ast) {
     if (ast.value) {
       if (ast.value.charAt(0) === '"') {
         return JSON.parse(ast.value);
+      } else if (ast.value.match(/\d+/) !== null) {
+        return parseInt(ast.value);
       } else {
         return frame[ast.value];
       }
     } else {
+      if (ast.parent === 'Code') {
+        return function(frame, params) {
+          return Statement(ast.children[0], frame);
+        };
+      }
       if (ast.parent.kind === "Op") {
         return Op(frame, ast.parent.value, ast.children);
       }
+      return Deref(frame[ast.parent.value], ast.children);
     }
   };
   Op = function(frame, op, children) {
     var operand1, operand2;
     operand1 = Eval(frame, children[0]);
     operand2 = Eval(frame, children[1]);
-    console.log('ops', operand1, operand2);
     if (op === '*') {
       return operand1 * operand2;
     }
-  };
-  Value = function(ast) {
-    if (ast.value != null) {
-      return ast.value;
-    }
-    return ast.parent.value;
   };
   Runtime = {
     Block: function(ast) {
@@ -68,25 +76,13 @@
     Assign: function(ast, frame) {
       var lhs, rhs;
       lhs = ast[0].value;
-      rhs = ast[1];
+      rhs = Eval(frame, ast[1]);
       return frame[lhs] = rhs;
     },
     Call: function(ast, frame) {
-      var method, method_block, method_name;
-      method_name = Value(ast[0]);
-      method = frame[method_name];
-      if (method == null) {
-        throw "unknown method " + method_name;
-      }
-      if (method instanceof Function) {
-        method(frame, ast.slice(1, ast.length));
-        return;
-      }
-      if (method.parent !== "Code") {
-        throw "uncallable " + method_name;
-      }
-      method_block = method.children[0];
-      return Statement(method_block);
+      var method;
+      method = Eval(frame, ast[0]);
+      return method(frame, ast.slice(1, ast.length));
     }
   };
   handle_data = function(data) {
