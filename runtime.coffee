@@ -27,9 +27,14 @@ Frame = (params) ->
     self[key] = params[key]
   self
 
-Deref = (obj, accessors) ->
+Deref = (frame, obj, accessors) ->
   result = obj
   for accessor in accessors
+    if accessor.parent == 'Index'
+      index = Eval frame, accessor.children[0]
+      console.log frame
+      console.log result
+      result = result[index]
     result = result[accessor.value]
   result
 
@@ -61,9 +66,11 @@ Eval = (frame, ast) ->
       return arr
     if ast.parent ==  "Value"
       return Eval frame, ast.children[0] # strange
+    if ast.parent ==  "Parens"
+      return Eval frame, ast.children[0].children[0] # strange
     if ast.parent.kind == "Op"
       return Op frame, ast.parent.value, ast.children
-    return Deref frame[ast.parent.value], ast.children
+    return Deref frame, frame[ast.parent.value], ast.children
 
 
 Op = (frame, op, children) ->
@@ -78,15 +85,24 @@ Op = (frame, op, children) ->
     operand2 = Eval frame, children[1]
     if op == '*'
       return operand1 * operand2
-    else if op == '==='
-      return operand2 is operand2
-    else
-      throw "unknown op #{op}"
+    if op == '+'
+      return operand1 + operand2
+    if op == '==='
+      return operand1 is operand2
+    if op == '>>'
+      return operand1 >> operand2
+    if op == '<'
+      return operand1 < operand2
+    throw "unknown op #{op}"
 
 Runtime =
   Block: (ast, frame, param_values = {}) ->
     frame = Frame param_values
     for stmt in ast
+      if stmt.parent == "Return"
+        retval = Eval frame, stmt.children[0]
+        console.log "RETURN", retval
+        return retval
       Statement stmt, frame
 
   Assign: (ast, frame) ->
@@ -98,6 +114,26 @@ Runtime =
     method = Eval frame, ast[0]
     method frame, ast[1...ast.length]
 
+  While: (ast, frame) ->
+    expr = ast[0]
+    code = ast[1].children
+    while true
+      result = Eval frame, expr
+      break if !result
+      for stmt in code
+        Statement stmt, frame
+      
+  If: (ast, frame) ->
+    expr = ast[0]
+    if expr
+      code = ast[1].children
+      for stmt in code
+        Statement stmt, frame
+    else
+      if ast[2]
+        code = ast[2].children
+        for stmt in code
+          Statement stmt, frame
 
 handle_data = (data) ->
   program = JSON.parse data
