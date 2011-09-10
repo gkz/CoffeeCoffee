@@ -1,4 +1,4 @@
-# This is an experiment in having CS host itself. One use case would
+# This is an experiment in having CS interpret itself. One use case would
 # be educational environments, where students are learning CS and need
 # to be able to pause/resume applications, etc.
 
@@ -12,7 +12,7 @@ Statement = (ast, frame) ->
 
 pp = (obj, description) ->
   console.log "-----"
-  console.log description
+  console.log description if description?
   console.log JSON.stringify obj, null, "  "
 
 # Frame is just a hash for now.  It's mostly used by Assign.  No notion
@@ -31,9 +31,12 @@ Deref = (obj, accessors) ->
   result
 
 Function = (frame, ast, params) ->
+  param_values = {}
   for child_ast in ast
-    if child_ast.parent == "Block"
-      Statement child_ast, frame
+    if child_ast.kind == "Param"
+      param_values[child_ast.value] = Eval frame, params.shift()
+    else if child_ast.parent == "Block"
+      Runtime.Block child_ast.children, param_values
 
 Eval = (frame, ast) ->
   if ast.value
@@ -58,7 +61,7 @@ Op = (frame, op, children) ->
     return operand1 * operand2
 
 Runtime =
-  Block: (ast) ->
+  Block: (ast, param_values = {}) ->
     frame = Frame()
     for stmt in ast
       Statement stmt, frame
