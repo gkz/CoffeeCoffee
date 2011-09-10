@@ -50,18 +50,38 @@ Eval = (frame, ast) ->
     else
       return frame[ast.value]
   else
+    if Runtime[ast.parent]
+      return Runtime[ast.parent] ast.children, frame
     if ast.parent == 'Code'
       return (frame, params) -> Function frame, ast.children, params
+    if ast.parent == "Arr"
+      arr = []
+      for child in ast.children
+        arr.push Eval frame, child
+      return arr
+    if ast.parent ==  "Value"
+      return Eval frame, ast.children[0] # strange
     if ast.parent.kind == "Op"
       return Op frame, ast.parent.value, ast.children
     return Deref frame[ast.parent.value], ast.children
 
 
 Op = (frame, op, children) ->
-  operand1 = Eval frame, children[0]
-  operand2 = Eval frame, children[1]
-  if op == '*'
-    return operand1 * operand2
+  if op == '-'
+    operand1 = Eval frame, children[0]
+    if op == '-'
+      return -1 * operand1
+    else
+      throw "unknown op #{op}"
+  else
+    operand1 = Eval frame, children[0]
+    operand2 = Eval frame, children[1]
+    if op == '*'
+      return operand1 * operand2
+    else if op == '==='
+      return operand2 is operand2
+    else
+      throw "unknown op #{op}"
 
 Runtime =
   Block: (ast, param_values = {}) ->
