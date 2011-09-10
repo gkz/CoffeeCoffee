@@ -44,7 +44,7 @@ Function = (frame, ast, params) ->
     if child_ast.kind == "Param"
       param_values[child_ast.value] = Eval frame, params.shift()
     else if child_ast.parent == "Block"
-      Runtime.Block child_ast.children, frame, param_values
+      return Runtime.Block child_ast.children, frame, param_values
 
 Eval = (frame, ast) ->
   if ast.value
@@ -101,15 +101,20 @@ statements = (frame, code) ->
   for stmt in code
     if stmt.parent == "Return"
       retval = Eval frame, stmt.children[0]
-      # throw "RETURN: #{retval}"
-      console.log "RETURN: #{retval}"
+      throw retval: retval
       return retval
     Statement stmt, frame
 
 Runtime =
   Block: (ast, frame, param_values = {}) ->
     frame = Frame param_values
-    statements frame, ast
+    try
+      return statements frame, ast
+    catch e
+      if e.retval
+        console.log "RETURN", e.retval
+        return e.retval
+      throw e
 
   Assign: (ast, frame) ->
     lhs = ast[0].value
