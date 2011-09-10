@@ -25,10 +25,8 @@ Eval = (frame, ast) ->
   if ast.value
     if ast.value.charAt(0) == '"'
       return JSON.parse ast.value
-    else if ast.value == "6"
-      return 6
-    else if ast.value == "7"
-      return 7
+    else if ast.value.match(/\d+/) != null
+      return parseInt(ast.value)
     else
       return frame[ast.value]
   else
