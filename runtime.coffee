@@ -14,11 +14,11 @@ pp = (obj, description) ->
   console.log description if description?
   console.log JSON.stringify obj, null, "  "
 
-# Frame is just a hash for now.  It's mostly used by Assign.  No notion
+# Frame is just wraps a hash for now.  It's mostly used by Assign.  No notion
 # of closures yet.
 Frame = (params) ->
   # for now, all frames get the "builtins" hacked in, which is kind of ugly
-  self =
+  vars =
     console: 
       log: (frame, parms) ->
         arr = []
@@ -26,12 +26,17 @@ Frame = (params) ->
           arr.push "#{Eval frame, parm}"
         console.log "***", arr.join ' '
   for key of params
-    self[key] = params[key]
-  self
+    vars[key] = params[key]
+  self =
+    set: (var_name, value) ->
+      vars[var_name] = value
+    get: (var_name) ->
+      vars[var_name]
+    vars: vars
 
-Deref = (frame, obj, accessors) ->
-  result = obj
-  for accessor in accessors
+Deref = (frame, ast) ->
+  result = frame.get ast.parent.value
+  for accessor in ast.children
     if accessor.parent == 'Index'
       index = Eval frame, accessor.children[0]
       result = result[index]
@@ -54,7 +59,7 @@ Eval = (frame, ast) ->
     else if ast.value.match(/\d+/) != null
       return parseInt(ast.value)
     else
-      return frame[ast.value]
+      return frame.get ast.value
   else
     if Runtime[ast.parent]
       return Runtime[ast.parent] ast.children, frame
@@ -71,7 +76,7 @@ Eval = (frame, ast) ->
       return Eval frame, ast.children[0].children[0] # strange
     if ast.parent.kind == "Op"
       return Op frame, ast.parent.value, ast.children
-    return Deref frame, frame[ast.parent.value], ast.children
+    return Deref frame, ast
 
 
 Op = (frame, op, children) ->
@@ -116,7 +121,7 @@ Runtime =
   Assign: (ast, frame) ->
     lhs = ast[0].value
     rhs = Eval frame, ast[1]
-    frame[lhs] = rhs
+    frame.set lhs, rhs
 
   Call: (ast, frame) ->
     method = Eval frame, ast[0]
