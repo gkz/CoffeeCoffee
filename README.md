@@ -1,8 +1,13 @@
-nodes_to_json.coffee helps turn the --nodes output from "coffee" into a JSON data structure that you can easily walk.
+nodes_to_json.coffee uses the CS compiler to generate a JSON representation of the AST.
 
-It is probably best demonstrated with a small program.
+It requires the coffee-script lib, so make sure it is in your path:
 
-Here is a pretty simple program:
+```
+~/WORKSPACE/CoffeeNodesToJson > ls -l lib
+lrwxr-xr-x  1 steve  staff  21 Sep 11 12:54 lib -> ../coffee-script/lib/
+```
+
+We'll use a small program to show nodes_to_json.coffee in action.
 
 ```
 # This is just a small program to test with.
@@ -14,154 +19,135 @@ hello_world = ->
 hello_world()
 ```
 
-Using the --nodes option, you can see the AST, but you can't walk it easily.
-
-```
-~/WORKSPACE/CoffeeNodesToJson > coffee -n hello_world.coffee 
-Block
-  Assign
-    Value "hello_world"
-    Code
-      Block
-        Call
-          Value "console"
-            Access "log"
-          Value ""hello world""
-        Assign
-          Value "six"
-          Value "6"
-        Assign
-          Value "seven"
-          Value "7"
-        Call
-          Value "console"
-            Access "log"
-          Op *
-            Value "six"
-            Value "seven"
-  Call
-    Value "hello_world"
-```
-
-If you run it through nodes_to_json.coffee, you get a data structure that you can walk.
+If you run it through nodes_to_json.coffee, you get a data structure that you can walk.  Think about using this for code visualizers, linters, etc.
 
 
 ```
-~/WORKSPACE/CoffeeNodesToJson > coffee -n hello_world.coffee | coffee nodes_to_json.coffee 
+~/WORKSPACE/CoffeeNodesToJson > coffee nodes_to_json.coffee hello_world.coffee 
 [
   {
-    "parent": "Block",
-    "children": [
-      {
-        "parent": "Assign",
-        "children": [
-          {
-            "kind": "Value",
-            "value": "hello_world"
-          },
-          {
-            "parent": "Code",
-            "children": [
-              {
-                "parent": "Block",
-                "children": [
-                  {
-                    "parent": "Call",
-                    "children": [
-                      {
-                        "parent": {
-                          "kind": "Value",
-                          "value": "console"
-                        },
-                        "children": [
-                          {
-                            "kind": "Access",
-                            "value": "log"
-                          }
-                        ]
-                      },
-                      {
-                        "kind": "Value",
-                        "value": "\"hello world\""
-                      }
-                    ]
+    "Assign": {
+      "variable": {
+        "base": {
+          "value": "hello_world"
+        },
+        "properties": []
+      },
+      "value": {
+        "params": [],
+        "body": {
+          "expressions": [
+            {
+              "args": [
+                {
+                  "base": {
+                    "value": "\"hello world\""
                   },
+                  "properties": []
+                }
+              ],
+              "soak": false,
+              "isNew": false,
+              "isSuper": false,
+              "variable": {
+                "base": {
+                  "value": "console"
+                },
+                "properties": [
                   {
-                    "parent": "Assign",
-                    "children": [
-                      {
-                        "kind": "Value",
-                        "value": "six"
-                      },
-                      {
-                        "kind": "Value",
-                        "value": "6"
-                      }
-                    ]
-                  },
-                  {
-                    "parent": "Assign",
-                    "children": [
-                      {
-                        "kind": "Value",
-                        "value": "seven"
-                      },
-                      {
-                        "kind": "Value",
-                        "value": "7"
-                      }
-                    ]
-                  },
-                  {
-                    "parent": "Call",
-                    "children": [
-                      {
-                        "parent": {
-                          "kind": "Value",
-                          "value": "console"
-                        },
-                        "children": [
-                          {
-                            "kind": "Access",
-                            "value": "log"
-                          }
-                        ]
-                      },
-                      {
-                        "parent": {
-                          "kind": "Op",
-                          "value": "*"
-                        },
-                        "children": [
-                          {
-                            "kind": "Value",
-                            "value": "six"
-                          },
-                          {
-                            "kind": "Value",
-                            "value": "seven"
-                          }
-                        ]
-                      }
-                    ]
+                    "name": {
+                      "value": "log",
+                      "asKey": true
+                    },
+                    "soak": false
                   }
                 ]
               }
-            ]
-          }
-        ]
-      },
-      {
-        "parent": "Call",
-        "children": [
-          {
-            "kind": "Value",
-            "value": "hello_world"
-          }
-        ]
+            },
+            {
+              "variable": {
+                "base": {
+                  "value": "six"
+                },
+                "properties": []
+              },
+              "value": {
+                "base": {
+                  "value": "6"
+                },
+                "properties": []
+              }
+            },
+            {
+              "variable": {
+                "base": {
+                  "value": "seven"
+                },
+                "properties": []
+              },
+              "value": {
+                "base": {
+                  "value": "7"
+                },
+                "properties": []
+              }
+            },
+            {
+              "args": [
+                {
+                  "operator": "*",
+                  "first": {
+                    "base": {
+                      "value": "six"
+                    },
+                    "properties": []
+                  },
+                  "second": {
+                    "base": {
+                      "value": "seven"
+                    },
+                    "properties": []
+                  },
+                  "flip": false
+                }
+              ],
+              "soak": false,
+              "isNew": false,
+              "isSuper": false,
+              "variable": {
+                "base": {
+                  "value": "console"
+                },
+                "properties": [
+                  {
+                    "name": {
+                      "value": "log",
+                      "asKey": true
+                    },
+                    "soak": false
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "bound": false
       }
-    ]
+    }
+  },
+  {
+    "Call": {
+      "args": [],
+      "soak": false,
+      "isNew": false,
+      "isSuper": false,
+      "variable": {
+        "base": {
+          "value": "hello_world"
+        },
+        "properties": []
+      }
+    }
   }
 ]
-
 ```
