@@ -22,7 +22,10 @@ Frame = (params) ->
   self =
     console: 
       log: (frame, parms) ->
-        console.log Eval frame, parms[0]
+        arr = []
+        for parm in parms
+          arr.push Eval frame, parm
+        console.log 'YO', arr.join(' ')
   for key of params
     self[key] = params[key]
   self
@@ -128,10 +131,11 @@ Runtime =
   While: (ast, frame) ->
     expr = ast[0]
     code = ast[1].children
-    statements frame, code
+    while Eval frame, expr
+      statements frame, code
       
   If: (ast, frame) ->
-    expr = ast[0]
+    expr = Eval frame, ast[0]
     if expr
       code = ast[1].children
       statements frame, code
