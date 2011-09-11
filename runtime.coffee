@@ -4,7 +4,6 @@
 
 Statement = (ast, frame) ->
   method = Runtime[ast.parent]
-  console.log "Statement", ast.parent
   if method
     method ast.children, frame
   else
@@ -24,8 +23,8 @@ Frame = (params) ->
       log: (frame, parms) ->
         arr = []
         for parm in parms
-          arr.push Eval frame, parm
-        console.log 'YO', arr.join(' ')
+          arr.push "#{Eval frame, parm}"
+        console.log "***", arr.join ' '
   for key of params
     self[key] = params[key]
   self
@@ -35,10 +34,6 @@ Deref = (frame, obj, accessors) ->
   for accessor in accessors
     if accessor.parent == 'Index'
       index = Eval frame, accessor.children[0]
-      console.log "*******"
-      console.log frame
-      console.log result
-      console.log "*******"
       result = result[index]
     else
       result = result[accessor.value]
@@ -94,8 +89,6 @@ Op = (frame, op, children) ->
     if op == '+'
       return operand1 + operand2
     if op == '==='
-      console.log frame
-      console.log 'Trequals', operand1, operand2
       return operand1 is operand2
     if op == '>>'
       return operand1 >> operand2
@@ -108,7 +101,6 @@ statements = (frame, code) ->
     if stmt.parent == "Return"
       retval = Eval frame, stmt.children[0]
       throw retval: retval
-      return retval
     Statement stmt, frame
 
 Runtime =
@@ -117,8 +109,7 @@ Runtime =
     try
       return statements frame, ast
     catch e
-      if e.retval
-        console.log "RETURN", e.retval
+      if e.retval?
         return e.retval
       throw e
 
