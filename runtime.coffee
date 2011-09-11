@@ -35,10 +35,13 @@ Deref = (frame, obj, accessors) ->
   for accessor in accessors
     if accessor.parent == 'Index'
       index = Eval frame, accessor.children[0]
+      console.log "*******"
       console.log frame
       console.log result
+      console.log "*******"
       result = result[index]
-    result = result[accessor.value]
+    else
+      result = result[accessor.value]
   result
 
 Function = (frame, ast, params) ->
