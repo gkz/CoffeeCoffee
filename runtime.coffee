@@ -1,3 +1,6 @@
+# IMPORTANT: This is temporarily broken, as I've modified the incoming format of the AST.
+
+
 # This is an experiment in having CS interpret itself. One use case would
 # be educational environments, where students are learning CS and need
 # to be able to pause/resume applications, etc.
