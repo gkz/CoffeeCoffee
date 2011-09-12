@@ -1,5 +1,7 @@
 nodes_to_json.coffee uses the CS compiler to generate a JSON representation of the AST.
 
+(Aside: This distro also includes runtime.coffee, which is very experimental at this point.)
+
 It requires the coffee-script lib, so make sure it is in your path:
 
 ```
