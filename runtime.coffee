@@ -6,6 +6,8 @@
 # to be able to pause/resume applications, etc.
 
 Statement = (ast, frame) ->
+  name = ast.keys[0]
+  console.log name
   method = Runtime[ast.parent]
   if method
     method ast.children, frame

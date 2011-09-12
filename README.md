@@ -27,8 +27,9 @@ If you run it through nodes_to_json.coffee, you get a data structure that you ca
 ```
 ~/WORKSPACE/CoffeeNodesToJson > coffee nodes_to_json.coffee hello_world.coffee 
 [
-  {
-    "Assign": {
+  [
+    "Assign",
+    {
       "variable": {
         "base": {
           "value": "hello_world"
@@ -61,6 +62,7 @@ If you run it through nodes_to_json.coffee, you get a data structure that you ca
                       "value": "log",
                       "asKey": true
                     },
+                    "proto": "",
                     "soak": false
                   }
                 ]
@@ -126,6 +128,7 @@ If you run it through nodes_to_json.coffee, you get a data structure that you ca
                       "value": "log",
                       "asKey": true
                     },
+                    "proto": "",
                     "soak": false
                   }
                 ]
@@ -136,9 +139,10 @@ If you run it through nodes_to_json.coffee, you get a data structure that you ca
         "bound": false
       }
     }
-  },
-  {
-    "Call": {
+  ],
+  [
+    "Call",
+    {
       "args": [],
       "soak": false,
       "isNew": false,
@@ -150,6 +154,7 @@ If you run it through nodes_to_json.coffee, you get a data structure that you ca
         "properties": []
       }
     }
-  }
+  ]
 ]
+
 ```

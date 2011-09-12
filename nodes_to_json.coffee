@@ -12,9 +12,7 @@ wrap = (expressions) ->
     if expression.body?.expressions
       expression.body.expressions = wrap(expression.body.expressions)
     name = expression.constructor.name
-    expr = {}
-    expr[name] = expression
-    expr
+    [name, expression]
   expressions
 
 handle_data = (data) ->
