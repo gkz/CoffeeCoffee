@@ -6,7 +6,6 @@
 # to be able to pause/resume applications, etc.
 
 Statement = (ast, frame) ->
-  frame ||= Frame()
   name = ast[0]
   method = Runtime[name]
   if method
@@ -52,13 +51,14 @@ Function = (frame, ast, params) ->
       return Runtime.Block child_ast.children, frame, param_values
 
 Eval = (frame, ast) ->
-  if ast.value
-    if ast.value.charAt(0) == '"'
-      return JSON.parse ast.value
-    else if ast.value.match(/\d+/) != null
-      return parseInt(ast.value)
+  if ast.base?.value
+    value = ast.base.value
+    if value.charAt(0) == '"'
+      return JSON.parse value
+    else if value.match(/\d+/) != null
+      return parseInt(value)
     else
-      return frame.get ast.value
+      return frame.get value
   else
     if Runtime[ast.parent]
       return Runtime[ast.parent] ast.children, frame
@@ -109,7 +109,7 @@ statements = (frame, code) ->
 
 Args = (frame, args) ->
   args.map (arg) ->
-    arg.base.value
+    Eval frame, arg
 
 
 Runtime =
@@ -123,8 +123,8 @@ Runtime =
       throw e
 
   Assign: (ast, frame) ->
-    lhs = ast[0].value
-    rhs = Eval frame, ast[1]
+    lhs = ast.variable.base.value
+    rhs = Eval frame, ast.value
     frame.set lhs, rhs
 
   Call: (ast, frame) ->
@@ -150,8 +150,9 @@ Runtime =
 
 handle_data = (data) ->
   program = JSON.parse data
+  frame = Frame()
   for stmt in program
-    Statement stmt
+    Statement stmt, frame
 
 
 # Example usage:
