@@ -6,13 +6,13 @@
 # to be able to pause/resume applications, etc.
 
 Statement = (ast, frame) ->
-  name = ast.keys[0]
-  console.log name
-  method = Runtime[ast.parent]
+  frame ||= Frame()
+  name = ast[0]
+  method = Runtime[name]
   if method
-    method ast.children, frame
+    method ast[1], frame
   else
-    console.log "Statement not supported:", ast.parent
+    console.log "Statement not supported:", name
 
 pp = (obj, description) ->
   console.log "-----"
@@ -25,11 +25,7 @@ Frame = (params) ->
   # for now, all frames get the "builtins" hacked in, which is kind of ugly
   vars =
     console: 
-      log: (frame, parms) ->
-        arr = []
-        for parm in parms
-          arr.push "#{Eval frame, parm}"
-        console.log "***", arr.join ' '
+      log: console.log
   for key of params
     vars[key] = params[key]
   self =
@@ -39,14 +35,12 @@ Frame = (params) ->
       vars[var_name]
     vars: vars
 
-Deref = (frame, ast) ->
-  result = frame.get ast.parent.value
-  for accessor in ast.children
-    if accessor.parent == 'Index'
-      index = Eval frame, accessor.children[0]
-      result = result[index]
-    else
-      result = result[accessor.value]
+Deref = (frame, variable) ->
+  root = variable.base.value
+  properties = variable.properties
+  result = frame.get root
+  for accessor in properties
+    result = result[accessor.name.value]
   result
 
 Function = (frame, ast, params) ->
@@ -113,6 +107,11 @@ statements = (frame, code) ->
       throw retval: retval
     Statement stmt, frame
 
+Args = (frame, args) ->
+  args.map (arg) ->
+    arg.base.value
+
+
 Runtime =
   Block: (ast, frame, param_values = {}) ->
     frame = Frame param_values
@@ -129,9 +128,10 @@ Runtime =
     frame.set lhs, rhs
 
   Call: (ast, frame) ->
-    method = Eval frame, ast[0]
-    method frame, ast[1...ast.length]
-
+    method = Deref frame, ast.variable
+    args = Args frame, ast.args
+    method args...
+    
   While: (ast, frame) ->
     expr = ast[0]
     code = ast[1].children
