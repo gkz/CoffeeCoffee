@@ -100,6 +100,8 @@ Op = (frame, ast) ->
     operand2 = Eval frame, ast.second
     if op == '*'
       return operand1 * operand2
+    if op == '/'
+      return operand1 / operand2
     if op == '+'
       return operand1 + operand2
     if op == '-'
