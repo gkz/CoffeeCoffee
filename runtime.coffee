@@ -89,6 +89,8 @@ Op = (frame, ast) ->
       return operand1 >> operand2
     if op == '<'
       return operand1 < operand2
+    if op == '>'
+      return operand1 > operand2
     throw "unknown op #{op}"
 
 statements = (frame, code) ->

@@ -1,7 +1,7 @@
-multiply = (a) ->
-  i = 0
-  while i < 42
-    i += a
+multiply = (i) ->
+  while i > 5
+    console.log i
+    i = i >> 1
   console.log i
 
-multiply(11)
+multiply(15)
