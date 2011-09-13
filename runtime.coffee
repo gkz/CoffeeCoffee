@@ -152,6 +152,7 @@ Runtime =
     frame.set lhs, rhs, ast.context
 
   Call: (frame, ast) ->
+    pp ast, "Call"
     method = Deref frame, ast.variable
     args = Args frame, ast.args
     method args...
