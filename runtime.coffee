@@ -15,10 +15,7 @@ pp = (obj, description) ->
 # Frame is just wraps a hash for now.  It's mostly used by Assign.  No notion
 # of closures yet.
 Frame = (params) ->
-  # for now, all frames get the "builtins" hacked in, which is kind of ugly
-  vars =
-    console: 
-      log: console.log
+  vars = {}
   for key of params
     vars[key] = params[key]
   self =
@@ -28,7 +25,12 @@ Frame = (params) ->
       else
         vars[var_name] = value
     get: (var_name) ->
-      vars[var_name]
+      val = vars[var_name]
+      return val if val?
+      # builtins
+      val = root[var_name]
+      return val if val?
+      throw "Var not found #{var_name}"
     vars: vars
 
 Deref = (frame, variable) ->
@@ -152,7 +154,7 @@ Runtime =
     frame.set lhs, rhs, ast.context
 
   Call: (frame, ast) ->
-    pp ast, "Call"
+    # pp ast, "Call"
     method = Deref frame, ast.variable
     args = Args frame, ast.args
     method args...
