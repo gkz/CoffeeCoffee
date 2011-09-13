@@ -1,12 +1,13 @@
-x = ->
-  arr = [0, 5]
-  result = arr[1]
-  while result < 400
-    x = 6 * 7
-    result += x
-  console.log "*********"
-  console.log result
-x()
+yo = ->
+  arr = [0..5]
+  for n in arr
+    result = n
+    while result < 400
+      x = 6 * 7
+      result += x
+    console.log "*********"
+    console.log result
+yo()
 # multiply = (i) ->
 #   while i > 5
 #     console.log i

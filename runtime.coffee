@@ -75,6 +75,10 @@ Eval = (frame, ast) ->
   if ast[0] == "Arr"
     objects = ast[1].objects
     return objects.map (obj) -> Eval frame, obj
+  if ast[0] == "Range"
+    from_val = Eval frame, ast[1].from
+    to_val = Eval frame, ast[1].to
+    return [from_val..to_val]
   if ast[0] == "Literal"
     ast = ast[1]
     value = ast.value[1]
@@ -162,6 +166,12 @@ Runtime =
     else if ast.elseBody
       statements frame, ast.elseBody.expressions
       
+  For: (frame, ast) ->
+    range = Eval frame, ast.source
+    step_var = ast.name.value
+    for step_val in range
+      frame.set step_var, step_val
+      statements frame, ast.body.expressions
 
 handle_data = (data) ->
   program = JSON.parse data
