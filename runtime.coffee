@@ -7,14 +7,6 @@
 
 util = require 'util'
 
-Statement = (frame, ast) ->
-  name = ast[0]
-  method = Runtime[name]
-  if method
-    method frame, ast[1]
-  else
-    throw "Statement not supported: #{name}"
-
 pp = (obj, description) ->
   util.debug "-----"
   util.debug description if description?
@@ -56,6 +48,10 @@ Access = (frame, obj, properties) ->
 Eval = (frame, ast) ->
   # pp ast, "Eval"
   # pp frame, "Frame"
+  name = ast[0]
+  method = Runtime[name]
+  if method
+    return method frame, ast[1]  
   if ast.base
     return Access frame, Eval(frame, ast.base), ast.properties
   if ast[0] == 'Access'
@@ -126,7 +122,8 @@ statements = (frame, code) ->
     if stmt[0] == "Return"
       retval = Eval frame, stmt[1].expression
       throw retval: retval
-    Statement frame, stmt
+    val = Eval frame, stmt
+  val
     
 Args = (frame, args) ->
   args.map (arg) ->
@@ -147,6 +144,7 @@ Block = (frame, body) ->
       return e.retval
     throw e
 
+# This should be really just be part of Eval.
 Runtime =
   Assign: (frame, ast) ->
     lhs = ast.variable.base.value
@@ -179,7 +177,7 @@ handle_data = (data) ->
   program = JSON.parse data
   frame = Frame()
   for stmt in program
-    Statement frame, stmt
+    Eval frame, stmt
 
 
 # Example usage:
