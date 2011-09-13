@@ -8,16 +8,25 @@ fs = require "fs"
   
 wrap = (expressions) ->
   expressions = expressions.map (expression) ->
-    expression.children = undefined
-    if expression.value?.body?.expressions
-      expression.value.body.expressions = wrap(expression.value.body.expressions)
-    if expression.body?.expressions
-      expression.body.expressions = wrap(expression.body.expressions)
-    if expression.elseBody?.expressions
-      expression.elseBody.expressions = wrap(expression.elseBody.expressions)
-    name = expression.constructor.name
+    wrap_obj(expression)
+    
+wrap_obj = (expression) ->
+  expression.children = undefined
+  keys = ['value', 'condition', 'first', 'second']
+  for key in keys
+    if expression[key]
+      expression[key] = wrap_obj expression[key]
+  if expression.args
+    expression.args = wrap(expression.args)
+  if expression.body?.expressions
+    expression.body.expressions = wrap(expression.body.expressions)
+  if expression.elseBody?.expressions
+    expression.elseBody.expressions = wrap(expression.elseBody.expressions)
+  name = expression.constructor.name
+  if name
     [name, expression]
-  expressions
+  else
+    expression
 
 handle_data = (data) ->
   expressions = CoffeeScript.nodes(data).expressions

@@ -54,12 +54,19 @@ Access = (frame, obj, properties) ->
   obj
 
 Eval = (frame, ast) ->
+  pp frame, "Eval"
+  if ast[0] == 'Op'
+    return Op frame, ast[1]
+  if ast[0] == 'Code'
+      return (args...) -> Function frame, ast[1], args...
+  if ast[0] == 'Value'
+    return Value frame, ast[1]
+  pp ast, "unknown"
+  throw "unknown value"
+
+Value = (frame, ast) ->
   if ast.base?.objects
     return ast.base.objects.map (obj) -> Eval frame, obj
-  if ast.body
-      return (args...) -> Function frame, ast, args...
-  if ast.operator
-      return Op frame, ast
   if ast.base?.value
     value = ast.base.value
     if value.charAt(0) == '"'
