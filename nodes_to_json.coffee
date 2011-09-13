@@ -9,8 +9,8 @@ fs = require "fs"
 wrap = (expressions) ->
   expressions = expressions.map (expression) ->
     expression.children = undefined
-    if expression.body?.expressions
-      expression.body.expressions = wrap(expression.body.expressions)
+    if expression.value?.body?.expressions
+      expression.value.body.expressions = wrap(expression.value.body.expressions)
     name = expression.constructor.name
     [name, expression]
   expressions
