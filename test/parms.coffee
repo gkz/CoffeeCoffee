@@ -1,5 +1,6 @@
 x = ->
-  result = 0
+  arr = [0, 5]
+  result = arr[1]
   while result < 400
     x = 6 * 7
     result += x

@@ -47,33 +47,37 @@ Deref = (frame, variable) ->
   
 Access = (frame, obj, properties) ->
   for accessor in properties
-    if accessor.index
-      obj = obj[Eval frame, accessor.index]
-    else
-      obj = obj[accessor.name.value]
+    key = Eval frame, accessor
+    return obj[key]
   obj
 
 Eval = (frame, ast) ->
-  pp frame, "Eval"
+  # pp ast, "Eval"
+  # pp frame, "Frame"
+  if ast.base
+    return Access frame, Eval(frame, ast.base), ast.properties
   if ast[0] == 'Op'
     return Op frame, ast[1]
   if ast[0] == 'Code'
-      return (args...) -> Function frame, ast[1], args...
+    return (args...) -> Function frame, ast[1], args...
   if ast[0] == 'Value'
-    return Value frame, ast[1]
+    return Eval frame, ast[1]
+  if ast[0] == 'Index'
+    return Eval frame, ast[1].index
+  if ast[0] == "Arr"
+    objects = ast[1].objects
+    return objects.map (obj) -> Eval frame, obj
+  if ast[0] == "Literal"
+    ast = ast[1]
+    value = ast.value[1]
+    if value
+      if value.charAt(0) == '"'
+        return JSON.parse value
+      if value.match(/\d+/) != null
+        return parseInt(value)
+      return frame.get(value)
   pp ast, "unknown"
-  throw "unknown value"
-
-Value = (frame, ast) ->
-  if ast.base?.objects
-    return ast.base.objects.map (obj) -> Eval frame, obj
-  if ast.base?.value
-    value = ast.base.value
-    if value.charAt(0) == '"'
-      return JSON.parse value
-    if value.match(/\d+/) != null
-      return parseInt(value)
-    return Access frame, frame.get(value), ast.properties
+  throw "cannot parse Value"
 
 Op = (frame, ast) ->
   op = ast.operator

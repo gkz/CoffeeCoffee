@@ -12,12 +12,16 @@ wrap = (expressions) ->
     
 wrap_obj = (expression) ->
   expression.children = undefined
-  keys = ['value', 'condition', 'first', 'second']
+  keys = ['value', 'condition', 'first', 'second', 'base', 'index']
   for key in keys
     if expression[key]
       expression[key] = wrap_obj expression[key]
   if expression.args
     expression.args = wrap(expression.args)
+  if expression.properties
+    expression.properties = wrap(expression.properties)
+  if expression.objects
+    expression.objects = wrap(expression.objects)
   if expression.body?.expressions
     expression.body.expressions = wrap(expression.body.expressions)
   if expression.elseBody?.expressions
