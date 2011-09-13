@@ -28,8 +28,11 @@ Frame = (params) ->
   for key of params
     vars[key] = params[key]
   self =
-    set: (var_name, value) ->
-      vars[var_name] = value
+    set: (var_name, value, context) ->
+      if context == "+="
+        vars[var_name] += value
+      else
+        vars[var_name] = value
     get: (var_name) ->
       vars[var_name]
     vars: vars
@@ -125,7 +128,7 @@ Runtime =
   Assign: (ast, frame) ->
     lhs = ast.variable.base.value
     rhs = Eval frame, ast.value
-    frame.set lhs, rhs
+    frame.set lhs, rhs, ast.context
 
   Call: (ast, frame) ->
     method = Deref frame, ast.variable
