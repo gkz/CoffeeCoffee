@@ -54,6 +54,8 @@ Function = (frame, ast, params) ->
       return Runtime.Block child_ast.children, frame, param_values
 
 Eval = (frame, ast) ->
+  if ast.operator
+      return Op frame, ast
   if ast.base?.value
     value = ast.base.value
     if value.charAt(0) == '"'
@@ -81,16 +83,17 @@ Eval = (frame, ast) ->
     return Deref frame, ast
 
 
-Op = (frame, op, children) ->
+Op = (frame, ast) ->
+  op = ast.operator
   if op == '-'
-    operand1 = Eval frame, children[0]
+    operand1 = Eval frame, ast.first
     if op == '-'
       return -1 * operand1
     else
       throw "unknown op #{op}"
   else
-    operand1 = Eval frame, children[0]
-    operand2 = Eval frame, children[1]
+    operand1 = Eval frame, ast.first
+    operand2 = Eval frame, ast.second
     if op == '*'
       return operand1 * operand2
     if op == '+'
