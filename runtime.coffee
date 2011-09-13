@@ -82,7 +82,7 @@ Eval = (frame, ast) ->
       if value.charAt(0) == '"'
         return JSON.parse value
       if value.match(/\d+/) != null
-        return parseInt(value)
+        return parseFloat(value)
       return frame.get(value)
   pp ast, "unknown"
   pp ast[0], "ast[0]"
