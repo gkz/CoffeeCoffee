@@ -107,8 +107,11 @@ Function = (frame, ast, args...) ->
   for param in ast.params
     parms[param.name.value] = args.shift()
   frame = Frame(parms)
+  Block frame, ast.body
+  
+Block = (frame, body) ->
   try
-    return statements frame, ast.body.expressions
+    return statements frame, body.expressions
   catch e
     if e.retval?
       return e.retval
@@ -124,6 +127,11 @@ Runtime =
     method = Deref frame, ast.variable
     args = Args frame, ast.args
     method args...
+    
+  While: (frame, ast) ->
+    while Eval frame, ast.condition
+      Block frame, ast.body
+      
 
 handle_data = (data) ->
   program = JSON.parse data

@@ -1,6 +1,7 @@
-multiply = (a, b) ->
-  x = [423]
-  result = x[0]
-  console.log result
+multiply = (a) ->
+  i = 0
+  while i < 42
+    i += a
+  console.log i
 
-multiply(6, 7)
+multiply(11)
