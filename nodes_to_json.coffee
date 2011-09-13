@@ -13,6 +13,8 @@ wrap = (expressions) ->
       expression.value.body.expressions = wrap(expression.value.body.expressions)
     if expression.body?.expressions
       expression.body.expressions = wrap(expression.body.expressions)
+    if expression.elseBody?.expressions
+      expression.elseBody.expressions = wrap(expression.elseBody.expressions)
     name = expression.constructor.name
     [name, expression]
   expressions

@@ -11,7 +11,7 @@ Statement = (frame, ast) ->
   if method
     method frame, ast[1]
   else
-    console.log "Statement not supported:", name
+    throw "Statement not supported: #{name}"
 
 pp = (obj, description) ->
   console.log "-----"
@@ -70,19 +70,15 @@ Eval = (frame, ast) ->
 
 Op = (frame, ast) ->
   op = ast.operator
-  if op == '-'
-    operand1 = Eval frame, ast.first
-    if op == '-'
-      return -1 * operand1
-    else
-      throw "unknown op #{op}"
-  else
+  if ast.second
     operand1 = Eval frame, ast.first
     operand2 = Eval frame, ast.second
     if op == '*'
       return operand1 * operand2
     if op == '+'
       return operand1 + operand2
+    if op == '-'
+      return operand1 - operand2
     if op == '==='
       return operand1 is operand2
     if op == '>>'
@@ -133,6 +129,12 @@ Runtime =
   While: (frame, ast) ->
     while Eval frame, ast.condition
       Block frame, ast.body
+      
+  If: (frame, ast) ->
+    if Eval frame, ast.condition
+      Block frame, ast.body
+    else if ast.elseBody
+      Block frame, ast.elseBody
       
 
 handle_data = (data) ->
