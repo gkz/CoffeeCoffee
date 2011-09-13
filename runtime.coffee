@@ -5,6 +5,8 @@
 # be educational environments, where students are learning CS and need
 # to be able to pause/resume applications, etc.
 
+util = require 'util'
+
 Statement = (frame, ast) ->
   name = ast[0]
   method = Runtime[name]
@@ -14,9 +16,9 @@ Statement = (frame, ast) ->
     throw "Statement not supported: #{name}"
 
 pp = (obj, description) ->
-  console.log "-----"
-  console.log description if description?
-  console.log JSON.stringify obj, null, "  "
+  util.debug "-----"
+  util.debug description if description?
+  util.debug JSON.stringify obj, null, "  "
 
 # Frame is just wraps a hash for now.  It's mostly used by Assign.  No notion
 # of closures yet.
@@ -56,8 +58,14 @@ Eval = (frame, ast) ->
   # pp frame, "Frame"
   if ast.base
     return Access frame, Eval(frame, ast.base), ast.properties
+  if ast[0] == 'Access'
+    return ast[1].name.value
+  if ast[0] == 'Parens'
+    return Eval frame, ast[1].body.expressions[0]
   if ast[0] == 'Op'
     return Op frame, ast[1]
+  if ast[0] == "Call"
+    return Runtime.Call frame, ast[1]
   if ast[0] == 'Code'
     return (args...) -> Function frame, ast[1], args...
   if ast[0] == 'Value'
@@ -77,6 +85,8 @@ Eval = (frame, ast) ->
         return parseInt(value)
       return frame.get(value)
   pp ast, "unknown"
+  pp ast[0], "ast[0]"
+  console.log "*******"
   throw "cannot parse Value"
 
 Op = (frame, ast) ->
@@ -98,13 +108,18 @@ Op = (frame, ast) ->
       return operand1 < operand2
     if op == '>'
       return operand1 > operand2
-    throw "unknown op #{op}"
+  else
+    operand1 = Eval frame, ast.first
+    if op == "-"
+      return -1 * operand1
+  throw "unknown op #{op}"
+  
 
 statements = (frame, code) ->
   for stmt in code
-    # if stmt.parent == "Return"
-    #   retval = Eval frame, stmt.children[0]
-    #   throw retval: retval
+    if stmt[0] == "Return"
+      retval = Eval frame, stmt[1].expression
+      throw retval: retval
     Statement frame, stmt
     
 Args = (frame, args) ->
@@ -139,13 +154,13 @@ Runtime =
     
   While: (frame, ast) ->
     while Eval frame, ast.condition
-      Block frame, ast.body
+      statements frame, ast.body.expressions
       
   If: (frame, ast) ->
     if Eval frame, ast.condition
-      Block frame, ast.body
+      statements frame, ast.body.expressions
     else if ast.elseBody
-      Block frame, ast.elseBody
+      statements frame, ast.elseBody.expressions
       
 
 handle_data = (data) ->
