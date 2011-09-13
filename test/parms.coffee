@@ -1,6 +1,6 @@
 multiply = (a, b) ->
-  result = a * b
+  x = [423]
+  result = x[0]
   console.log result
-  console.log "yo"
 
 multiply(6, 7)

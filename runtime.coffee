@@ -44,8 +44,18 @@ Deref = (frame, variable) ->
   for accessor in properties
     result = result[accessor.name.value]
   result
+  
+Access = (frame, obj, properties) ->
+  for accessor in properties
+    if accessor.index
+      obj = obj[Eval frame, accessor.index]
+    else
+      obj = obj[accessor.name.value]
+  obj
 
 Eval = (frame, ast) ->
+  if ast.base?.objects
+    return ast.base.objects.map (obj) -> Eval frame, obj
   if ast.body
       return (args...) -> Function frame, ast, args...
   if ast.operator
@@ -54,10 +64,9 @@ Eval = (frame, ast) ->
     value = ast.base.value
     if value.charAt(0) == '"'
       return JSON.parse value
-    else if value.match(/\d+/) != null
+    if value.match(/\d+/) != null
       return parseInt(value)
-    else
-      return frame.get value
+    return Access frame, frame.get(value), ast.properties
 
 Op = (frame, ast) ->
   op = ast.operator
