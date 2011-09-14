@@ -12,9 +12,7 @@ match = (regexp, text) ->
 
 # Search for the regexp at the beginning of the text.
 match_here = (regexp, text) ->
-  # punting on destructuring assignments for now
-  cur = regexp[0]
-  next = regexp[1]
+  [cur, next] = [regexp[0], regexp[1]]
   if regexp.length is 0 then return true
   if next is '*' then return match_star(cur, regexp.slice(2), text)
   if cur is '$' and not next then return text.length is 0

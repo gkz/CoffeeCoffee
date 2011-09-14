@@ -3,10 +3,7 @@
 
 # Return the index of an element in a sorted list. (or -1, if not present)
 index = (list, target) ->
-  # PUNTING on destructuring assignment for now
-  # [low, high] = [0, list.length]
-  low = 0
-  high = list.length
+  [low, high] = [0, list.length]
   while low < high
     mid = (low + high) >> 1
     val = list[mid]
