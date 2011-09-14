@@ -61,21 +61,17 @@ Eval = (frame, ast) ->
   pp ast[0], "ast[0]"
   console.log "*******"
   throw "cannot parse Value"
-
   
-statements = (frame, ast) ->
-  if ast[0] == 'Block'
-    ast = ast[1]
-  code = ast.expressions
-  for stmt in code
-    if stmt[0] == "Return"
-      retval = Eval frame, stmt[1].expression
-      throw retval: retval
-    val = Eval frame, stmt
-  val
-
-# This should be really just be part of Eval.
 Runtime =
+  Block: (frame, ast) ->
+    code = ast.expressions
+    for stmt in code
+      if stmt[0] == "Return"
+        retval = Eval frame, stmt[1].expression
+        throw retval: retval
+      val = Eval frame, stmt
+    val
+    
   Assign: (frame, ast) ->
     lhs = ast.variable.base.value
     rhs = Eval frame, ast.value
@@ -98,20 +94,20 @@ Runtime =
     
   While: (frame, ast) ->
     while Eval frame, ast.condition
-      statements frame, ast.body
+      Eval frame, ast.body
       
   If: (frame, ast) ->
     if Eval frame, ast.condition
-      statements frame, ast.body
+      Eval frame, ast.body
     else if ast.elseBody
-      statements frame, ast.elseBody
+      Eval frame, ast.elseBody
       
   For: (frame, ast) ->
     range = Eval frame, ast.source
     step_var = ast.name.value
     for step_val in range
       frame.set step_var, step_val
-      statements frame, ast.body
+      Eval frame, ast.body
       
   Access: (frame, ast) ->
     return ast.name.value
@@ -132,7 +128,7 @@ Runtime =
         parms[param.name.value] = args.shift()
       frame = Frame(parms, frame)
       try
-        return statements frame, ast.body
+        return Eval frame, ast.body
       catch e
         if e.retval?
           return e.retval
