@@ -26,7 +26,7 @@ wrap_obj = (expression) ->
     expression.expressions = wrap(expression.expressions)
   name = expression.constructor.name
   # TODO: get runtime to traverse Block properly
-  if name && name != 'Block'
+  if name && name
     [name, expression]
   else
     expression

@@ -92,15 +92,6 @@ Op = (frame, ast) ->
   throw "unknown op #{op}"
   
 
-statements = (frame, ast) ->
-  code = ast.expressions
-  for stmt in code
-    if stmt[0] == "Return"
-      retval = Eval frame, stmt[1].expression
-      throw retval: retval
-    val = Eval frame, stmt
-  val
-    
 Args = (frame, args) ->
   args.map (arg) ->
     Eval frame, arg
@@ -110,15 +101,23 @@ Function = (frame, ast, args...) ->
   for param in ast.params
     parms[param.name.value] = args.shift()
   frame = Frame(parms, frame)
-  Block frame, ast.body
-  
-Block = (frame, body) ->
   try
-    return statements frame, body
+    return statements frame, ast.body
   catch e
     if e.retval?
       return e.retval
     throw e
+
+statements = (frame, ast) ->
+  if ast[0] == 'Block'
+    ast = ast[1]
+  code = ast.expressions
+  for stmt in code
+    if stmt[0] == "Return"
+      retval = Eval frame, stmt[1].expression
+      throw retval: retval
+    val = Eval frame, stmt
+  val
 
 # This should be really just be part of Eval.
 Runtime =
@@ -164,6 +163,8 @@ Runtime =
 
   Parens: (frame, ast) ->
     body = ast.body
+    if body[0] == 'Block'
+      body = body[1]
     if body.expressions
       return Eval frame, body.expressions[0]
     else
