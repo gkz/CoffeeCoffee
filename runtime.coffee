@@ -69,26 +69,20 @@ Op = (frame, ast) ->
   if ast.second
     operand1 = Eval frame, ast.first
     operand2 = Eval frame, ast.second
-    if op == '*'
-      return operand1 * operand2
-    if op == '/'
-      return operand1 / operand2
-    if op == '+'
-      return operand1 + operand2
-    if op == '-'
-      return operand1 - operand2
-    if op == '==='
-      return operand1 is operand2
-    if op == '>>'
-      return operand1 >> operand2
-    if op == '&&'
-      return operand1 && operand2
-    if op == '||'
-      return operand1 || operand2
-    if op == '<'
-      return operand1 < operand2
-    if op == '>'
-      return operand1 > operand2
+    ops = {
+      '*':   -> operand1 * operand2
+      '/':   -> operand1 / operand2
+      '+':   -> operand1 + operand2
+      '-':   -> operand1 - operand2
+      '===': -> operand1 is operand2
+      '>>':  -> operand1 >> operand2
+      '&&':  -> operand1 && operand2
+      '||':  -> operand1 || operand2
+      '<':   -> operand1 < operand2
+      '>':   -> operand1 > operand2
+    }
+    if ops[op]
+      return ops[op]()
   else
     operand1 = Eval frame, ast.first
     if op == "-"
