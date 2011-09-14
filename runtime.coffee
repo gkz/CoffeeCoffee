@@ -42,13 +42,6 @@ Frame = (params, parent_frame) ->
       throw "Var not found #{var_name}"
     vars: vars
 
-  
-Access = (frame, obj, properties) ->
-  for accessor in properties
-    key = Eval frame, accessor
-    return obj[key]
-  obj
-
 Eval = (frame, ast) ->
   # pp ast, "Eval"
   # pp frame, "Frame"
@@ -56,8 +49,13 @@ Eval = (frame, ast) ->
   method = Runtime[name]
   if method
     return method frame, ast[1]  
+
   if ast.base
-    return Access frame, Eval(frame, ast.base), ast.properties
+    obj = Eval frame, ast.base
+    for accessor in ast.properties
+      key = Eval frame, accessor
+      obj = obj[key]
+    return obj
 
   pp ast, "unknown"
   pp ast[0], "ast[0]"
