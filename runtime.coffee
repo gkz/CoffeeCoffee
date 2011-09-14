@@ -89,11 +89,6 @@ Op = (frame, ast) ->
       return !operand1
   throw "unknown op #{op}"
   
-
-Args = (frame, args) ->
-  args.map (arg) ->
-    Eval frame, arg
-
 statements = (frame, ast) ->
   if ast[0] == 'Block'
     ast = ast[1]
@@ -123,8 +118,8 @@ Runtime =
     for accessor in properties
       root = method
       method = method[accessor.name.value]
-    args = Args frame, ast.args
-    # pp args, "CALL"
+    args = ast.args.map (arg) ->
+        Eval frame, arg
     method.apply root, args
     
   While: (frame, ast) ->
