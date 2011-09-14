@@ -3,7 +3,7 @@
 # to be able to pause/resume applications, etc.
 
 # Example usage:
-#  coffee -n test/binary_search.coffee | coffee nodes_to_json.coffee | coffee runtime.coffee
+#  coffee nodes_to_json.coffee test/binary_search.coffee | coffee runtime.coffee
 #
 
 # IMPORTANT: This is very much a work in progress, but it does run
