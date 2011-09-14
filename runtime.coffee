@@ -37,13 +37,6 @@ Frame = (params, parent_frame) ->
       throw "Var not found #{var_name}"
     vars: vars
 
-Deref = (frame, variable) ->
-  root = variable.base.value
-  properties = variable.properties
-  result = frame.get root
-  for accessor in properties
-    result = result[accessor.name.value]
-  result
   
 Access = (frame, obj, properties) ->
   for accessor in properties
@@ -167,12 +160,20 @@ Runtime =
     rhs = Eval frame, ast.value
     frame.set lhs, rhs, ast.context
 
+  # This is fairly clumsy now and only handles
+  # foo.bar.baz(yo1, yo2); it does not handle
+  # foo[bar].baz(yo), for example.
   Call: (frame, ast) ->
-    # pp ast, "Call"
-    method = Deref frame, ast.variable
+    variable = ast.variable
+    root = variable.base.value
+    properties = variable.properties
+    method = frame.get root
+    for accessor in properties
+      root = method
+      method = method[accessor.name.value]
     args = Args frame, ast.args
     # pp args, "CALL"
-    method args...
+    method.apply root, args
     
   While: (frame, ast) ->
     while Eval frame, ast.condition
