@@ -73,6 +73,10 @@ AST =
     # can get kind of subtle, so avoiding coupling is higher priority
     # than avoiding duplication.
     LHS = 
+      Arr: (scope, ast, value) ->
+        for object, i in ast.objects
+          set scope, object, value[i]
+        
       Literal: (scope, ast, value) ->
         lhs = ast.value[1]
         scope.set lhs, value, context
