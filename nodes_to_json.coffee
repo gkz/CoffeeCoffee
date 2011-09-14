@@ -25,8 +25,9 @@ wrap_obj = (expression) ->
   if expression.expressions
     expression.expressions = wrap(expression.expressions)
   name = expression.constructor.name
-  # TODO: get runtime to traverse Block properly
-  if name && name
+  if name == 'Obj'
+    expression.objects = undefined
+  if name
     [name, expression]
   else
     expression
