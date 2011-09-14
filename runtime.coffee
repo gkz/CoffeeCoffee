@@ -17,11 +17,17 @@ handle_data = (data) ->
   for stmt in program
     Eval scope, stmt
 
-# Scope is just wraps a hash for now.  It's mostly used by Assign.  Its 
-# scoping is still very primitive, e.g. it doesn't have full closures.
+# Scope: returns an object to manage variable assignment
+#
+# Scope essentially just wraps a hash for now.  It's mostly used by Assign.  Its 
+# scoping is still very primitive, e.g. it doesn't have full closures.  It uses
+# its parent scope for lookups, but it's basically read-only.
 Scope = (params, parent_scope) ->
   vars = {}
   for key of params
+    # Vars are wrapped inside a hash, as a cheap trick to avoid ambiguity
+    # w/r/t undefined values.  This prevents us from trying to go to the parent
+    # scope when the variable has been assigned in our own scope.
     vars[key] = {obj: params[key]}
   self =
     set: (var_name, value, context) ->
