@@ -5,6 +5,11 @@
 # be educational environments, where students are learning CS and need
 # to be able to pause/resume applications, etc.
 
+
+# Example usage:
+#  coffee -n hello_world.coffee | coffee nodes_to_json.coffee | coffee runtime.coffee
+#
+
 util = require 'util'
 
 pp = (obj, description) ->
@@ -17,16 +22,16 @@ pp = (obj, description) ->
 Frame = (params, parent_frame) ->
   vars = {}
   for key of params
-    vars[key] = params[key]
+    vars[key] = {obj: params[key]}
   self =
     set: (var_name, value, context) ->
       if context == "+="
-        vars[var_name] += value
+        vars[var_name].obj += value
       else
-        vars[var_name] = value
+        vars[var_name] = {obj: value}
     get: (var_name) ->
       val = vars[var_name]
-      return val if val?
+      return val.obj if val?
       # parent frame
       if parent_frame
         val = parent_frame.get var_name
@@ -198,10 +203,6 @@ handle_data = (data) ->
   for stmt in program
     Eval frame, stmt
 
-
-# Example usage:
-#  coffee -n hello_world.coffee | coffee nodes_to_json.coffee | coffee runtime.coffee
-#
 fs = require 'fs'
 fn = process.argv[2]
 if fn
