@@ -85,8 +85,12 @@ Eval = (frame, ast) ->
     ast = ast[1]
     value = ast.value[1]
     if value
+      return false if value == 'false'
+      return true if value == 'true'
       if value.charAt(0) == '"'
         return JSON.parse value
+      if value.charAt(0) == "'"
+        return value.substring(1, value.length-2)
       if value.match(/\d+/) != null
         return parseFloat(value)
       return frame.get(value)
@@ -112,6 +116,10 @@ Op = (frame, ast) ->
       return operand1 is operand2
     if op == '>>'
       return operand1 >> operand2
+    if op == '&&'
+      return operand1 && operand2
+    if op == '||'
+      return operand1 || operand2
     if op == '<'
       return operand1 < operand2
     if op == '>'
@@ -120,6 +128,8 @@ Op = (frame, ast) ->
     operand1 = Eval frame, ast.first
     if op == "-"
       return -1 * operand1
+    if op == '!'
+      return !operand1
   throw "unknown op #{op}"
   
 
@@ -161,6 +171,7 @@ Runtime =
     # pp ast, "Call"
     method = Deref frame, ast.variable
     args = Args frame, ast.args
+    # pp args, "CALL"
     method args...
     
   While: (frame, ast) ->
