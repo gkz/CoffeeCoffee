@@ -62,32 +62,6 @@ Eval = (frame, ast) ->
   console.log "*******"
   throw "cannot parse Value"
 
-Op = (frame, ast) ->
-  op = ast.operator
-  if ast.second
-    operand1 = Eval frame, ast.first
-    operand2 = Eval frame, ast.second
-    ops = {
-      '*':   -> operand1 * operand2
-      '/':   -> operand1 / operand2
-      '+':   -> operand1 + operand2
-      '-':   -> operand1 - operand2
-      '===': -> operand1 is operand2
-      '>>':  -> operand1 >> operand2
-      '&&':  -> operand1 && operand2
-      '||':  -> operand1 || operand2
-      '<':   -> operand1 < operand2
-      '>':   -> operand1 > operand2
-    }
-    if ops[op]
-      return ops[op]()
-  else
-    operand1 = Eval frame, ast.first
-    if op == "-"
-      return -1 * operand1
-    if op == '!'
-      return !operand1
-  throw "unknown op #{op}"
   
 statements = (frame, ast) ->
   if ast[0] == 'Block'
@@ -151,9 +125,6 @@ Runtime =
     else
       return Eval frame, body
 
-  Op: (frame, ast) ->
-    return Op frame, ast
-
   Code: (frame, ast) ->
     return (args...) ->
       parms = {}
@@ -194,6 +165,33 @@ Runtime =
       if value.match(/\d+/) != null
         return parseFloat(value)
       return frame.get(value)
+
+  Op: (frame, ast) ->
+    op = ast.operator
+    if ast.second
+      operand1 = Eval frame, ast.first
+      operand2 = Eval frame, ast.second
+      ops = {
+        '*':   -> operand1 * operand2
+        '/':   -> operand1 / operand2
+        '+':   -> operand1 + operand2
+        '-':   -> operand1 - operand2
+        '===': -> operand1 is operand2
+        '>>':  -> operand1 >> operand2
+        '&&':  -> operand1 && operand2
+        '||':  -> operand1 || operand2
+        '<':   -> operand1 < operand2
+        '>':   -> operand1 > operand2
+      }
+      if ops[op]
+        return ops[op]()
+    else
+      operand1 = Eval frame, ast.first
+      if op == "-"
+        return -1 * operand1
+      if op == '!'
+        return !operand1
+    throw "unknown op #{op}"
 
 handle_data = (data) ->
   program = JSON.parse data
