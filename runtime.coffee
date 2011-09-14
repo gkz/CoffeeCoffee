@@ -92,7 +92,8 @@ Op = (frame, ast) ->
   throw "unknown op #{op}"
   
 
-statements = (frame, code) ->
+statements = (frame, ast) ->
+  code = ast.expressions
   for stmt in code
     if stmt[0] == "Return"
       retval = Eval frame, stmt[1].expression
@@ -113,7 +114,7 @@ Function = (frame, ast, args...) ->
   
 Block = (frame, body) ->
   try
-    return statements frame, body.expressions
+    return statements frame, body
   catch e
     if e.retval?
       return e.retval
@@ -143,20 +144,20 @@ Runtime =
     
   While: (frame, ast) ->
     while Eval frame, ast.condition
-      statements frame, ast.body.expressions
+      statements frame, ast.body
       
   If: (frame, ast) ->
     if Eval frame, ast.condition
-      statements frame, ast.body.expressions
+      statements frame, ast.body
     else if ast.elseBody
-      statements frame, ast.elseBody.expressions
+      statements frame, ast.elseBody
       
   For: (frame, ast) ->
     range = Eval frame, ast.source
     step_var = ast.name.value
     for step_val in range
       frame.set step_var, step_val
-      statements frame, ast.body.expressions
+      statements frame, ast.body
       
   Access: (frame, ast) ->
     return ast.name.value
