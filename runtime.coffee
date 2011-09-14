@@ -58,44 +58,7 @@ Eval = (frame, ast) ->
     return method frame, ast[1]  
   if ast.base
     return Access frame, Eval(frame, ast.base), ast.properties
-  if ast[0] == 'Access'
-    return ast[1].name.value
-  if ast[0] == 'Parens'
-    body = ast[1].body
-    if body.expressions
-      return Eval frame, body.expressions[0]
-    else
-      return Eval frame, body
-  if ast[0] == 'Op'
-    return Op frame, ast[1]
-  if ast[0] == "Call"
-    return Runtime.Call frame, ast[1]
-  if ast[0] == 'Code'
-    return (args...) -> Function frame, ast[1], args...
-  if ast[0] == 'Value'
-    return Eval frame, ast[1]
-  if ast[0] == 'Index'
-    return Eval frame, ast[1].index
-  if ast[0] == "Arr"
-    objects = ast[1].objects
-    return objects.map (obj) -> Eval frame, obj
-  if ast[0] == "Range"
-    from_val = Eval frame, ast[1].from
-    to_val = Eval frame, ast[1].to
-    return [from_val..to_val]
-  if ast[0] == "Literal"
-    ast = ast[1]
-    value = ast.value[1]
-    if value
-      return false if value == 'false'
-      return true if value == 'true'
-      if value.charAt(0) == '"'
-        return JSON.parse value
-      if value.charAt(0) == "'"
-        return value.substring(1, value.length-1)
-      if value.match(/\d+/) != null
-        return parseFloat(value)
-      return frame.get(value)
+
   pp ast, "unknown"
   pp ast[0], "ast[0]"
   console.log "*******"
@@ -200,6 +163,50 @@ Runtime =
     for step_val in range
       frame.set step_var, step_val
       statements frame, ast.body.expressions
+      
+  Access: (frame, ast) ->
+    return ast.name.value
+
+  Parens: (frame, ast) ->
+    body = ast.body
+    if body.expressions
+      return Eval frame, body.expressions[0]
+    else
+      return Eval frame, body
+
+  Op: (frame, ast) ->
+    return Op frame, ast
+
+  Code: (frame, ast) ->
+    return (args...) -> Function frame, ast, args...
+
+  Value: (frame, ast) ->
+    return Eval frame, ast
+
+  Index: (frame, ast) ->
+    return Eval frame, ast.index
+
+  Arr: (frame, ast) ->
+    objects = ast.objects
+    return objects.map (obj) -> Eval frame, obj
+
+  Range: (frame, ast) ->
+    from_val = Eval frame, ast.from
+    to_val = Eval frame, ast.to
+    return [from_val..to_val]
+
+  Literal: (frame, ast) ->
+    value = ast.value[1]
+    if value
+      return false if value == 'false'
+      return true if value == 'true'
+      if value.charAt(0) == '"'
+        return JSON.parse value
+      if value.charAt(0) == "'"
+        return value.substring(1, value.length-1)
+      if value.match(/\d+/) != null
+        return parseFloat(value)
+      return frame.get(value)
 
 handle_data = (data) ->
   program = JSON.parse data
