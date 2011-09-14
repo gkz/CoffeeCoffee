@@ -10,15 +10,15 @@
 #  coffee -n hello_world.coffee | coffee nodes_to_json.coffee | coffee runtime.coffee
 #
 
-util = require 'util'
-
-pp = (obj, description) ->
-  util.debug "-----"
-  util.debug description if description?
-  util.debug JSON.stringify obj, null, "  "
-
 # Frame is just wraps a hash for now.  It's mostly used by Assign.  Its 
 # scoping is still very primitive, e.g. it doesn't have full closures.
+
+handle_data = (data) ->
+  program = JSON.parse data
+  frame = Frame()
+  for stmt in program
+    Eval frame, stmt
+
 Frame = (params, parent_frame) ->
   vars = {}
   for key of params
@@ -186,11 +186,12 @@ Runtime =
         return !operand1
     throw "unknown op #{op}"
 
-handle_data = (data) ->
-  program = JSON.parse data
-  frame = Frame()
-  for stmt in program
-    Eval frame, stmt
+util = require 'util'
+
+pp = (obj, description) ->
+  util.debug "-----"
+  util.debug description if description?
+  util.debug JSON.stringify obj, null, "  "
 
 fs = require 'fs'
 fn = process.argv[2]
