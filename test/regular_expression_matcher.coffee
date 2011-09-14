@@ -16,7 +16,7 @@ match_here = (regexp, text) ->
   cur = regexp[0]
   next = regexp[1]
   if regexp.length is 0 then return true
-  # if next is '*' then return match_star(cur, regexp.slice(2), text)
+  if next is '*' then return match_star(cur, regexp.slice(2), text)
   if cur is '$' and not next then return text.length is 0
   if text and (cur is '.' or cur is text[0]) then return match_here(regexp.slice(1), text.slice(1))
   false
@@ -32,5 +32,5 @@ console.log match("ex", "some text")
 console.log match("s..t", "spit")
 console.log match("^..t", "buttercup")
 console.log match("i..$", "cherries")
-# console.log match("o*m", "vrooooommm!")
-# console.log match("^hel*o$", "hellllllo")
+console.log match("o*m", "vrooooommm!")
+console.log match("^hel*o$", "hellllllo")

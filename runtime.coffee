@@ -61,7 +61,11 @@ Eval = (frame, ast) ->
   if ast[0] == 'Access'
     return ast[1].name.value
   if ast[0] == 'Parens'
-    return Eval frame, ast[1].body.expressions[0]
+    body = ast[1].body
+    if body.expressions
+      return Eval frame, body.expressions[0]
+    else
+      return Eval frame, body
   if ast[0] == 'Op'
     return Op frame, ast[1]
   if ast[0] == "Call"

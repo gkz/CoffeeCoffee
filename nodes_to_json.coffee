@@ -12,7 +12,7 @@ wrap = (expressions) ->
     
 wrap_obj = (expression) ->
   expression.children = undefined
-  keys = ['value', 'condition', 'first', 'second', 'base', 'index', 'expression', 'source', 'from', 'to']
+  keys = ['value', 'condition', 'first', 'second', 'body', 'elseBody', 'base', 'index', 'expression', 'source', 'from', 'to']
   for key in keys
     if expression[key]
       expression[key] = wrap_obj expression[key]
@@ -22,12 +22,11 @@ wrap_obj = (expression) ->
     expression.properties = wrap(expression.properties)
   if expression.objects
     expression.objects = wrap(expression.objects)
-  if expression.body?.expressions
-    expression.body.expressions = wrap(expression.body.expressions)
-  if expression.elseBody?.expressions
-    expression.elseBody.expressions = wrap(expression.elseBody.expressions)
+  if expression.expressions
+    expression.expressions = wrap(expression.expressions)
   name = expression.constructor.name
-  if name
+  # TODO: get runtime to traverse Block properly
+  if name && name != 'Block'
     [name, expression]
   else
     expression
