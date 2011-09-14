@@ -94,18 +94,6 @@ Args = (frame, args) ->
   args.map (arg) ->
     Eval frame, arg
 
-Function = (frame, ast, args...) ->
-  parms = {}
-  for param in ast.params
-    parms[param.name.value] = args.shift()
-  frame = Frame(parms, frame)
-  try
-    return statements frame, ast.body
-  catch e
-    if e.retval?
-      return e.retval
-    throw e
-
 statements = (frame, ast) ->
   if ast[0] == 'Block'
     ast = ast[1]
@@ -172,7 +160,17 @@ Runtime =
     return Op frame, ast
 
   Code: (frame, ast) ->
-    return (args...) -> Function frame, ast, args...
+    return (args...) ->
+      parms = {}
+      for param in ast.params
+        parms[param.name.value] = args.shift()
+      frame = Frame(parms, frame)
+      try
+        return statements frame, ast.body
+      catch e
+        if e.retval?
+          return e.retval
+        throw e
 
   Value: (frame, ast) ->
     return Eval frame, ast
