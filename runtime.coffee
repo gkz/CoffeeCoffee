@@ -50,13 +50,6 @@ Eval = (frame, ast) ->
   if method
     return method frame, ast[1]  
 
-  if ast.base
-    obj = Eval frame, ast.base
-    for accessor in ast.properties
-      key = Eval frame, accessor
-      obj = obj[key]
-    return obj
-
   pp ast, "unknown"
   pp ast[0], "ast[0]"
   console.log "*******"
@@ -135,7 +128,11 @@ Runtime =
         throw e
 
   Value: (frame, ast) ->
-    return Eval frame, ast
+    obj = Eval frame, ast.base
+    for accessor in ast.properties
+      key = Eval frame, accessor
+      obj = obj[key]
+    return obj
 
   Index: (frame, ast) ->
     return Eval frame, ast.index
