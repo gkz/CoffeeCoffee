@@ -1,14 +1,13 @@
-# IMPORTANT: This is very much a work in progress, but it does run
-# simple programs like test/binary_search.coffee.
-
 # This is an experiment in having CS interpret itself. One use case would
 # be educational environments, where students are learning CS and need
 # to be able to pause/resume applications, etc.
 
-
 # Example usage:
 #  coffee -n test/binary_search.coffee | coffee nodes_to_json.coffee | coffee runtime.coffee
 #
+
+# IMPORTANT: This is very much a work in progress, but it does run
+# simple programs like test/binary_search.coffee.
 
 # BIG OVERVIEW: The AST comes in as a JSON tree.  We recursively apply Eval to the nodes,
 # using Scope to manage our variables.
@@ -44,19 +43,25 @@ Scope = (params, parent_scope) ->
     vars: vars
 
 Eval = (scope, ast) ->
-  # pp ast, "Eval"
-  # pp scope, "Scope"
   name = ast[0]
-  method = Runtime[name]
+  method = AST[name]
   if method
     return method scope, ast[1]  
-
-  pp ast, "unknown"
-  pp ast[0], "ast[0]"
-  console.log "*******"
-  throw "cannot parse Value"
+  throw "#{name} not supported yet"
   
-Runtime =
+AST =
+  Access: (scope, ast) ->
+    return ast.name.value
+
+  Arr: (scope, ast) ->
+    objects = ast.objects
+    return objects.map (obj) -> Eval scope, obj
+
+  Assign: (scope, ast) ->
+    lhs = ast.variable.base.value
+    rhs = Eval scope, ast.value
+    scope.set lhs, rhs, ast.context
+
   Block: (scope, ast) ->
     code = ast.expressions
     for stmt in code
@@ -66,11 +71,6 @@ Runtime =
       val = Eval scope, stmt
     val
     
-  Assign: (scope, ast) ->
-    lhs = ast.variable.base.value
-    rhs = Eval scope, ast.value
-    scope.set lhs, rhs, ast.context
-
   # This is fairly clumsy now and only handles
   # foo.bar.baz(yo1, yo2); it does not handle
   # foo[bar].baz(yo), for example.
@@ -86,8 +86,24 @@ Runtime =
         Eval scope, arg
     method.apply root, args
     
-  While: (scope, ast) ->
-    while Eval scope, ast.condition
+  Code: (scope, ast) ->
+    return (args...) ->
+      parms = {}
+      for param in ast.params
+        parms[param.name.value] = args.shift()
+      sub_scope = Scope(parms, scope)
+      try
+        return Eval sub_scope, ast.body
+      catch e
+        if e.retval?
+          return e.retval
+        throw e
+
+  For: (scope, ast) ->
+    range = Eval scope, ast.source
+    step_var = ast.name.value
+    for step_val in range
+      scope.set step_var, step_val
       Eval scope, ast.body
       
   If: (scope, ast) ->
@@ -96,56 +112,8 @@ Runtime =
     else if ast.elseBody
       Eval scope, ast.elseBody
       
-  For: (scope, ast) ->
-    range = Eval scope, ast.source
-    step_var = ast.name.value
-    for step_val in range
-      scope.set step_var, step_val
-      Eval scope, ast.body
-      
-  Access: (scope, ast) ->
-    return ast.name.value
-
-  Parens: (scope, ast) ->
-    body = ast.body
-    if body[0] == 'Block'
-      body = body[1]
-    if body.expressions
-      return Eval scope, body.expressions[0]
-    else
-      return Eval scope, body
-
-  Code: (scope, ast) ->
-    return (args...) ->
-      parms = {}
-      for param in ast.params
-        parms[param.name.value] = args.shift()
-      scope = Scope(parms, scope)
-      try
-        return Eval scope, ast.body
-      catch e
-        if e.retval?
-          return e.retval
-        throw e
-
-  Value: (scope, ast) ->
-    obj = Eval scope, ast.base
-    for accessor in ast.properties
-      key = Eval scope, accessor
-      obj = obj[key]
-    return obj
-
   Index: (scope, ast) ->
     return Eval scope, ast.index
-
-  Arr: (scope, ast) ->
-    objects = ast.objects
-    return objects.map (obj) -> Eval scope, obj
-
-  Range: (scope, ast) ->
-    from_val = Eval scope, ast.from
-    to_val = Eval scope, ast.to
-    return [from_val..to_val]
 
   Literal: (scope, ast) ->
     value = ast.value[1]
@@ -187,6 +155,31 @@ Runtime =
         return !operand1
     throw "unknown op #{op}"
 
+  Parens: (scope, ast) ->
+    body = ast.body
+    if body[0] == 'Block'
+      body = body[1]
+    if body.expressions
+      return Eval scope, body.expressions[0]
+    else
+      return Eval scope, body
+
+  Range: (scope, ast) ->
+    from_val = Eval scope, ast.from
+    to_val = Eval scope, ast.to
+    return [from_val..to_val]
+
+  Value: (scope, ast) ->
+    obj = Eval scope, ast.base
+    for accessor in ast.properties
+      key = Eval scope, accessor
+      obj = obj[key]
+    return obj
+
+  While: (scope, ast) ->
+    while Eval scope, ast.condition
+      Eval scope, ast.body
+      
 util = require 'util'
 
 pp = (obj, description) ->
