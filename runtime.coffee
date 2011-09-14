@@ -7,19 +7,20 @@
 
 
 # Example usage:
-#  coffee -n hello_world.coffee | coffee nodes_to_json.coffee | coffee runtime.coffee
+#  coffee -n test/binary_search.coffee | coffee nodes_to_json.coffee | coffee runtime.coffee
 #
 
-# Frame is just wraps a hash for now.  It's mostly used by Assign.  Its 
-# scoping is still very primitive, e.g. it doesn't have full closures.
-
+# BIG OVERVIEW: The AST comes in as a JSON tree.  We recursively apply Eval to the nodes,
+# using Scope to manage our variables.
 handle_data = (data) ->
   program = JSON.parse data
-  frame = Frame()
+  scope = Scope()
   for stmt in program
-    Eval frame, stmt
+    Eval scope, stmt
 
-Frame = (params, parent_frame) ->
+# Scope is just wraps a hash for now.  It's mostly used by Assign.  Its 
+# scoping is still very primitive, e.g. it doesn't have full closures.
+Scope = (params, parent_scope) ->
   vars = {}
   for key of params
     vars[key] = {obj: params[key]}
@@ -32,9 +33,9 @@ Frame = (params, parent_frame) ->
     get: (var_name) ->
       val = vars[var_name]
       return val.obj if val?
-      # parent frame
-      if parent_frame
-        val = parent_frame.get var_name
+      # parent scope
+      if parent_scope
+        val = parent_scope.get var_name
         return val if val?
       # builtins
       val = root[var_name]
@@ -42,13 +43,13 @@ Frame = (params, parent_frame) ->
       throw "Var not found #{var_name}"
     vars: vars
 
-Eval = (frame, ast) ->
+Eval = (scope, ast) ->
   # pp ast, "Eval"
-  # pp frame, "Frame"
+  # pp scope, "Scope"
   name = ast[0]
   method = Runtime[name]
   if method
-    return method frame, ast[1]  
+    return method scope, ast[1]  
 
   pp ast, "unknown"
   pp ast[0], "ast[0]"
@@ -56,97 +57,97 @@ Eval = (frame, ast) ->
   throw "cannot parse Value"
   
 Runtime =
-  Block: (frame, ast) ->
+  Block: (scope, ast) ->
     code = ast.expressions
     for stmt in code
       if stmt[0] == "Return"
-        retval = Eval frame, stmt[1].expression
+        retval = Eval scope, stmt[1].expression
         throw retval: retval
-      val = Eval frame, stmt
+      val = Eval scope, stmt
     val
     
-  Assign: (frame, ast) ->
+  Assign: (scope, ast) ->
     lhs = ast.variable.base.value
-    rhs = Eval frame, ast.value
-    frame.set lhs, rhs, ast.context
+    rhs = Eval scope, ast.value
+    scope.set lhs, rhs, ast.context
 
   # This is fairly clumsy now and only handles
   # foo.bar.baz(yo1, yo2); it does not handle
   # foo[bar].baz(yo), for example.
-  Call: (frame, ast) ->
+  Call: (scope, ast) ->
     variable = ast.variable
     root = variable.base.value
     properties = variable.properties
-    method = frame.get root
+    method = scope.get root
     for accessor in properties
       root = method
       method = method[accessor.name.value]
     args = ast.args.map (arg) ->
-        Eval frame, arg
+        Eval scope, arg
     method.apply root, args
     
-  While: (frame, ast) ->
-    while Eval frame, ast.condition
-      Eval frame, ast.body
+  While: (scope, ast) ->
+    while Eval scope, ast.condition
+      Eval scope, ast.body
       
-  If: (frame, ast) ->
-    if Eval frame, ast.condition
-      Eval frame, ast.body
+  If: (scope, ast) ->
+    if Eval scope, ast.condition
+      Eval scope, ast.body
     else if ast.elseBody
-      Eval frame, ast.elseBody
+      Eval scope, ast.elseBody
       
-  For: (frame, ast) ->
-    range = Eval frame, ast.source
+  For: (scope, ast) ->
+    range = Eval scope, ast.source
     step_var = ast.name.value
     for step_val in range
-      frame.set step_var, step_val
-      Eval frame, ast.body
+      scope.set step_var, step_val
+      Eval scope, ast.body
       
-  Access: (frame, ast) ->
+  Access: (scope, ast) ->
     return ast.name.value
 
-  Parens: (frame, ast) ->
+  Parens: (scope, ast) ->
     body = ast.body
     if body[0] == 'Block'
       body = body[1]
     if body.expressions
-      return Eval frame, body.expressions[0]
+      return Eval scope, body.expressions[0]
     else
-      return Eval frame, body
+      return Eval scope, body
 
-  Code: (frame, ast) ->
+  Code: (scope, ast) ->
     return (args...) ->
       parms = {}
       for param in ast.params
         parms[param.name.value] = args.shift()
-      frame = Frame(parms, frame)
+      scope = Scope(parms, scope)
       try
-        return Eval frame, ast.body
+        return Eval scope, ast.body
       catch e
         if e.retval?
           return e.retval
         throw e
 
-  Value: (frame, ast) ->
-    obj = Eval frame, ast.base
+  Value: (scope, ast) ->
+    obj = Eval scope, ast.base
     for accessor in ast.properties
-      key = Eval frame, accessor
+      key = Eval scope, accessor
       obj = obj[key]
     return obj
 
-  Index: (frame, ast) ->
-    return Eval frame, ast.index
+  Index: (scope, ast) ->
+    return Eval scope, ast.index
 
-  Arr: (frame, ast) ->
+  Arr: (scope, ast) ->
     objects = ast.objects
-    return objects.map (obj) -> Eval frame, obj
+    return objects.map (obj) -> Eval scope, obj
 
-  Range: (frame, ast) ->
-    from_val = Eval frame, ast.from
-    to_val = Eval frame, ast.to
+  Range: (scope, ast) ->
+    from_val = Eval scope, ast.from
+    to_val = Eval scope, ast.to
     return [from_val..to_val]
 
-  Literal: (frame, ast) ->
+  Literal: (scope, ast) ->
     value = ast.value[1]
     if value
       return false if value == 'false'
@@ -157,13 +158,13 @@ Runtime =
         return value.substring(1, value.length-1)
       if value.match(/\d+/) != null
         return parseFloat(value)
-      return frame.get(value)
+      return scope.get(value)
 
-  Op: (frame, ast) ->
+  Op: (scope, ast) ->
     op = ast.operator
     if ast.second
-      operand1 = Eval frame, ast.first
-      operand2 = Eval frame, ast.second
+      operand1 = Eval scope, ast.first
+      operand2 = Eval scope, ast.second
       ops = {
         '*':   -> operand1 * operand2
         '/':   -> operand1 / operand2
@@ -179,7 +180,7 @@ Runtime =
       if ops[op]
         return ops[op]()
     else
-      operand1 = Eval frame, ast.first
+      operand1 = Eval scope, ast.first
       if op == "-"
         return -1 * operand1
       if op == '!'
