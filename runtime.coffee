@@ -1,5 +1,5 @@
-# IMPORTANT: This is temporarily broken, as I've modified the incoming format of the AST.
-
+# IMPORTANT: This is very much a work in progress, but it does run
+# simple programs like test/binary_search.coffee.
 
 # This is an experiment in having CS interpret itself. One use case would
 # be educational environments, where students are learning CS and need
@@ -12,9 +12,9 @@ pp = (obj, description) ->
   util.debug description if description?
   util.debug JSON.stringify obj, null, "  "
 
-# Frame is just wraps a hash for now.  It's mostly used by Assign.  No notion
-# of closures yet.
-Frame = (params) ->
+# Frame is just wraps a hash for now.  It's mostly used by Assign.  Its 
+# scoping is still very primitive, e.g. it doesn't have full closures.
+Frame = (params, parent_frame) ->
   vars = {}
   for key of params
     vars[key] = params[key]
@@ -27,6 +27,10 @@ Frame = (params) ->
     get: (var_name) ->
       val = vars[var_name]
       return val if val?
+      # parent frame
+      if parent_frame
+        val = parent_frame.get var_name
+        return val if val?
       # builtins
       val = root[var_name]
       return val if val?
@@ -135,7 +139,7 @@ Function = (frame, ast, args...) ->
   parms = {}
   for param in ast.params
     parms[param.name.value] = args.shift()
-  frame = Frame(parms)
+  frame = Frame(parms, frame)
   Block frame, ast.body
   
 Block = (frame, body) ->
