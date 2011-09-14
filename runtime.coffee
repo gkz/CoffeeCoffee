@@ -36,6 +36,8 @@ Scope = (params, parent_scope) ->
       else
         vars[var_name] = {obj: value}
     get: (var_name) ->
+      if var_name == 'require'
+        return (args...) -> require args...
       val = vars[var_name]
       return val.obj if val?
       # parent scope
