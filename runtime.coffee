@@ -58,9 +58,31 @@ AST =
     return objects.map (obj) -> Eval scope, obj
 
   Assign: (scope, ast) ->
-    lhs = ast.variable.base.value
     rhs = Eval scope, ast.value
-    scope.set lhs, rhs, ast.context
+    context = ast.context
+    
+    set = (scope, ast, value) ->
+      name = ast[0]
+      method = LHS[name]
+      if method
+        return method scope, ast[1], value
+      throw "#{name} not supported yet on LHS"
+
+    # There is a bit of similarity within LHS vs. AST for handling
+    # the left-hand-side of assignments, but the semantic differences
+    # can get kind of subtle, so avoiding coupling is higher priority
+    # than avoiding duplication.
+    LHS = 
+      Literal: (scope, ast, value) ->
+        lhs = ast.value[1]
+        scope.set lhs, value, context
+
+      # Only supports foo =, not foo.bar =
+      Value: (scope, ast, value) ->    
+        set scope, ast.base, value
+
+    rhs = Eval scope, ast.value
+    set scope, ast.variable, rhs
 
   Block: (scope, ast) ->
     code = ast.expressions
@@ -72,19 +94,20 @@ AST =
     val
     
   # This is fairly clumsy now and only handles
-  # foo.bar.baz(yo1, yo2); it does not handle
+  # foo.bar.baz(yo1, yo2); it may not handle
   # foo[bar].baz(yo), for example.
   Call: (scope, ast) ->
-    variable = ast.variable
-    root = variable.base.value
+    variable = ast.variable[1]
+    obj = Eval scope, variable.base
     properties = variable.properties
-    method = scope.get root
+    method = obj
     for accessor in properties
-      root = method
-      method = method[accessor.name.value]
+      obj = method
+      key = Eval scope, accessor
+      method = method[key]
     args = ast.args.map (arg) ->
         Eval scope, arg
-    method.apply root, args
+    method.apply obj, args
     
   Code: (scope, ast) ->
     return (args...) ->
