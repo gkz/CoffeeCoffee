@@ -79,6 +79,7 @@ update_variable_reference = (hash, key, value, context) ->
     '=':   -> hash[key] = value
     '+=':  -> hash[key] += value
     '*=':  -> hash[key] *= value
+    '||=': -> hash[key] ||= value
   }
   throw "unknown context #{context}" unless commands[context]
   commands[context]()
@@ -213,6 +214,7 @@ AST =
     if value
       return false if value == 'false'
       return true if value == 'true'
+      return null if value == 'null'
       if value.charAt(0) == '"'
         return JSON.parse value
       if value.charAt(0) == "'"
@@ -248,6 +250,10 @@ AST =
 
   Op: (scope, ast) ->
     op = ast.operator
+    
+    if op == '&&'
+      return Eval(scope, ast.first) && Eval(scope, ast.second)
+      
     if ast.second
       operand1 = Eval scope, ast.first
       operand2 = Eval scope, ast.second
@@ -259,7 +265,6 @@ AST =
         '===': -> operand1 is operand2
         '!==': -> operand1 isnt operand2
         '>>':  -> operand1 >> operand2
-        '&&':  -> operand1 && operand2
         '||':  -> operand1 || operand2
         '<':   -> operand1 < operand2
         '>':   -> operand1 > operand2
