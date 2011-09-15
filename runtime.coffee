@@ -32,6 +32,14 @@ Scope = (params, parent_scope) ->
     vars[key] = {obj: params[key]}
 
   self =
+    # try to find the wrapped variable at the correct closure scope...still a work
+    # in progress
+    get_closure_wrapper: (var_name) ->
+      val = vars[var_name]
+      return val if val?
+      return parent_scope.get_closure_wrapper var_name if parent_scope
+      return
+      
     set: (var_name, value, context) ->
       context ||= "=" # default, could also be +=, etc.
       if context == "="
@@ -41,12 +49,11 @@ Scope = (params, parent_scope) ->
     get: (var_name) ->
       if var_name == 'require'
         return (args...) -> require args...
-      val = vars[var_name]
-      return val.obj if val?
-      # parent scope
-      if parent_scope
-        val = parent_scope.get var_name
-        return val if val?
+        
+      closure_wrapper = self.get_closure_wrapper(var_name)
+      if closure_wrapper
+        return closure_wrapper.obj
+        
       # builtins
       val = root[var_name]
       return val if val?
