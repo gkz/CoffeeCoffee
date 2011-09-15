@@ -199,6 +199,7 @@ AST =
         '+':   -> operand1 + operand2
         '-':   -> operand1 - operand2
         '===': -> operand1 is operand2
+        '!==': -> operand1 isnt operand2
         '>>':  -> operand1 >> operand2
         '&&':  -> operand1 && operand2
         '||':  -> operand1 || operand2
