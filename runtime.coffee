@@ -22,7 +22,7 @@ handle_data = (data) ->
 # Scope essentially just wraps a hash for now.  It's mostly used by Assign.  Its 
 # scoping is still very primitive, e.g. it doesn't have full closures.  It uses
 # its parent scope for lookups, but it's basically read-only.
-Scope = (params, parent_scope) ->
+Scope = (params, parent_scope, this_value) ->
   vars = {}
 
   set_local_value = (key, value) ->
@@ -33,6 +33,7 @@ Scope = (params, parent_scope) ->
 
   for key, value of params
     set_local_value(key, value)
+  set_local_value("this", this_value)
 
   self =
     # try to find the wrapped variable at the correct closure scope...still a work
@@ -176,7 +177,7 @@ AST =
       parms = {}
       for param in ast.params
         parms[param.name.value] = args.shift()
-      sub_scope = Scope(parms, scope)
+      sub_scope = Scope(parms, scope, this)
       try
         return Eval sub_scope, ast.body
       catch e
