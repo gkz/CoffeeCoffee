@@ -95,10 +95,11 @@ AST =
           set scope, lhs, value
         else
           lhs = Eval scope, lhs
-          final_accessor = Eval scope, ast.properties.pop()
-          for accessor in ast.properties
+          properties = ast.properties
+          for accessor in properties.slice(0, properties.length - 1)
             key = Eval scope, accessor
             lhs = lhs[key]
+          final_accessor = Eval scope, properties[properties.length - 1]
           lhs[final_accessor] = value
 
     rhs = Eval scope, ast.value
