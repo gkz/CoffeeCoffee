@@ -90,19 +90,21 @@ class LinkedList
 
 
 # Tests.
-list = new LinkedList
+# TODO: Support bare new
+list = new LinkedList()
 
 list.add("Hi")
 console.log list.size()  is 1
 console.log list.item(0) is "Hi"
 console.log list.item(1) is null
 
-list = new LinkedList
+list = new LinkedList()
 list.add("zero").add("one").add("two")
 console.log list.size()     is 3
 console.log list.item(2)    is "two"
 console.log list.remove(1)  is "one"
 console.log list.item(0)    is "zero"
 console.log list.item(1)    is "two"
+console.log list.item(-10)
 console.log list.size()     is 2
 console.log list.item(-10)  is null
