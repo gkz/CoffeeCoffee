@@ -89,7 +89,6 @@ AST =
         lhs = ast.value[1]
         scope.set lhs, value, context
 
-      # Only supports foo =, not foo.bar =
       Value: (scope, ast, value) ->
         lhs = ast.base  
         if ast.properties.length == 0
@@ -237,7 +236,10 @@ AST =
   Range: (scope, ast) ->
     from_val = Eval scope, ast.from
     to_val = Eval scope, ast.to
-    return [from_val..to_val]
+    if ast.exclusive
+      [from_val...to_val]
+    else
+      [from_val..to_val]
 
   Value: (scope, ast) ->
     obj = Eval scope, ast.base
