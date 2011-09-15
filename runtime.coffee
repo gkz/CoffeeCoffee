@@ -24,17 +24,20 @@ handle_data = (data) ->
 # its parent scope for lookups, but it's basically read-only.
 Scope = (params, parent_scope) ->
   vars = {}
+
   for key of params
     # Vars are wrapped inside a hash, as a cheap trick to avoid ambiguity
     # w/r/t undefined values.  This prevents us from trying to go to the parent
     # scope when the variable has been assigned in our own scope.
     vars[key] = {obj: params[key]}
+
   self =
     set: (var_name, value, context) ->
-      if context == "+="
-        vars[var_name].obj += value
-      else
-        vars[var_name] = {obj: value}
+      context ||= "=" # default, could also be +=, etc.
+      if context == "="
+        vars[var_name] ||= {}
+      update_variable_reference(vars[var_name], "obj", value, context)
+
     get: (var_name) ->
       if var_name == 'require'
         return (args...) -> require args...
@@ -48,7 +51,12 @@ Scope = (params, parent_scope) ->
       val = root[var_name]
       return val if val?
       throw "Var not found #{var_name}"
-    vars: vars
+
+update_variable_reference = (hash, key, value, context) ->
+  if context == "+="
+    hash[key] += value
+  else
+    hash[key] = value  
 
 Eval = (scope, ast) ->
   name = ast[0]
