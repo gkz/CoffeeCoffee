@@ -170,22 +170,22 @@ AST =
       ast = property[1]
 
       LHS = 
-        set: (scope, ast, value) ->
+        set: (ast, value) ->
           name = ast[0]
           method = LHS[name]
           if method
-            return method scope, ast[1], value
+            return method ast[1], value
           throw "#{name} not supported yet on Obj LHS"
 
-        Literal: (scope, ast, value) ->
+        Literal: (ast, value) ->
           lhs = ast.value[1]
           obj[lhs] = value
 
-        Value: (scope, ast, value) ->    
-          LHS.set scope, ast.base, value
+        Value: (ast, value) ->    
+          LHS.set ast.base, value
           
       value = Eval scope, ast.value
-      LHS.set scope, ast.variable, value
+      LHS.set ast.variable, value
     obj
 
   Op: (scope, ast) ->
