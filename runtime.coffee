@@ -131,7 +131,7 @@ AST =
             key = Eval scope, accessor
             lhs = lhs[key]
           final_accessor = Eval scope, properties[properties.length - 1]
-          lhs[final_accessor] = value
+          update_variable_reference lhs, final_accessor, value, context
 
     rhs = Eval scope, ast.value
     set scope, ast.variable, rhs

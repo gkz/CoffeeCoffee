@@ -6,7 +6,7 @@ class Foo
     @incr()
     this.foo
   incr: ->
-    @foo = @foo + 1
+    @foo += 1
   
 c = new Foo("bar")
 console.log c.bar()
