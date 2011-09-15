@@ -98,7 +98,6 @@ AST =
     return objects.map (obj) -> Eval scope, obj
 
   Assign: (scope, ast) ->
-    rhs = Eval scope, ast.value
     context = ast.context
     
     set = (scope, ast, value) ->
@@ -120,7 +119,7 @@ AST =
       Value: (scope, ast, value) ->
         if ast.properties.length == 0
           if ast.base[0] == "Arr"
-            LHS.Arr scope, ast.base[1], value
+            set scope, ast.base, value
           else
             lhs = ast.base[1].value[1]  
             scope.set lhs, value, context
