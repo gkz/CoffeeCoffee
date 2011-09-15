@@ -90,8 +90,17 @@ AST =
         scope.set lhs, value, context
 
       # Only supports foo =, not foo.bar =
-      Value: (scope, ast, value) ->    
-        set scope, ast.base, value
+      Value: (scope, ast, value) ->
+        lhs = ast.base  
+        if ast.properties.length == 0
+          set scope, lhs, value
+        else
+          lhs = Eval scope, lhs
+          final_accessor = Eval scope, ast.properties.pop()
+          for accessor in ast.properties
+            key = Eval scope, accessor
+            lhs = lhs[key]
+          lhs[final_accessor] = value
 
     rhs = Eval scope, ast.value
     set scope, ast.variable, rhs
