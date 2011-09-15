@@ -163,6 +163,31 @@ AST =
         return parseFloat(value)
       return scope.get(value)
 
+  Obj: (scope, ast) ->
+    obj = {}
+    for property in ast.properties
+      throw "unexpected" if property[0] != 'Assign'
+      ast = property[1]
+
+      LHS = 
+        set: (scope, ast, value) ->
+          name = ast[0]
+          method = LHS[name]
+          if method
+            return method scope, ast[1], value
+          throw "#{name} not supported yet on Obj LHS"
+
+        Literal: (scope, ast, value) ->
+          lhs = ast.value[1]
+          obj[lhs] = value
+
+        Value: (scope, ast, value) ->    
+          LHS.set scope, ast.base, value
+          
+      value = Eval scope, ast.value
+      LHS.set scope, ast.variable, value
+    obj
+
   Op: (scope, ast) ->
     op = ast.operator
     if ast.second

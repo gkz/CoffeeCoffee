@@ -1,3 +1,2 @@
-[x, y] = [1, "foo"]
+x = {foo: 'bar'}
 console.log x
-console.log "foo"
