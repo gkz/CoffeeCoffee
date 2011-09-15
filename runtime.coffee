@@ -161,7 +161,6 @@ AST =
         Eval scope, arg
     method.apply obj, args
   
-  # XXX - very much hard coded
   Class: (scope, ast) ->
     # traverse variable, Value, base, Literal, value, 1
     class_name = ast.variable[1].base[1].value[1]
