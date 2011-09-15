@@ -117,16 +117,15 @@ AST =
         for object, i in ast.objects
           set scope, object, value[i]
         
-      Literal: (scope, ast, value) ->
-        lhs = ast.value[1]
-        scope.set lhs, value, context
-
       Value: (scope, ast, value) ->
-        lhs = ast.base  
         if ast.properties.length == 0
-          set scope, lhs, value
+          if ast.base[0] == "Arr"
+            LHS.Arr scope, ast.base[1], value
+          else
+            lhs = ast.base[1].value[1]  
+            scope.set lhs, value, context
         else
-          lhs = Eval scope, lhs
+          lhs = Eval scope, ast.base
           properties = ast.properties
           for accessor in properties.slice(0, properties.length - 1)
             key = Eval scope, accessor
@@ -161,6 +160,15 @@ AST =
     args = ast.args.map (arg) ->
         Eval scope, arg
     method.apply obj, args
+  
+  # XXX - very much hard coded
+  Class: (scope, ast) ->
+    class_name = ast.variable[1].base[1].value[1]
+    console.log class_name
+    my_constructor = (args...) ->
+      console.log "Instantiate", args...
+      bar: -> 5
+    scope.set class_name, my_constructor
     
   Code: (scope, ast) ->
     return (args...) ->
