@@ -162,11 +162,13 @@ AST =
   
   # XXX - very much hard coded
   Class: (scope, ast) ->
+    # traverse variable, Value, base, Literal, value, 1
     class_name = ast.variable[1].base[1].value[1]
-    console.log class_name
     my_constructor = (args...) ->
-      console.log "Instantiate", args...
-      bar: -> 5
+      # traverse body, Block, expressions, Value, base Obj
+      obj_ast = ast.body[1].expressions[0][1].base
+      obj = Eval scope, obj_ast
+      obj
     scope.set class_name, my_constructor
     
   Code: (scope, ast) ->
