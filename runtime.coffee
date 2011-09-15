@@ -164,12 +164,20 @@ AST =
   Class: (scope, ast) ->
     # traverse variable, Value, base, Literal, value, 1
     class_name = ast.variable[1].base[1].value[1]
-    my_constructor = (args...) ->
-      # traverse body, Block, expressions, Value, base Obj
-      obj_ast = ast.body[1].expressions[0][1].base
-      obj = Eval scope, obj_ast
+    factory = (args...) ->
+      # traverse, body, Block
+      expressions = ast.body[1].expressions
+      if expressions.length == 1
+        ctor_ast = null
+        block_ast = expressions[0]
+      else
+        [ctor_ast, block_ast] = expressions
+      obj = Eval scope, block_ast
+      if ctor_ast
+        ctor = Eval scope, ctor_ast
+        ctor.apply obj, args
       obj
-    scope.set class_name, my_constructor
+    scope.set class_name, factory
     
   Code: (scope, ast) ->
     return (args...) ->
