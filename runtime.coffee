@@ -25,11 +25,14 @@ handle_data = (data) ->
 Scope = (params, parent_scope) ->
   vars = {}
 
-  for key of params
+  set_local_value = (key, value) ->
     # Vars are wrapped inside a hash, as a cheap trick to avoid ambiguity
     # w/r/t undefined values.  This prevents us from trying to go to the parent
     # scope when the variable has been assigned in our own scope.
-    vars[key] = {obj: params[key]}
+    vars[key] = {obj: value}
+
+  for key, value of params
+    set_local_value(key, value)
 
   self =
     # try to find the wrapped variable at the correct closure scope...still a work
