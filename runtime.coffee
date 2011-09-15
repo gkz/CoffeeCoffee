@@ -48,14 +48,16 @@ Scope = (params, parent_scope) ->
       
       closure_wrapper = self.get_closure_wrapper var_name
       
-      if context == "="
-        if !closure_wrapper
-          return set_local_value(var_name, value)
+      if closure_wrapper
+        # we have a previous reference
+        update_variable_reference(closure_wrapper, "obj", value, context)
+      else if context == "="
+        # first reference to local variable
+        return set_local_value(var_name, value)
       else
-        throw "Var #{var_name} has not been set" if !closure_wrapper
+        # cannot find var, so += and friends won't work
+        throw "Var #{var_name} has not been set"
       
-      # we have a previous reference
-      update_variable_reference(closure_wrapper, "obj", value, context)
 
     get: (var_name) ->
       if var_name == 'require'
