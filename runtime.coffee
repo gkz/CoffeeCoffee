@@ -60,10 +60,14 @@ Scope = (params, parent_scope) ->
       throw "Var not found #{var_name}"
 
 update_variable_reference = (hash, key, value, context) ->
-  if context == "+="
-    hash[key] += value
-  else
-    hash[key] = value  
+  context ||= '='
+  commands = {
+    '=':   -> hash[key] = value
+    '+=':  -> hash[key] += value
+    '*=':  -> hash[key] *= value
+  }
+  throw "unknown context #{context}" unless commands[context]
+  commands[context]()
 
 Eval = (scope, ast) ->
   name = ast[0]
@@ -229,6 +233,7 @@ AST =
         '||':  -> operand1 || operand2
         '<':   -> operand1 < operand2
         '>':   -> operand1 > operand2
+        '%':   -> operand1 % operand2
       }
       if ops[op]
         return ops[op]()
