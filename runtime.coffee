@@ -140,9 +140,6 @@ AST =
   Block: (scope, ast) ->
     code = ast.expressions
     for stmt in code
-      if stmt[0] == "Return"
-        retval = Eval scope, stmt[1].expression
-        throw retval: retval
       val = Eval scope, stmt
     val
     
@@ -296,6 +293,10 @@ AST =
       [from_val...to_val]
     else
       [from_val..to_val]
+
+  Return: (scope, ast) ->
+    retval = Eval scope, ast.expression
+    throw retval: retval
 
   Value: (scope, ast) ->
     obj = Eval scope, ast.base
