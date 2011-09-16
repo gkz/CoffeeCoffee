@@ -105,6 +105,5 @@ console.log list.item(2)    is "two"
 console.log list.remove(1)  is "one"
 console.log list.item(0)    is "zero"
 console.log list.item(1)    is "two"
-console.log list.item(-10)
 console.log list.size()     is 2
 console.log list.item(-10)  is null

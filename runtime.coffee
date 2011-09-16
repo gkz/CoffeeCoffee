@@ -187,7 +187,7 @@ AST =
         return Eval sub_scope, ast.body
       catch e
         if e.retval?
-          return e.retval
+          return e.retval.obj
         throw e
 
   For: (scope, ast) ->
@@ -295,7 +295,7 @@ AST =
       [from_val..to_val]
 
   Return: (scope, ast) ->
-    retval = Eval scope, ast.expression
+    retval = {obj: Eval scope, ast.expression}
     throw retval: retval
 
   Value: (scope, ast) ->
