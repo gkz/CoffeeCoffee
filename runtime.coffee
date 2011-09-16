@@ -248,6 +248,11 @@ AST =
   Op: (scope, ast) ->
     op = ast.operator
     
+    if op == 'new'
+      # traverse first, Value, base, Literal, value
+      class_name = ast.first[1].base[1].value[1]
+      return scope.get(class_name)()
+        
     if op == '&&'
       return Eval(scope, ast.first) && Eval(scope, ast.second)
       
