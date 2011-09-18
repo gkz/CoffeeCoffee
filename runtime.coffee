@@ -19,9 +19,10 @@ handle_data = (data) ->
 
 # Scope: returns an object to manage variable assignment
 #
-# Scope essentially just wraps a hash for now.  It's mostly used by Assign.  Its 
-# scoping is still very primitive, e.g. it doesn't have full closures.  It uses
-# its parent scope for lookups, but it's basically read-only.
+# Scope essentially just wraps a hash and parent scope for now.  It's mostly used by Assign.
+# Scoping is still very primitive, e.g. it doesn't have full closures.  It uses
+# its parent scope for lookups, but it's not rigorous about detecting hoisted
+# variables.  It should work for most simple cases, though.
 Scope = (params, parent_scope, this_value) ->
   vars = {}
 
