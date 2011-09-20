@@ -232,11 +232,22 @@ AST =
     val?
 
   For: (scope, ast) ->
-    range = Eval scope, ast.source
-    step_var = ast.name.value
-    for step_val in range
-      scope.set step_var, step_val
-      Eval scope, ast.body
+    if ast.index
+      obj = Eval scope, ast.source
+      # traverse index, Literal, value, 1
+      key_var = ast.index[1].value[1]
+      val_var = ast.name?.value
+      for key_val, val_val of obj
+        scope.set key_var, key_val
+        if val_var?
+          scope.set val_var, val_val
+        Eval scope, ast.body
+    else
+      range = Eval scope, ast.source
+      step_var = ast.name.value
+      for step_val in range
+        scope.set step_var, step_val
+        Eval scope, ast.body
       
   If: (scope, ast) ->
     if Eval scope, ast.condition
