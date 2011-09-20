@@ -35,6 +35,7 @@ wrap_obj = (expression) ->
     'args',
     'expressions'
     'objects',
+    'params',
     'properties',
   ]
   for list_key in list_keys

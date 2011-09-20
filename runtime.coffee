@@ -205,6 +205,8 @@ AST =
     return (args...) ->
       parms = {}
       for param in ast.params
+        throw "Error" unless param[0] == 'Param'
+        param = param[1]
         field = param.name.value
         val = args.shift()
         if val == undefined && param.value
