@@ -26,19 +26,20 @@ wrap_obj = (expression) ->
     'source',
     'to',
     'value',
-    'variable'
+    'variable',
     ]
   for key in keys
     if expression[key]
       expression[key] = wrap_obj expression[key]
-  if expression.args
-    expression.args = wrap(expression.args)
-  if expression.properties
-    expression.properties = wrap(expression.properties)
-  if expression.objects
-    expression.objects = wrap(expression.objects)
-  if expression.expressions
-    expression.expressions = wrap(expression.expressions)
+  list_keys = [
+    'args',
+    'expressions'
+    'objects',
+    'properties',
+  ]
+  for list_key in list_keys
+    if expression[list_key]
+      expression[list_key] = wrap expression[list_key]
   name = expression.constructor.name
   if name == 'Obj'
     expression.objects = undefined
