@@ -94,8 +94,16 @@ Eval = (scope, ast) ->
   
 AST =
   deref: (obj, scope, property) ->
-    key = Eval scope, property
-    obj[key]
+    if property[0] == 'Slice'
+      # traverse Slice/Range
+      range = property[1].range[1]
+      from_val = Eval scope, range.from
+      to_val = Eval scope, range.to
+      to_val += 1 if !range.exclusive
+      obj.slice(from_val, to_val)
+    else
+      key = Eval scope, property
+      obj[key]
 
   Access: (scope, ast) ->
     return ast.name.value
