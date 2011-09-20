@@ -1,0 +1,13 @@
+#!/bin/sh
+
+./coffeecoffee test/binary_search.coffee
+./coffeecoffee test/binary_search2.coffee
+./coffeecoffee test/bubble_sort.coffee
+./coffeecoffee test/linked_list.coffee
+./coffeecoffee test/luhn_algorithm.coffee
+./coffeecoffee test/merge_sort.coffee
+./coffeecoffee test/quicksort_runtime.coffee
+./coffeecoffee test/regular_expression_matcher.coffee
+./coffeecoffee test/selection_sort.coffee
+./coffeecoffee test/snippets.coffee
+
