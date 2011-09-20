@@ -1,2 +1,5 @@
 #!/bin/sh
-coffee nodes_to_json.coffee $1 | coffee runtime.coffee
+filename=$1
+shift
+echo "--------- $filename"
+coffee nodes_to_json.coffee "$filename" | coffee runtime.coffee - $@

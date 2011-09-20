@@ -334,14 +334,14 @@ pp = (obj, description) ->
   util.debug JSON.stringify obj, null, "  "
 
 fs = require 'fs'
-fn = process.argv[2]
-if fn
-  data = fs.readFileSync(fn).toString()
-  handle_data(data)
-else
+[fn] = process.argv.splice 2, 1
+if fn == '-'
   data = ''
   stdin = process.openStdin()
   stdin.on 'data', (buffer) ->
     data += buffer.toString() if buffer
   stdin.on 'end', ->
     handle_data(data)
+else
+  data = fs.readFileSync(fn).toString()
+  handle_data(data)
