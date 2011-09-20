@@ -210,7 +210,7 @@ AST =
         field = param.name.value
         val = args.shift()
         if val == undefined && param.value
-          val = AST.Value scope, {value: param.value}
+          val = Eval scope, param.value
         parms[field] = val
       sub_scope = Scope(parms, scope, this)
       try

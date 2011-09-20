@@ -1,5 +1,8 @@
-# TODO: default param values, liquid="coffee"
-
-fill = (container, liquid) ->
+banner = (header) ->
+  console.log "******* #{header}"
+  
+banner "Functions"
+  
+fill = (container, liquid = "coffee") ->
   "Filling the #{container} with #{liquid}..."
-console.log fill "cup", "coffee"
+console.log fill "cup"
