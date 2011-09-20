@@ -179,8 +179,12 @@ AST =
       obj = method
       key = Eval scope, accessor
       method = method[key]
-    args = ast.args.map (arg) ->
-        Eval scope, arg
+    args = []
+    for arg in ast.args
+      if arg[0] == 'Splat'
+        args = args.concat scope.get arg[1].name.base.value
+      else
+        args.push Eval scope, arg
     method.apply obj, args
   
   Class: (scope, ast) ->
@@ -208,7 +212,10 @@ AST =
         throw "Error" unless param[0] == 'Param'
         param = param[1]
         field = param.name.value
-        val = args.shift()
+        if param.splat
+          val = args
+        else
+          val = args.shift()
         if val == undefined && param.value
           val = Eval scope, param.value
         parms[field] = val
