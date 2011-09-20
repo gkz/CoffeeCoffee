@@ -93,6 +93,10 @@ Eval = (scope, ast) ->
   throw "#{name} not supported yet"
   
 AST =
+  deref: (obj, scope, property) ->
+    key = Eval scope, property
+    obj[key]
+
   Access: (scope, ast) ->
     return ast.name.value
 
@@ -307,8 +311,7 @@ AST =
   Value: (scope, ast) ->
     obj = Eval scope, ast.base
     for accessor in ast.properties
-      key = Eval scope, accessor
-      obj = obj[key]
+      obj = AST.deref obj, scope, accessor
     return obj
 
   While: (scope, ast) ->
