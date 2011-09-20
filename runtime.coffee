@@ -115,10 +115,14 @@ AST =
     if value.match(/\d+/) != null
       return parseFloat(value)
     return scope.get(value)
+    
+  name: (ast) ->
+    # traverse name, Literal, value, 1
+    return ast.name[1].value[1]
 
   Access: (scope, ast) ->
-    return ast.name.value
-
+    AST.name ast
+    
   Arr: (scope, ast) ->
     objects = ast.objects
     return objects.map (obj) -> Eval scope, obj
@@ -182,7 +186,7 @@ AST =
     args = []
     for arg in ast.args
       if arg[0] == 'Splat'
-        args = args.concat scope.get arg[1].name.base.value
+        args = args.concat Eval scope, arg[1].name
       else
         args.push Eval scope, arg
     method.apply obj, args
@@ -211,7 +215,7 @@ AST =
       for param in ast.params
         throw "Error" unless param[0] == 'Param'
         param = param[1]
-        field = param.name.value
+        field = AST.name param
         if param.splat
           val = args
         else
@@ -236,7 +240,7 @@ AST =
       obj = Eval scope, ast.source
       # traverse index, Literal, value, 1
       key_var = ast.index[1].value[1]
-      val_var = ast.name?.value
+      val_var = AST.name ast
       for key_val, val_val of obj
         scope.set key_var, key_val
         if val_var?
@@ -244,7 +248,7 @@ AST =
         Eval scope, ast.body
     else
       range = Eval scope, ast.source
-      step_var = ast.name.value
+      step_var = AST.name ast
       for step_val in range
         scope.set step_var, step_val
         Eval scope, ast.body
