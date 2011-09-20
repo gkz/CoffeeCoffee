@@ -103,6 +103,19 @@ AST =
       key = Eval scope, property
       obj[key]
 
+  value: (scope, value) ->
+    return false if value == 'false'
+    return true if value == 'true'
+    return null if value == 'null'
+    return undefined if value == 'undefined'
+    if value.charAt(0) == '"'
+      return JSON.parse value
+    if value.charAt(0) == "'"
+      return value.substring(1, value.length-1)
+    if value.match(/\d+/) != null
+      return parseFloat(value)
+    return scope.get(value)
+
   Access: (scope, ast) ->
     return ast.name.value
 
@@ -192,7 +205,11 @@ AST =
     return (args...) ->
       parms = {}
       for param in ast.params
-        parms[param.name.value] = args.shift()
+        field = param.name.value
+        val = args.shift()
+        if val == undefined && param.value
+          val = AST.Value scope, {value: param.value}
+        parms[field] = val
       sub_scope = Scope(parms, scope, this)
       try
         return Eval sub_scope, ast.body
@@ -222,20 +239,10 @@ AST =
     return Eval scope, ast.index
 
   Literal: (scope, ast) ->
-    value = ast.value[1]
-    if value
-      return false if value == 'false'
-      return true if value == 'true'
-      return null if value == 'null'
-      return undefined if value == 'undefined'
-      if value.charAt(0) == '"'
-        return JSON.parse value
-      if value.charAt(0) == "'"
-        return value.substring(1, value.length-1)
-      if value.match(/\d+/) != null
-        return parseFloat(value)
-      return scope.get(value)
-
+    val = ast.value[1]
+    if val
+      AST.value scope, val
+      
   Obj: (scope, ast) ->
     obj = {}
     for property in ast.properties
