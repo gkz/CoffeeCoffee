@@ -78,6 +78,7 @@ update_variable_reference = (hash, key, value, context) ->
     '=':   -> hash[key] = value
     '+=':  -> hash[key] += value
     '*=':  -> hash[key] *= value
+    '-=':  -> hash[key] -= value
     '||=': -> hash[key] ||= value
   }
   throw "unknown context #{context}" unless commands[context]

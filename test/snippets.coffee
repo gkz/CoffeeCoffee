@@ -82,3 +82,10 @@ yearsOld = max: 10, ida: 9, tim: 11
 ages = for child, age of yearsOld
   "#{child} is #{age}"
 console.log ages
+
+# Nursery Rhyme
+num = 6
+lyrics = while num -= 1
+  "#{num} little monkeys, jumping on the bed.
+    One fell out and bumped his head."
+console.log lyrics
