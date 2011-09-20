@@ -3,6 +3,7 @@
 ./coffeecoffee test/binary_search.coffee
 ./coffeecoffee test/binary_search2.coffee
 ./coffeecoffee test/bubble_sort.coffee
+./coffeecoffee test/cubes.coffee
 ./coffeecoffee test/echo.coffee hello world
 ./coffeecoffee test/linked_list.coffee
 ./coffeecoffee test/luhn_algorithm.coffee

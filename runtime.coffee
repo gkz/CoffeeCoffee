@@ -70,10 +70,8 @@ Scope = (params, parent_scope, this_value) ->
         return closure_wrapper.obj
         
       # builtins
-      val = root[var_name]
-      return val if val?
-      throw "Var not found #{var_name}"
-
+      root[var_name]
+      
 update_variable_reference = (hash, key, value, context) ->
   context ||= '='
   commands = {
@@ -202,6 +200,10 @@ AST =
         if e.retval?
           return e.retval.obj
         throw e
+
+  Existence: (scope, ast) ->
+    val = Eval scope, ast.expression
+    val?
 
   For: (scope, ast) ->
     range = Eval scope, ast.source
