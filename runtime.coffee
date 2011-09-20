@@ -225,6 +225,7 @@ AST =
       return false if value == 'false'
       return true if value == 'true'
       return null if value == 'null'
+      return undefined if value == 'undefined'
       if value.charAt(0) == '"'
         return JSON.parse value
       if value.charAt(0) == "'"
