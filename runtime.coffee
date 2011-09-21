@@ -105,24 +105,26 @@ AST =
       val = Eval scope, stmt
     val
     
-  # This is fairly clumsy now and only handles
-  # foo.bar.baz(yo1, yo2); it may not handle
-  # foo[bar].baz(yo), for example.
   Call: (scope, ast) ->
-    variable = ast.variable[1]
-    obj = Eval scope, variable.base
-    properties = variable.properties
-    method = obj
-    for accessor in properties
-      obj = method
-      key = Eval scope, accessor
-      method = method[key]
     args = []
     for arg in ast.args
       if arg[0] == 'Splat'
         args = args.concat Eval scope, arg[1].name
       else
         args.push Eval scope, arg
+
+    variable = ast.variable[1]
+    obj = Eval scope, variable.base
+    properties = variable.properties
+
+    if properties.length == 0
+      return obj args...
+      
+    method = obj
+    for accessor in properties
+      obj = method
+      key = Eval scope, accessor
+      method = method[key]
     method.apply obj, args
   
   Class: (scope, ast) ->
