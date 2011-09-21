@@ -120,11 +120,11 @@ AST =
     if properties.length == 0
       return obj args...
       
-    method = obj
-    for accessor in properties
-      obj = method
-      key = Eval scope, accessor
-      method = method[key]
+    for accessor in properties.slice(0, properties.length - 1)
+      obj = AST.deref obj, scope, accessor
+    
+    key = Eval scope, properties[properties.length - 1]
+    method = obj[key]
     method.apply obj, args
   
   Class: (scope, ast) ->
