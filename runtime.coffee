@@ -37,6 +37,17 @@ AST =
       key = Eval scope, property
       obj[key]
 
+  deref_properties: (scope, obj, properties) ->
+    for accessor in properties.slice(0, properties.length - 1)
+      key = Eval scope, accessor
+      obj = obj[key]
+    key = Eval scope, properties[properties.length - 1]
+    [obj, key]
+
+  name: (ast) ->
+    # traverse name, Literal, value, 1
+    return ast.name[1].value[1]
+
   value: (scope, value) ->
     return false if value == 'false'
     return true if value == 'true'
@@ -49,10 +60,6 @@ AST =
     if value.match(/\d+/) != null
       return parseFloat(value)
     return scope.get(value)
-    
-  name: (ast) ->
-    # traverse name, Literal, value, 1
-    return ast.name[1].value[1]
 
   Access: (scope, ast) ->
     AST.name ast
@@ -89,12 +96,8 @@ AST =
             scope.set lhs, value, context
         else
           lhs = Eval scope, ast.base
-          properties = ast.properties
-          for accessor in properties.slice(0, properties.length - 1)
-            key = Eval scope, accessor
-            lhs = lhs[key]
-          final_accessor = Eval scope, properties[properties.length - 1]
-          update_variable_reference lhs, final_accessor, value, context
+          [lhs, key] = AST.deref_properties scope, lhs, ast.properties
+          update_variable_reference lhs, key, value, context
 
     rhs = Eval scope, ast.value
     set scope, ast.variable, rhs
