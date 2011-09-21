@@ -17,73 +17,6 @@ handle_data = (data) ->
   for stmt in program
     Eval scope, stmt
 
-# Scope: returns an object to manage variable assignment
-#
-# Scope essentially just wraps a hash and parent scope for now.  It's mostly used by Assign.
-# Scoping is still very primitive, e.g. it doesn't have full closures.  It uses
-# its parent scope for lookups, but it's not rigorous about detecting hoisted
-# variables.  It should work for most simple cases, though.
-Scope = (params, parent_scope, this_value) ->
-  vars = {}
-
-  set_local_value = (key, value) ->
-    # Vars are wrapped inside a hash, as a cheap trick to avoid ambiguity
-    # w/r/t undefined values.  This prevents us from trying to go to the parent
-    # scope when the variable has been assigned in our own scope.
-    vars[key] = {obj: value}
-
-  for key, value of params
-    set_local_value(key, value)
-  set_local_value("this", this_value)
-
-  self =
-    # try to find the wrapped variable at the correct closure scope...still a work
-    # in progress
-    get_closure_wrapper: (var_name) ->
-      val = vars[var_name]
-      return val if val?
-      return parent_scope.get_closure_wrapper var_name if parent_scope
-      return
-      
-    set: (var_name, value, context) ->
-      context ||= "=" # default, could also be +=, etc.
-      
-      closure_wrapper = self.get_closure_wrapper var_name
-      
-      if closure_wrapper
-        # we have a previous reference
-        update_variable_reference(closure_wrapper, "obj", value, context)
-      else if context == "="
-        # first reference to local variable
-        return set_local_value(var_name, value)
-      else
-        # cannot find var, so += and friends won't work
-        throw "Var #{var_name} has not been set"
-      
-
-    get: (var_name) ->
-      if var_name == 'require'
-        return (args...) -> require args...
-        
-      closure_wrapper = self.get_closure_wrapper(var_name)
-      if closure_wrapper
-        return closure_wrapper.obj
-        
-      # builtins
-      root[var_name]
-      
-update_variable_reference = (hash, key, value, context) ->
-  context ||= '='
-  commands = {
-    '=':   -> hash[key] = value
-    '+=':  -> hash[key] += value
-    '*=':  -> hash[key] *= value
-    '-=':  -> hash[key] -= value
-    '||=': -> hash[key] ||= value
-  }
-  throw "unknown context #{context}" unless commands[context]
-  commands[context]()
-
 Eval = (scope, ast) ->
   name = ast[0]
   method = AST[name]
@@ -360,6 +293,74 @@ AST =
   While: (scope, ast) ->
     while Eval scope, ast.condition
       Eval scope, ast.body
+
+# Scope: returns an object to manage variable assignment
+#
+# Scope essentially just wraps a hash and parent scope for now.  It's mostly used by Assign.
+# Scoping is still very primitive, e.g. it doesn't have full closures.  It uses
+# its parent scope for lookups, but it's not rigorous about detecting hoisted
+# variables.  It should work for most simple cases, though.
+Scope = (params, parent_scope, this_value) ->
+  vars = {}
+
+  set_local_value = (key, value) ->
+    # Vars are wrapped inside a hash, as a cheap trick to avoid ambiguity
+    # w/r/t undefined values.  This prevents us from trying to go to the parent
+    # scope when the variable has been assigned in our own scope.
+    vars[key] = {obj: value}
+
+  for key, value of params
+    set_local_value(key, value)
+  set_local_value("this", this_value)
+
+  self =
+    # try to find the wrapped variable at the correct closure scope...still a work
+    # in progress
+    get_closure_wrapper: (var_name) ->
+      val = vars[var_name]
+      return val if val?
+      return parent_scope.get_closure_wrapper var_name if parent_scope
+      return
+
+    set: (var_name, value, context) ->
+      context ||= "=" # default, could also be +=, etc.
+
+      closure_wrapper = self.get_closure_wrapper var_name
+
+      if closure_wrapper
+        # we have a previous reference
+        update_variable_reference(closure_wrapper, "obj", value, context)
+      else if context == "="
+        # first reference to local variable
+        return set_local_value(var_name, value)
+      else
+        # cannot find var, so += and friends won't work
+        throw "Var #{var_name} has not been set"
+
+
+    get: (var_name) ->
+      if var_name == 'require'
+        return (args...) -> require args...
+
+      closure_wrapper = self.get_closure_wrapper(var_name)
+      if closure_wrapper
+        return closure_wrapper.obj
+
+      # builtins
+      root[var_name]
+
+update_variable_reference = (hash, key, value, context) ->
+  context ||= '='
+  commands = {
+    '=':   -> hash[key] = value
+    '+=':  -> hash[key] += value
+    '*=':  -> hash[key] *= value
+    '-=':  -> hash[key] -= value
+    '||=': -> hash[key] ||= value
+  }
+  throw "unknown context #{context}" unless commands[context]
+  commands[context]()
+
       
 util = require 'util'
 
