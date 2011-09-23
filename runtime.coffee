@@ -172,7 +172,7 @@ AST =
       obj = Eval scope, ast.source
       # traverse index, Literal, value, 1
       key_var = ast.index[1].value[1]
-      val_var = AST.name ast
+      val_var = ast.name && AST.name ast
       for key_val, val_val of obj
         scope.set key_var, key_val
         if val_var?

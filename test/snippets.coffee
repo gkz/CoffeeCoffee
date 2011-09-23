@@ -108,3 +108,6 @@ console.log eldest
 
 six = (one = 1) + (two = 2) + (three = 3)
 console.log six
+
+globals = (name for name of root)[0...10]
+console.log globals
