@@ -167,6 +167,7 @@ AST =
     try
       val = Eval scope, ast.expression
     catch e
+      throw e unless e.__meta?
       return false
     val?
 
@@ -298,8 +299,9 @@ AST =
       Eval scope, ast.attempt
     catch e
       # traverse error, Literal, value, 1
+      throw e unless e.__meta?
       catch_var = ast.error[1].value[1]
-      scope.set catch_var, e
+      scope.set catch_var, e.__meta
       Eval scope, ast.recovery
       
   Value: (scope, ast) ->
@@ -367,9 +369,12 @@ Scope = (params, parent_scope, this_value) ->
 
       # builtins
       val = root[var_name]
-      throw "Reference Error: #{var_name} is not defined" unless val?
+      internal_throw "Reference Error: #{var_name} is not defined" unless val?
       val
       
+internal_throw = (e) ->
+  throw __meta: e
+  
 update_variable_reference = (hash, key, value, context) ->
   context ||= '='
   if key.from_val? && key.to_val?
