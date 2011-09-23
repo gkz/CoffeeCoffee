@@ -297,8 +297,10 @@ AST =
     try
       Eval scope, ast.attempt
     catch e
-      throw e
-      # TODO
+      # traverse error, Literal, value, 1
+      catch_var = ast.error[1].value[1]
+      scope.set catch_var, e
+      Eval scope, ast.recovery
       
   Value: (scope, ast) ->
     obj = Eval scope, ast.base

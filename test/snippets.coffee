@@ -111,3 +111,10 @@ console.log six
 
 globals = (name for name of root)[0...10]
 console.log globals
+
+console.log(
+  try
+    nonexistent / undefined
+  catch error
+    "And the error is ... #{error}"
+)
