@@ -92,6 +92,7 @@ console.log lyrics
 
 ###########
 banner "Slicing and Splicing"
+
 numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 copy    = numbers[0...numbers.length]
 middle  = copy[3..6]
@@ -103,6 +104,7 @@ console.log numbers
 
 ###########
 banner "Everything is an Expression"
+
 eldest = if 24 > 21 then "Liz" else "Ike"
 console.log eldest
 
@@ -118,3 +120,9 @@ console.log(
   catch error
     "And the error is ... #{error}"
 )
+
+###########
+banner "The Existential Operator"
+
+footprints = yeti ? "bear"
+console.log footprints

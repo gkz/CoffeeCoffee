@@ -231,6 +231,13 @@ AST =
   Op: (scope, ast) ->
     op = ast.operator
     
+    if op == "?"
+      try
+        return Eval scope, ast.first
+      catch e
+        if e.__meta && e.__type == 'reference'
+          return Eval scope, ast.second
+      
     if op == 'new'
       # traverse first, Value, base, Literal, value
       class_name = ast.first[1].base[1].value[1]
@@ -369,12 +376,15 @@ Scope = (params, parent_scope, this_value) ->
 
       # builtins
       val = root[var_name]
-      internal_throw "Reference Error: #{var_name} is not defined" unless val?
+      internal_throw "reference", "Reference Error: #{var_name} is not defined" unless val?
       val
       
-internal_throw = (e) ->
-  throw __meta: e
-  
+internal_throw = (type, e) ->
+  throw {
+    __meta: e
+    __type: type
+  }
+    
 update_variable_reference = (hash, key, value, context) ->
   context ||= '='
   if key.from_val? && key.to_val?
