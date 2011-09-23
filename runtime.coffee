@@ -290,6 +290,13 @@ AST =
     from_val: from_val
     to_val: to_val
     
+  Try: (scope, ast) ->
+    try
+      Eval scope, ast.attempt
+    catch e
+      throw e
+      # TODO
+      
   Value: (scope, ast) ->
     obj = Eval scope, ast.base
     for accessor in ast.properties

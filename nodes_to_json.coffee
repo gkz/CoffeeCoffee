@@ -13,16 +13,19 @@ wrap = (expressions) ->
 wrap_obj = (expression) ->
   expression.children = undefined
   keys = [
+    'attempt',
     'base',
     'body',
     'condition',
     'elseBody',
+    'error',
     'expression',
     'first',
     'from',
     'index',
     'name',
     'range',
+    'recovery',
     'second',
     'source',
     'to',
