@@ -164,7 +164,10 @@ AST =
         throw e
 
   Existence: (scope, ast) ->
-    val = Eval scope, ast.expression
+    try
+      val = Eval scope, ast.expression
+    catch e
+      return false
     val?
 
   For: (scope, ast) ->
@@ -361,8 +364,10 @@ Scope = (params, parent_scope, this_value) ->
         return closure_wrapper.obj
 
       # builtins
-      root[var_name]
-
+      val = root[var_name]
+      throw "Reference Error: #{var_name} is not defined" unless val?
+      val
+      
 update_variable_reference = (hash, key, value, context) ->
   context ||= '='
   if key.from_val? && key.to_val?
