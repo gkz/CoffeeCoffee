@@ -123,6 +123,8 @@ AST =
       [obj, key] = AST.deref_properties scope, obj, properties
       val = obj[key].apply obj, args
 
+    if ast.isNew && val.constructor
+      val.constructor args...
     val
   
   Class: (scope, ast) ->
