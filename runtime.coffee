@@ -118,10 +118,12 @@ AST =
     properties = variable.properties
 
     if properties.length == 0
-      obj args...
+      val = obj args...
     else  
       [obj, key] = AST.deref_properties scope, obj, properties
-      obj[key].apply obj, args
+      val = obj[key].apply obj, args
+
+    val
   
   Class: (scope, ast) ->
     # traverse variable, Value, base, Literal, value, 1
