@@ -25,6 +25,11 @@ Eval = (scope, ast) ->
   throw "#{name} not supported yet"
   
 AST =
+  create_new_object: (scope, class_name) ->
+    class_function = scope.get(class_name)
+    obj = new class_function()
+    obj
+  
   deref: (obj, scope, property) ->
     if property[0] == 'Slice'
       # traverse Slice/Range
@@ -117,6 +122,11 @@ AST =
     obj = Eval scope, variable.base
     properties = variable.properties
 
+    if ast.isNew
+      # need to handle properties better
+      val = new obj()
+      return val
+
     if properties.length == 0
       val = obj args...
     else  
@@ -141,9 +151,10 @@ AST =
     if class_code
       Eval scope, class_code
 
+    proto = Eval scope, block_ast
     factory = (args...) ->
-      obj = Eval scope, block_ast
-      obj
+      null
+    factory.prototype = proto
     scope.set class_name, factory
     
   Code: (scope, ast) ->
@@ -251,8 +262,8 @@ AST =
     if op == 'new'
       # traverse first, Value, base, Literal, value
       class_name = ast.first[1].base[1].value[1]
-      return scope.get(class_name)()
-        
+      return AST.create_new_object scope, class_name
+    
     if op == '&&'
       return Eval(scope, ast.first) && Eval(scope, ast.second)
       
