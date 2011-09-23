@@ -100,3 +100,11 @@ console.log middle
 numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 numbers[3..6] = [-3, -4, -5, -6]
 console.log numbers
+
+###########
+banner "Everything is an Expression"
+eldest = if 24 > 21 then "Liz" else "Ike"
+console.log eldest
+
+six = (one = 1) + (two = 2) + (three = 3)
+console.log six

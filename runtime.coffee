@@ -338,7 +338,8 @@ Scope = (params, parent_scope, this_value) ->
         update_variable_reference(closure_wrapper, "obj", value, context)
       else if context == "="
         # first reference to local variable
-        return set_local_value(var_name, value)
+        set_local_value(var_name, value)
+        value
       else
         # cannot find var, so += and friends won't work
         throw "Var #{var_name} has not been set"
