@@ -28,11 +28,8 @@ AST =
   deref: (obj, scope, property) ->
     if property[0] == 'Slice'
       # traverse Slice/Range
-      range = property[1].range[1]
-      from_val = Eval scope, range.from
-      to_val = Eval scope, range.to
-      to_val += 1 if !range.exclusive
-      obj.slice(from_val, to_val)
+      slice = Eval scope, property
+      obj.slice(slice.from_val, slice.to_val)
     else
       key = Eval scope, property
       obj[key]
@@ -285,6 +282,14 @@ AST =
     retval = {obj: Eval scope, ast.expression}
     throw retval: retval
 
+  Slice: (scope, ast) ->
+    range = ast.range[1]
+    from_val = Eval scope, range.from
+    to_val = Eval scope, range.to
+    to_val += 1 if !range.exclusive
+    from_val: from_val
+    to_val: to_val
+    
   Value: (scope, ast) ->
     obj = Eval scope, ast.base
     for accessor in ast.properties
@@ -352,6 +357,10 @@ Scope = (params, parent_scope, this_value) ->
 
 update_variable_reference = (hash, key, value, context) ->
   context ||= '='
+  if key.from_val? && key.to_val?
+    throw "slice assignment not allowed" if context != '='
+    [].splice.apply(hash, [key.from_val, key.to_val - key.from_val].concat(value))
+    return value
   commands = {
     '=':   -> hash[key] = value
     '+=':  -> hash[key] += value
