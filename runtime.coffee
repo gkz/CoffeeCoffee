@@ -152,14 +152,19 @@ AST =
       for param in ast.params
         throw "Error" unless param[0] == 'Param'
         param = param[1]
-        field = AST.name param
         if param.splat
           val = args
         else
           val = args.shift()
         if val == undefined && param.value
           val = Eval scope, param.value
-        parms[field] = val
+        if param.name[1].properties
+          # traverse name, Value, properties, 0, Access
+          field = AST.name param.name[1].properties[0][1]
+          this[field] = val
+        else
+          field = AST.name param
+          parms[field] = val
       sub_scope = Scope(parms, scope, this)
       try
         return Eval sub_scope, ast.body
