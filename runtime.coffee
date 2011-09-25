@@ -25,11 +25,6 @@ Eval = (scope, ast) ->
   throw "#{name} not supported yet"
   
 AST =
-  create_new_object: (scope, class_name) ->
-    class_function = scope.get(class_name)
-    obj = new class_function()
-    obj
-  
   deref: (obj, scope, property) ->
     if property[0] == 'Slice'
       # traverse Slice/Range
@@ -260,7 +255,8 @@ AST =
     if op == 'new'
       # traverse first, Value, base, Literal, value
       class_name = ast.first[1].base[1].value[1]
-      return AST.create_new_object scope, class_name
+      class_function = scope.get(class_name)
+      return new class_function()
     
     if op == '&&'
       return Eval(scope, ast.first) && Eval(scope, ast.second)
