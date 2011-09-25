@@ -124,7 +124,9 @@ AST =
 
     if ast.isNew
       # need to handle properties better
-      val = new obj()
+      val = new obj
+      if val.constructor
+        val.constructor args...
       return val
 
     if properties.length == 0
@@ -132,10 +134,6 @@ AST =
     else  
       [obj, key] = AST.deref_properties scope, obj, properties
       val = obj[key].apply obj, args
-
-    if ast.isNew && val.constructor
-      val.constructor args...
-    val
   
   Class: (scope, ast) ->
     # traverse variable, Value, base, Literal, value, 1
