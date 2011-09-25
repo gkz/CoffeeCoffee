@@ -128,6 +128,8 @@ AST =
       val = obj args...
     else  
       [obj, key] = AST.deref_properties scope, obj, properties
+      if !obj[key]?
+        throw "method #{key} does not exist for obj #{obj}"
       val = obj[key].apply obj, args
   
   Class: (scope, ast) ->
