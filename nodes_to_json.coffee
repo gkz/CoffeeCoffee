@@ -24,6 +24,7 @@ wrap_obj = (expression) ->
     'from',
     'index',
     'name',
+    'parent',
     'range',
     'recovery',
     'second',
