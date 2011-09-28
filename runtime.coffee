@@ -396,12 +396,6 @@ Scope = (params, parent_scope, this_value) ->
       internal_throw "reference", "ReferenceError: #{var_name} is not defined" unless val?
       val
       
-internal_throw = (type, e) ->
-  throw {
-    __meta: e
-    __type: type
-  }
-    
 update_variable_reference = (hash, key, value, context) ->
   context ||= '='
   if key.from_val? && key.to_val?
@@ -417,6 +411,12 @@ update_variable_reference = (hash, key, value, context) ->
   }
   throw "unknown context #{context}" unless commands[context]
   commands[context]()
+
+internal_throw = (type, e) ->
+  throw {
+    __meta: e
+    __type: type
+  }
 
 build_class = (proto, superclass)->
   # The class mechanism is mostly handled through JS, rather than
