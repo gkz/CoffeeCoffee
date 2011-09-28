@@ -434,8 +434,11 @@ build_class = (proto, superclass)->
     child
 
   X = ->
+    this.__super__ = X.__super__
     if Object::hasOwnProperty.call(proto, "constructor")
       proto.constructor.apply this, arguments
+    else if superclass
+      X.__super__.constructor.apply this, arguments
     else
       undefined
   if superclass
@@ -443,6 +446,7 @@ build_class = (proto, superclass)->
   for key of proto
     X.prototype[key] = proto[key]
   X
+
   
 newify = (func, args) ->
   ctor = ->
