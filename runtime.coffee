@@ -109,15 +109,12 @@ AST =
     args = []
     for arg in ast.args
       if arg[0] == 'Splat'
-        if arg[1].name[0] == 'Literal' && arg[1].name[1].value[1] == 'arguments'
-          console.log "IN arguments"
-        else
-          args = args.concat Eval scope, arg[1].name
+        args = args.concat Eval scope, arg[1].name
       else
         args.push Eval scope, arg
 
     if ast.isSuper
-      console.log "SUPER!!!"
+      console.log "SUPER!!!", args
       return
 
     variable = ast.variable[1]
@@ -161,6 +158,7 @@ AST =
     
   Code: (scope, ast) ->
     (args...) ->
+      my_args = arg for arg in args
       parms = {}
       for param in ast.params
         throw "Error" unless param[0] == 'Param'
@@ -178,7 +176,7 @@ AST =
         else
           field = AST.name param
           parms[field] = val
-      sub_scope = Scope(parms, scope, this)
+      sub_scope = Scope(parms, scope, this, my_args)
       try
         return Eval sub_scope, ast.body
       catch e
@@ -351,7 +349,7 @@ AST =
 # Scoping is still very primitive, e.g. it doesn't have full closures.  It uses
 # its parent scope for lookups, but it's not rigorous about detecting hoisted
 # variables.  It should work for most simple cases, though.
-Scope = (params, parent_scope, this_value) ->
+Scope = (params, parent_scope, this_value, args) ->
   vars = {}
 
   set_local_value = (key, value) ->
@@ -363,6 +361,7 @@ Scope = (params, parent_scope, this_value) ->
   for key, value of params
     set_local_value(key, value)
   set_local_value("this", this_value)
+  set_local_value("arguments", args)
 
   self =
     # try to find the wrapped variable at the correct closure scope...still a work
