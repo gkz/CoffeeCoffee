@@ -109,9 +109,16 @@ AST =
     args = []
     for arg in ast.args
       if arg[0] == 'Splat'
-        args = args.concat Eval scope, arg[1].name
+        if arg[1].name[0] == 'Literal' && arg[1].name[1].value[1] == 'arguments'
+          console.log "IN arguments"
+        else
+          args = args.concat Eval scope, arg[1].name
       else
         args.push Eval scope, arg
+
+    if ast.isSuper
+      console.log "SUPER!!!"
+      return
 
     variable = ast.variable[1]
     obj = Eval scope, variable.base
@@ -153,7 +160,7 @@ AST =
     scope.set class_name, klass
     
   Code: (scope, ast) ->
-    return (args...) ->
+    (args...) ->
       parms = {}
       for param in ast.params
         throw "Error" unless param[0] == 'Param'
