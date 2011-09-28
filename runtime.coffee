@@ -119,9 +119,7 @@ AST =
 
     if ast.isNew
       # need to handle properties better
-      val = new obj
-      if val.constructor
-        val.constructor args...
+      val = newify obj, args
       return val
 
     if properties.length == 0
@@ -145,12 +143,14 @@ AST =
       [class_code, block_ast] = expressions
     if class_code
       Eval scope, class_code
-
+        
     proto = Eval scope, block_ast
-    factory = (args...) ->
-      null
-    factory.prototype = proto
-    scope.set class_name, factory
+    if ast.parent
+      parent_class = Eval scope, ast.parent 
+    else
+      parent_class = null
+    klass = build_class proto, parent_class
+    scope.set class_name, klass
     
   Code: (scope, ast) ->
     return (args...) ->
@@ -258,7 +258,7 @@ AST =
       # traverse first, Value, base, Literal, value
       class_name = ast.first[1].base[1].value[1]
       class_function = scope.get(class_name)
-      return new class_function()
+      return newify class_function, []
     
     if op == '&&'
       return Eval(scope, ast.first) && Eval(scope, ast.second)
@@ -393,7 +393,7 @@ Scope = (params, parent_scope, this_value) ->
 
       # builtins
       val = root[var_name]
-      internal_throw "reference", "Reference Error: #{var_name} is not defined" unless val?
+      internal_throw "reference", "ReferenceError: #{var_name} is not defined" unless val?
       val
       
 internal_throw = (type, e) ->
@@ -418,6 +418,41 @@ update_variable_reference = (hash, key, value, context) ->
   throw "unknown context #{context}" unless commands[context]
   commands[context]()
 
+build_class = (proto, superclass)->
+  # The class mechanism is mostly handled through JS, rather than
+  # simulated, but we need to do this to play nice with JS libraries.
+  extendify = (child, parent) ->
+    ctor = ->
+      this.constructor = child
+      null # super important
+    for key of parent
+      if Object::hasOwnProperty.call(parent, key)
+        child[key] = parent[key]
+    ctor.prototype = parent.prototype
+    child.prototype = new ctor
+    child.__super__ = parent.prototype
+    child
+
+  X = ->
+    if Object::hasOwnProperty.call(proto, "constructor")
+      proto.constructor.apply this, arguments
+    else
+      undefined
+  if superclass
+    extendify(X, superclass)
+  for key of proto
+    X.prototype[key] = proto[key]
+  X
+  
+newify = (func, args) ->
+  ctor = ->
+  ctor.prototype = func.prototype
+  child = new ctor
+  result = func.apply child, args
+  if typeof result is "object"
+    result
+  else
+    child
       
 util = require 'util'
 
