@@ -89,10 +89,16 @@ AST =
       Arr: (scope, ast, value) ->
         for object, i in ast.objects
           set scope, object, value[i]
+          
+      Obj: (scope, ast, value) ->
+        for property in ast.properties
+          # traverse Value/base/Literal/value/1
+          name = property[1].base[1].value[1]
+          scope.set name, value[name]
         
       Value: (scope, ast, value) ->
         if ast.properties.length == 0
-          if ast.base[0] == "Arr"
+          if ast.base[0] == "Arr" || ast.base[0] == "Obj"
             set scope, ast.base, value
           else
             lhs = ast.base[1].value[1]  
