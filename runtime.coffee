@@ -23,6 +23,8 @@ Eval = (scope, ast) ->
   if method
     return method scope, ast[1]  
   throw "#{name} not supported yet"
+
+CURRENT_OBJECT_METHOD_NAME = null # for super
   
 AST =
   deref: (obj, scope, property) ->
@@ -114,7 +116,8 @@ AST =
         args.push Eval scope, arg
 
     if ast.isSuper
-      console.log "SUPER!!!", args
+      this_var = scope.get "this"
+      this_var.__super__[CURRENT_OBJECT_METHOD_NAME].apply this_var, args
       return
 
     variable = ast.variable[1]
@@ -132,7 +135,13 @@ AST =
       [obj, key] = AST.deref_properties scope, obj, properties
       if !obj[key]?
         throw "method #{key} does not exist for obj #{obj}"
-      val = obj[key].apply obj, args
+      old_method_name = CURRENT_OBJECT_METHOD_NAME
+      CURRENT_OBJECT_METHOD_NAME = key
+      try
+        val = obj[key].apply obj, args
+      finally
+        CURRENT_OBJECT_METHOD_NAME = old_method_name
+      val
   
   Class: (scope, ast) ->
     # traverse variable, Value, base, Literal, value, 1
