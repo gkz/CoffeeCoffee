@@ -157,3 +157,22 @@ tom.move()
 String::dasherize = ->
   this.replace /_/g, "-"
 console.log "one_two".dasherize()
+
+###########
+banner "Destructuring Assignment"
+
+theBait   = 1000
+theSwitch = 0
+
+[theBait, theSwitch] = [theSwitch, theBait]
+console.log theBait
+
+
+weatherReport = (location) ->
+  # Make an Ajax request to fetch the weather...
+  [location, 72, "Mostly Sunny"]
+
+[city, temp, forecast] = weatherReport "Berkeley, CA"
+console.log forecast
+
+
