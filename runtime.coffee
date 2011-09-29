@@ -58,6 +58,10 @@ AST =
       return value.substring(1, value.length-1)
     if value.match(/\d+/) != null
       return parseFloat(value)
+    if value.charAt(0) == '/'
+      regex = /\/(.*)\/(.*)/
+      match = regex.exec(value)
+      return RegExp match[1], match[2]
     return scope.get(value)
 
   Access: (scope, ast) ->

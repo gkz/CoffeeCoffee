@@ -151,3 +151,9 @@ tom = new Horse "Tommy the Palomino"
 
 sam.move()
 tom.move()
+
+####
+
+String::dasherize = ->
+  this.replace /_/g, "-"
+console.log "one_two".dasherize()
