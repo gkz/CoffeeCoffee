@@ -92,9 +92,19 @@ AST =
           
       Obj: (scope, ast, value) ->
         for property in ast.properties
-          # traverse Value/base/Literal/value/1
-          name = property[1].base[1].value[1]
-          scope.set name, value[name]
+          if property[0] == 'Assign'
+            Assign = property[1]
+            variable = Assign.variable
+            Value = variable[1]
+            base = Value.base
+            Literal = base[1]
+            key = Literal.value[1]
+            val = value[key]
+            set scope, Assign.value, val
+          else
+            # traverse Value/base/Literal/value/1
+            name = property[1].base[1].value[1]
+            scope.set name, value[name]
         
       Value: (scope, ast, value) ->
         if ast.properties.length == 0
