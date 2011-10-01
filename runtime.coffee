@@ -361,6 +361,10 @@ AST =
     from_val: from_val
     to_val: to_val
     
+  Switch: (scope, ast) ->
+    subject = Eval scope, ast.subject
+    subject
+    
   Try: (scope, ast) ->
     try
       Eval scope, ast.attempt

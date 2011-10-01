@@ -29,6 +29,7 @@ wrap_obj = (expression) ->
     'recovery',
     'second',
     'source',
+    'subject',
     'to',
     'value',
     'variable',
