@@ -188,3 +188,8 @@ futurists =
 
 {poet: {name, address: [street, city]}} = futurists
 console.log name + '-' + street
+
+# splats
+tag = "<impossible>"
+[open, contents..., close] = tag.split("")
+console.log contents.join ''

@@ -88,7 +88,11 @@ AST =
     LHS = 
       Arr: (scope, ast, value) ->
         for object, i in ast.objects
-          set scope, object, value[i]
+          if object[0] == 'Splat'
+            num_to_grab = value.length - ast.objects.length + 1
+            set scope, object[1].name, value[i...i+num_to_grab]
+          else
+            set scope, object, value[i]
           
       Obj: (scope, ast, value) ->
         for property in ast.properties
