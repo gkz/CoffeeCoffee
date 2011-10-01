@@ -58,8 +58,11 @@ wrap_obj = (expression) ->
   name = expression.constructor.name
   if name == 'Obj'
     expression.objects = undefined
-  if name && name != 'Array'
-    [name, expression]
+  if name && name != 'Array' && name != "String" && name != "Object"
+    obj = {}
+    obj[name] = expression
+    obj.__name__ = name
+    obj
   else
     expression
 

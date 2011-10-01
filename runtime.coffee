@@ -18,17 +18,17 @@ handle_data = (data) ->
     Eval scope, stmt
 
 Eval = (scope, ast) ->
-  name = ast[0]
+  name = ast.__name__
   method = AST[name]
   if method
-    return method scope, ast[1]  
+    return method scope, ast[name]  
   throw "#{name} not supported yet"
 
 CURRENT_OBJECT_METHOD_NAME = null # for super
   
 AST =
   deref: (obj, scope, property) ->
-    if property[0] == 'Slice'
+    if property.__name__ == 'Slice'
       # traverse Slice/Range
       slice = Eval scope, property
       obj.slice(slice.from_val, slice.to_val)
@@ -44,8 +44,7 @@ AST =
     [obj, key]
 
   name: (ast) ->
-    # traverse name, Literal, value, 1
-    return ast.name[1].value[1]
+    return ast.name.Literal.value
 
   value: (scope, value) ->
     return false if value == 'false'
@@ -75,10 +74,10 @@ AST =
     context = ast.context
     
     set = (scope, ast, value) ->
-      name = ast[0]
+      name = ast.__name__
       method = LHS[name]
       if method
-        return method scope, ast[1], value
+        return method scope, ast[name], value
       throw "#{name} not supported yet on LHS"
 
     # There is a bit of similarity within LHS vs. AST for handling
@@ -88,34 +87,28 @@ AST =
     LHS = 
       Arr: (scope, ast, value) ->
         for object, i in ast.objects
-          if object[0] == 'Splat'
+          if object.Splat?
             num_to_grab = value.length - ast.objects.length + 1
-            set scope, object[1].name, value[i...i+num_to_grab]
+            set scope, object.Splat.name, value[i...i+num_to_grab]
           else
             set scope, object, value[i]
           
       Obj: (scope, ast, value) ->
         for property in ast.properties
-          if property[0] == 'Assign'
-            Assign = property[1]
-            variable = Assign.variable
-            Value = variable[1]
-            base = Value.base
-            Literal = base[1]
-            key = Literal.value[1]
+          if property.Assign?
+            key = property.Assign.variable.Value.base.Literal.value
             val = value[key]
-            set scope, Assign.value, val
+            set scope, property.Assign.value, val
           else
-            # traverse Value/base/Literal/value/1
-            name = property[1].base[1].value[1]
+            name = property.Value.base.Literal.value
             scope.set name, value[name]
         
       Value: (scope, ast, value) ->
         if ast.properties.length == 0
-          if ast.base[0] == "Arr" || ast.base[0] == "Obj"
+          if ast.base.__name__ == "Arr" || ast.base.__name__ == "Obj"
             set scope, ast.base, value
           else
-            lhs = ast.base[1].value[1]  
+            lhs = ast.base.Literal.value  
             scope.set lhs, value, context
         else
           lhs = Eval scope, ast.base
@@ -134,8 +127,8 @@ AST =
   Call: (scope, ast) ->
     args = []
     for arg in ast.args
-      if arg[0] == 'Splat'
-        args = args.concat Eval scope, arg[1].name
+      if arg.Splat?
+        args = args.concat Eval scope, arg.Splat.name
       else
         args.push Eval scope, arg
 
@@ -144,7 +137,7 @@ AST =
       this_var.__super__[CURRENT_OBJECT_METHOD_NAME].apply this_var, args
       return
 
-    variable = ast.variable[1]
+    variable = ast.variable.Value
     obj = Eval scope, variable.base
     properties = variable.properties
 
@@ -155,7 +148,7 @@ AST =
 
     if properties.length == 0
       val = obj args...
-    else  
+    else
       [obj, key] = AST.deref_properties scope, obj, properties
       if !obj[key]?
         throw "method #{key} does not exist for obj #{obj}"
@@ -168,11 +161,10 @@ AST =
       val
   
   Class: (scope, ast) ->
-    # traverse variable, Value, base, Literal, value, 1
-    class_name = ast.variable[1].base[1].value[1]
+    class_name = ast.variable.Value.base.Literal.value
 
     # traverse, body, Block
-    expressions = ast.body[1].expressions
+    expressions = ast.body.Block.expressions
     if expressions.length == 1
       class_code = null
       block_ast = expressions[0]
@@ -194,17 +186,15 @@ AST =
       my_args = arg for arg in args
       parms = {}
       for param in ast.params
-        throw "Error" unless param[0] == 'Param'
-        param = param[1]
+        param = param.Param
         if param.splat
           val = args
         else
           val = args.shift()
         if val == undefined && param.value
           val = Eval scope, param.value
-        if param.name[1].properties
-          # traverse name, Value, properties, 0, Access
-          field = AST.name param.name[1].properties[0][1]
+        if param.name.Value?.properties
+          field = AST.name param.name.Value.properties[0].Access
           this[field] = val
         else
           field = AST.name param
@@ -233,8 +223,7 @@ AST =
   For: (scope, ast) ->
     if ast.index
       obj = Eval scope, ast.source
-      # traverse index, Literal, value, 1
-      key_var = ast.index[1].value[1]
+      key_var = ast.index.Literal.value
       val_var = ast.name && AST.name ast
       for key_val, val_val of obj
         scope.set key_var, key_val
@@ -258,26 +247,25 @@ AST =
     return Eval scope, ast.index
 
   Literal: (scope, ast) ->
-    val = ast.value[1]
+    val = ast.value
     if val
       AST.value scope, val
       
   Obj: (scope, ast) ->
     obj = {}
     for property in ast.properties
-      throw "unexpected" if property[0] != 'Assign'
-      ast = property[1]
+      ast = property.Assign
 
       LHS = 
         set: (ast, value) ->
-          name = ast[0]
+          name = ast.__name__
           method = LHS[name]
           if method
-            return method ast[1], value
+            return method ast[name], value
           throw "#{name} not supported yet on Obj LHS"
 
         Literal: (ast, value) ->
-          lhs = ast.value[1]
+          lhs = ast.value
           obj[lhs] = value
 
         Value: (ast, value) ->    
@@ -298,8 +286,7 @@ AST =
           return Eval scope, ast.second
       
     if op == 'new'
-      # traverse first, Value, base, Literal, value
-      class_name = ast.first[1].base[1].value[1]
+      class_name = ast.first.Value.base.Literal.value
       class_function = scope.get(class_name)
       return newify class_function, []
     
@@ -334,8 +321,8 @@ AST =
 
   Parens: (scope, ast) ->
     body = ast.body
-    if body[0] == 'Block'
-      body = body[1]
+    if body.Block?
+      body = body.Block
     if body.expressions
       return Eval scope, body.expressions[0]
     else
@@ -354,7 +341,7 @@ AST =
     throw retval: retval
 
   Slice: (scope, ast) ->
-    range = ast.range[1]
+    range = ast.range.Range
     from_val = Eval scope, range.from
     to_val = Eval scope, range.to
     to_val += 1 if !range.exclusive
@@ -375,9 +362,8 @@ AST =
     try
       Eval scope, ast.attempt
     catch e
-      # traverse error, Literal, value, 1
       throw e unless e.__meta?
-      catch_var = ast.error[1].value[1]
+      catch_var = ast.error.Literal.value
       scope.set catch_var, e.__meta
       Eval scope, ast.recovery
       
