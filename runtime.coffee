@@ -367,7 +367,9 @@ AST =
       match_value = Eval scope, case_ast.cond
       if subject == match_value
         return Eval scope, case_ast.block
-    subject
+    if ast.otherwise
+      return Eval scope, ast.otherwise
+    null
     
   Try: (scope, ast) ->
     try
