@@ -364,10 +364,9 @@ AST =
   Switch: (scope, ast) ->
     subject = Eval scope, ast.subject
     for case_ast in ast.cases
-      for cond in case_ast.conds
-        console.log cond
-        match_value = Eval scope, cond
-        console.log match_value, "**"
+      match_value = Eval scope, case_ast.cond
+      if subject == match_value
+        return Eval scope, case_ast.block
     subject
     
   Try: (scope, ast) ->

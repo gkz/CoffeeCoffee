@@ -51,7 +51,7 @@ wrap_obj = (expression) ->
     my_cases = []
     for when_statement in expression.cases
       my_cases.push
-        conds: wrap_obj my_cond for my_cond in when_statement[0]
+        cond: wrap_obj when_statement[0]
         block: wrap_obj when_statement[1]
     expression.cases = my_cases
   name = expression.constructor.name
