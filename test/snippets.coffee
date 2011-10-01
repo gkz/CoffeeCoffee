@@ -193,3 +193,22 @@ console.log name + '-' + street
 tag = "<impossible>"
 [open, contents..., close] = tag.split("")
 console.log contents.join ''
+
+#############
+banner "Function Binding"
+
+class Button
+  click: (@f) ->
+  do_click: -> @f.apply(@)
+
+button = new Button    
+
+class Account
+  constructor: (@customer) ->
+    button.click =>
+      console.log @customer
+    
+account = new Account("alice")
+button.do_click()
+
+

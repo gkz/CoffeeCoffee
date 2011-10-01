@@ -190,7 +190,7 @@ AST =
     scope.set class_name, klass
     
   Code: (scope, ast) ->
-    (args...) ->
+    f = (args...) ->
       my_args = arg for arg in args
       parms = {}
       for param in ast.params
@@ -216,6 +216,11 @@ AST =
         if e.retval?
           return e.retval.obj
         throw e
+    if ast.bound
+      obj = scope.get "this"
+      return (args...) ->
+        f.apply(obj, args)
+    f
 
   Existence: (scope, ast) ->
     try
