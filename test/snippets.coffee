@@ -211,4 +211,16 @@ class Account
 account = new Account("alice")
 button.do_click()
 
+##############
+banner "Switch/When/Else"
+f = (day) -> 
+  long_name = switch day
+      when "Mon" then "Monday"
+      when "Tue" then "Tuesday"
+      else "no match"
+  console.log long_name
+
+f "Mon"
+f "Tue"
+f "Wed"
 
