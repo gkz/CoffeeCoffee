@@ -39,7 +39,7 @@ wrap_obj = (expression) ->
       expression[key] = wrap_obj expression[key]
   list_keys = [
     'args',
-    'expressions'
+    'expressions',
     'objects',
     'params',
     'properties',
@@ -47,6 +47,13 @@ wrap_obj = (expression) ->
   for list_key in list_keys
     if expression[list_key]
       expression[list_key] = wrap expression[list_key]
+  if expression.cases
+    my_cases = []
+    for when_statement in expression.cases
+      my_cases.push
+        conds: wrap_obj my_cond for my_cond in when_statement[0]
+        block: wrap_obj when_statement[1]
+    expression.cases = my_cases
   name = expression.constructor.name
   if name == 'Obj'
     expression.objects = undefined
