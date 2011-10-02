@@ -24,14 +24,6 @@ Eval = (scope, ast) ->
 CURRENT_OBJECT_METHOD_NAME = null # for super
   
 AST =
-  deref: (obj, scope, property) ->
-    if the_key_of(property) == 'Slice'
-      slice = Eval scope, property
-      obj.slice(slice.from_val, slice.to_val)
-    else
-      key = Eval scope, property
-      obj[key]
-
   deref_properties: (scope, obj, properties) ->
     for accessor in properties.slice(0, properties.length - 1)
       key = Eval scope, accessor
@@ -402,8 +394,22 @@ AST =
       
   Value: (scope, ast) ->
     obj = Eval scope, ast.base
-    for accessor in ast.properties
-      obj = AST.deref obj, scope, accessor
+    for property in ast.properties
+      break if property.Access?.soak && !obj?
+      key = the_key_of(property)
+      if key == 'Slice'
+        slice = Eval scope, property
+        obj = obj.slice(slice.from_val, slice.to_val)
+      else if key == 'Access'
+        key = Eval scope, property
+        obj = obj[key]
+      else if key == "Index"
+        key = Eval scope, property
+        obj = obj[key]
+      else
+        throw "unexpected key #{key}"
+
+      
     return obj
 
   While: (scope, ast) ->
