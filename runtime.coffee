@@ -425,7 +425,13 @@ AST =
 
   While: (scope, ast) ->
     while Eval scope, ast.condition
-      Eval scope, ast.body
+      try
+        val = Eval scope, ast.body
+      catch e
+        break if e.__meta_break
+        continue if e.__meta_continue
+        throw e
+      val
 
 # Scope: returns an object to manage variable assignment
 #

@@ -286,3 +286,18 @@ console.log true and true, true or false
 console.log "x" of {x: 0}, "y" not of {x: 0}
 console.log 1 in [1,2], 3 not in [1,2]
 console.log !("x".foo?.bar.whatever)?
+
+########
+banner "break and continue"
+
+for i in [0..10]
+  continue if i % 2 == 0
+  console.log i
+  break if i == 5
+
+i = 0
+while true
+  i += 1
+  continue if i % 2 == 0
+  console.log i
+  break if i == 5
