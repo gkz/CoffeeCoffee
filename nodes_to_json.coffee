@@ -19,6 +19,7 @@ wrap_obj = (expression) ->
     'condition',
     'elseBody',
     'error',
+    'ensure',
     'expression',
     'first',
     'from',

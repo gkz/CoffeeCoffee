@@ -224,3 +224,16 @@ f "Mon"
 f "Tue"
 f "Wed"
 
+#############
+banner "Try/Catch/Finally"
+f = (n) ->
+  try
+    if n == 1
+      throw "1 leads to exception"
+    console.log n
+  catch error
+    console.log error
+  finally
+    console.log "finally"
+f(1)
+f(2)

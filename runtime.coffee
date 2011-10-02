@@ -359,6 +359,10 @@ AST =
       return Eval scope, ast.otherwise
     null
     
+  Throw: (scope, ast) ->
+    e = Eval scope, ast.expression
+    throw __meta: e
+    
   Try: (scope, ast) ->
     try
       Eval scope, ast.attempt
@@ -367,6 +371,9 @@ AST =
       catch_var = ast.error.Literal.value
       scope.set catch_var, e.__meta
       Eval scope, ast.recovery
+    finally
+      if ast.ensure
+        Eval scope, ast.ensure
       
   Value: (scope, ast) ->
     obj = Eval scope, ast.base
