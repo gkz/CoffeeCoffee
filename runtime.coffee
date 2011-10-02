@@ -250,6 +250,13 @@ AST =
     else if ast.elseBody
       Eval scope, ast.elseBody
       
+  In: (scope, ast) ->
+    object = Eval scope, ast.object
+    array = Eval scope, ast.array
+    val = object in array
+    val = !val if ast.negated
+    val
+    
   Index: (scope, ast) ->
     return Eval scope, ast.index
 
