@@ -268,7 +268,7 @@ console.log html
 
 
 #########
-banner "Misc: bare classes and instanceof"
+banner "Misc: bare classes and instanceof, etc."
 
 class C
 
@@ -277,3 +277,5 @@ class D
 c = new C
 console.log c instanceof C
 console.log !(c instanceof D)
+console.log C not instanceof D
+console.log typeof "x"

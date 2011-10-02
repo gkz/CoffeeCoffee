@@ -328,10 +328,13 @@ AST =
         return ops[op]()
     else
       operand1 = Eval scope, ast.first
-      if op == "-"
-        return -1 * operand1
-      if op == '!'
-        return !operand1
+      ops = {
+        '-': -> -1 * operand1
+        '!': -> !operand1
+        'typeof': -> typeof operand1
+      }
+      if ops[op]
+        return ops[op]()
     throw "unknown op #{op}"
 
   Parens: (scope, ast) ->
