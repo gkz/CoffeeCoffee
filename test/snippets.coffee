@@ -265,3 +265,15 @@ html = '''
        </strong>
        '''
 console.log html
+
+
+#########
+banner "Misc: bare classes and instanceof"
+
+class C
+
+class D
+  
+c = new C
+console.log c instanceof C
+console.log !(c instanceof D)

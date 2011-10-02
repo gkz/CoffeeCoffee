@@ -164,15 +164,23 @@ AST =
     class_name = ast.variable.Value.base.Literal.value
 
     expressions = ast.body.Block.expressions
-    if expressions.length == 1
+    if expressions.length == 0
+      class_code = null
+      block_ast = null
+    else if expressions.length == 1
       class_code = null
       block_ast = expressions[0]
     else
       [class_code, block_ast] = expressions
+        
     if class_code
       Eval scope, class_code
         
-    proto = Eval scope, block_ast
+    if block_ast
+      proto = Eval scope, block_ast
+    else
+      proto = ->
+        
     if ast.parent
       parent_class = Eval scope, ast.parent 
     else
@@ -314,6 +322,7 @@ AST =
         '<':   -> operand1 < operand2
         '>':   -> operand1 > operand2
         '%':   -> operand1 % operand2
+        'instanceof': -> operand1 instanceof operand2
       }
       if ops[op]
         return ops[op]()
