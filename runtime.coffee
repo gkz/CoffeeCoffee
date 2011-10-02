@@ -37,23 +37,6 @@ AST =
   name: (ast) ->
     return ast.name.Literal.value
 
-  value: (scope, value) ->
-    return false if value == 'false'
-    return true if value == 'true'
-    return null if value == 'null'
-    return undefined if value == 'undefined'
-    if value.charAt(0) == '"'
-      return JSON.parse value
-    if value.charAt(0) == "'"
-      return JSON.parse '"' + value.substring(1, value.length-1) + '"'
-    if value.match(/\d+/) != null
-      return parseFloat(value)
-    if value.charAt(0) == '/'
-      regex = /\/(.*)\/(.*)/
-      match = regex.exec(value)
-      return RegExp match[1], match[2]
-    return scope.get(value)
-
   Access: (scope, ast) ->
     AST.name ast
     
@@ -228,13 +211,25 @@ AST =
         scope.set key_var, key_val
         if val_var?
           scope.set val_var, val_val
-        Eval scope, ast.body
+        try
+          val = Eval scope, ast.body
+        catch e
+          break if e.__meta_break
+          continue if e.__meta_continue
+          throw e
+        val
     else
       range = Eval scope, ast.source
       step_var = AST.name ast
       for step_val in range
         scope.set step_var, step_val
-        Eval scope, ast.body
+        try
+          val = Eval scope, ast.body
+        catch e
+          break if e.__meta_break
+          continue if e.__meta_continue
+          throw e
+        val
       
   If: (scope, ast) ->
     if Eval scope, ast.condition
@@ -253,9 +248,27 @@ AST =
     return Eval scope, ast.index
 
   Literal: (scope, ast) ->
-    val = ast.value
-    if val
-      AST.value scope, val
+    value = ast.value
+    if value
+      return false if value == 'false'
+      return true if value == 'true'
+      return null if value == 'null'
+      return undefined if value == 'undefined'
+      if value == 'break'
+        throw __meta_break: true
+      if value == 'continue'
+        throw __meta_continue: true
+      if value.charAt(0) == '"'
+        return JSON.parse value
+      if value.charAt(0) == "'"
+        return JSON.parse '"' + value.substring(1, value.length-1) + '"'
+      if value.match(/\d+/) != null
+        return parseFloat(value)
+      if value.charAt(0) == '/'
+        regex = /\/(.*)\/(.*)/
+        match = regex.exec(value)
+        return RegExp match[1], match[2]
+      return scope.get(value)
       
   Obj: (scope, ast) ->
     obj = {}
