@@ -279,3 +279,9 @@ console.log c instanceof C
 console.log !(c instanceof D)
 console.log C not instanceof D
 console.log typeof "x"
+console.log true, on, yes
+console.log !false, !off, not no
+console.log 4 is 4, 4 isnt 5
+console.log true and true, true or false
+console.log "x" of {x: 0}, "y" not of {x: 0}
+# console.log 1 in [1,2], 3 not in [1,2]

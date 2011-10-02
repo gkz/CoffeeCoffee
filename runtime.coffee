@@ -322,6 +322,7 @@ AST =
         '<':   -> operand1 < operand2
         '>':   -> operand1 > operand2
         '%':   -> operand1 % operand2
+        'in':  -> operand1 of operand2
         'instanceof': -> operand1 instanceof operand2
       }
       if ops[op]
