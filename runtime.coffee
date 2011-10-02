@@ -277,6 +277,9 @@ AST =
     obj
 
   Op: (scope, ast) ->
+    is_chainable = (op) ->
+      op in ['<', '>', '>=', '<=', '===', '!==']
+    
     op = ast.operator
     
     if op == "?"
@@ -296,6 +299,10 @@ AST =
       
     if ast.second
       operand1 = Eval scope, ast.first
+      if is_chainable(op) && the_key_of(ast.first) == "Op" && is_chainable(ast.first.Op.operator)
+        return false if !operand1
+        operand1 = Eval scope, ast.first.Op.second
+
       operand2 = Eval scope, ast.second
       ops = {
         '*':   -> operand1 * operand2

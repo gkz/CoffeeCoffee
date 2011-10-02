@@ -237,3 +237,9 @@ f = (n) ->
     console.log "finally"
 f(1)
 f(2)
+
+#############
+banner "Chained Comparisons"
+cholesterol = 127
+healthy = 200 > cholesterol > 60
+console.log healthy
