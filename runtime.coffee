@@ -54,7 +54,7 @@ AST =
     if value.charAt(0) == '"'
       return JSON.parse value
     if value.charAt(0) == "'"
-      return value.substring(1, value.length-1)
+      return JSON.parse '"' + value.substring(1, value.length-1) + '"'
     if value.match(/\d+/) != null
       return parseFloat(value)
     if value.charAt(0) == '/'
