@@ -407,9 +407,7 @@ AST =
         key = Eval scope, property
         obj = obj[key]
       else
-        throw "unexpected key #{key}"
-
-      
+        throw "unexpected key #{key}"      
     return obj
 
   While: (scope, ast) ->
