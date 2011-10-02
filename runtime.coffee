@@ -36,7 +36,10 @@ AST =
     for accessor in properties.slice(0, properties.length - 1)
       key = Eval scope, accessor
       obj = obj[key]
-    key = Eval scope, properties[properties.length - 1]
+    last_property = properties[properties.length - 1]
+    if last_property.Access?.proto == ".prototype"
+      obj = obj.prototype
+    key = Eval scope, last_property
     [obj, key]
 
   name: (ast) ->

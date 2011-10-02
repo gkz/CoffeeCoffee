@@ -3,7 +3,7 @@
 # 
 # USAGE: coffee nodes_to_json.coffee hello_world.coffee
 
-CoffeeScript = require "./lib/coffee-script"
+CoffeeScript = require "coffee-script"
 fs = require "fs"
   
 wrap = (expressions) ->
