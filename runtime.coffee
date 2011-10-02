@@ -3,11 +3,8 @@
 # to be able to pause/resume applications, etc.
 
 # Example usage:
-#  coffee nodes_to_json.coffee test/binary_search.coffee | coffee runtime.coffee
+#  coffee nodes_to_json.coffee test/binary_search.coffee | coffee runtime.coffee -
 #
-
-# IMPORTANT: This is very much a work in progress, but it does run
-# simple programs like test/binary_search.coffee.
 
 # BIG OVERVIEW: The AST comes in as a JSON tree.  We recursively apply Eval to the nodes,
 # using Scope to manage our variables.
