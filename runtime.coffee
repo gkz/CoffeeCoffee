@@ -26,7 +26,6 @@ CURRENT_OBJECT_METHOD_NAME = null # for super
 AST =
   deref: (obj, scope, property) ->
     if the_key_of(property) == 'Slice'
-      # traverse Slice/Range
       slice = Eval scope, property
       obj.slice(slice.from_val, slice.to_val)
     else
@@ -161,7 +160,6 @@ AST =
   Class: (scope, ast) ->
     class_name = ast.variable.Value.base.Literal.value
 
-    # traverse, body, Block
     expressions = ast.body.Block.expressions
     if expressions.length == 1
       class_code = null
