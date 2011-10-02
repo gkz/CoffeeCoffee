@@ -18,7 +18,7 @@ handle_data = (data) ->
     Eval scope, stmt
 
 Eval = (scope, ast) ->
-  name = ast.__name__
+  name = the_key_of(ast)
   method = AST[name]
   if method
     return method scope, ast[name]  
@@ -28,7 +28,7 @@ CURRENT_OBJECT_METHOD_NAME = null # for super
   
 AST =
   deref: (obj, scope, property) ->
-    if property.__name__ == 'Slice'
+    if the_key_of(property) == 'Slice'
       # traverse Slice/Range
       slice = Eval scope, property
       obj.slice(slice.from_val, slice.to_val)
@@ -74,7 +74,7 @@ AST =
     context = ast.context
     
     set = (scope, ast, value) ->
-      name = ast.__name__
+      name = the_key_of(ast)
       method = LHS[name]
       if method
         return method scope, ast[name], value
@@ -105,7 +105,8 @@ AST =
         
       Value: (scope, ast, value) ->
         if ast.properties.length == 0
-          if ast.base.__name__ == "Arr" || ast.base.__name__ == "Obj"
+          base_key = the_key_of(ast.base)
+          if base_key == "Arr" || base_key == "Obj"
             set scope, ast.base, value
           else
             lhs = ast.base.Literal.value  
@@ -258,7 +259,7 @@ AST =
 
       LHS = 
         set: (ast, value) ->
-          name = ast.__name__
+          name = the_key_of(ast)
           method = LHS[name]
           if method
             return method ast[name], value
@@ -486,7 +487,6 @@ build_class = (proto, superclass)->
   for key of proto
     X.prototype[key] = proto[key]
   X
-
   
 newify = (func, args) ->
   ctor = ->
@@ -497,6 +497,11 @@ newify = (func, args) ->
     result
   else
     child
+
+the_key_of = (ast) ->
+  # there is just one key
+  for key of ast
+    return key
       
 util = require 'util'
 

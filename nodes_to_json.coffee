@@ -61,7 +61,6 @@ wrap_obj = (expression) ->
   if name && name != 'Array' && name != "String" && name != "Object"
     obj = {}
     obj[name] = expression
-    obj.__name__ = name
     obj
   else
     expression
