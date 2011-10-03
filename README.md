@@ -104,7 +104,7 @@ true
 5
 ```
 
-Here is the program:
+Here is the program that coffeecoffee interprets in the example above.  You can see that a wide variety of CS idioms are supported.
 
 ```
 > cat test/snippets.coffee 
