@@ -327,12 +327,19 @@ AST =
         '/':   -> operand1 / operand2
         '+':   -> operand1 + operand2
         '-':   -> operand1 - operand2
+        '|':   -> operand1 | operand2
+        '&':   -> operand1 & operand2
+        '^':   -> operand1 ^ operand2
         '===': -> operand1 is operand2
         '!==': -> operand1 isnt operand2
         '>>':  -> operand1 >> operand2
+        '>>>': -> operand1 >>> operand2
+        '<<':  -> operand1 << operand2
         '||':  -> operand1 || operand2
         '<':   -> operand1 < operand2
+        '<=':  -> operand1 <= operand2
         '>':   -> operand1 > operand2
+        '>=':  -> operand1 >= operand2
         '%':   -> operand1 % operand2
         'in':  -> operand1 of operand2
         'instanceof': -> operand1 instanceof operand2
@@ -344,6 +351,7 @@ AST =
       ops = {
         '-': -> -1 * operand1
         '!': -> !operand1
+        '~': -> ~operand1
         'typeof': -> typeof operand1
       }
       if ops[op]
