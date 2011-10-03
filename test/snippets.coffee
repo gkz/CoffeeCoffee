@@ -291,6 +291,8 @@ console.log 27 % 10 == 7
 console.log 3 >=3 and 4 >=3 and 3 <= 3 and 3 <= 4
 console.log 5 << 2 == 20 and 15 >> 1 == 7 and 15 >>> 1 == 7
 console.log (5 | 2) == 7 and (5 & 4) == 4 and (5 ^ 4) == (4 ^ 5)
+x = 5
+console.log ++x == 6, --x == 5
 
 ########
 banner "break and continue"

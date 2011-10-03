@@ -300,6 +300,12 @@ AST =
     
     op = ast.operator
     
+    if op == '++' or op == '--'
+      return AST.Assign scope,
+        context: op
+        variable: ast.first
+        value: ast.first
+    
     if op == "?"
       try
         return Eval scope, ast.first
@@ -512,6 +518,8 @@ update_variable_reference = (hash, key, value, context) ->
     '*=':  -> hash[key] *= value
     '-=':  -> hash[key] -= value
     '||=': -> hash[key] ||= value
+    '++':  -> ++hash[key]
+    '--':  -> --hash[key]
   }
   throw "unknown context #{context}" unless commands[context]
   commands[context]()
