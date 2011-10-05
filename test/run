@@ -5,6 +5,7 @@
 ./coffeecoffee test/bubble_sort.coffee
 ./coffeecoffee test/cubes.coffee
 ./coffeecoffee test/echo.coffee hello world
+./coffeecoffee test/fib.coffee 15
 ./coffeecoffee test/linked_list.coffee
 ./coffeecoffee test/luhn_algorithm.coffee
 ./coffeecoffee test/merge_sort.coffee
