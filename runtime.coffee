@@ -352,7 +352,7 @@ AST =
       }
       if ops[op]
         val = ops[op]()
-        debug ast, "Op: #{operand1} #{op} #{operand2} -> #{val}"
+        debug "Op: #{operand1} #{op} #{operand2} -> #{val}"
         return val
     else
       operand1 = Eval scope, ast.first
@@ -485,7 +485,9 @@ Scope = (params, parent_scope, this_value, args) ->
 
       if closure_wrapper
         # we have a previous reference
-        update_variable_reference(closure_wrapper, "obj", value, context)
+        assigned_val = update_variable_reference(closure_wrapper, "obj", value, context)
+        debug "#{var_name} #{context} #{value} -> #{assigned_val}"
+        assigned_val
       else if context == "="
         # first reference to local variable
         set_local_value(var_name, value)
@@ -583,7 +585,7 @@ pp = (obj, description) ->
   util.debug description if description?
   util.debug JSON.stringify obj, null, "  "
 
-debug = (ast, s) ->
+debug = (s) ->
   console.log "(interpreter)", s
 
 fs = require 'fs'
