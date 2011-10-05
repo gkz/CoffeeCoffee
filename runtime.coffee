@@ -486,6 +486,8 @@ Scope = (params, parent_scope, this_value, args) ->
 
       if closure_wrapper
         # we have a previous reference
+        if context != '='
+          debug "#{var_name} = #{closure_wrapper.obj}..."
         assigned_val = update_variable_reference(closure_wrapper, "obj", value, context)
         debug "#{var_name} #{context} #{value} -> #{assigned_val}"
         assigned_val
@@ -505,7 +507,9 @@ Scope = (params, parent_scope, this_value, args) ->
 
       closure_wrapper = self.get_closure_wrapper(var_name)
       if closure_wrapper
-        return closure_wrapper.obj
+        value = closure_wrapper.obj
+        debug "get #{value} (#{var_name})"
+        return value
 
       # builtins
       val = root[var_name]
