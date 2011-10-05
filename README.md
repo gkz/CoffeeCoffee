@@ -1,8 +1,12 @@
 coffeecoffee is a program that interprets CoffeeScript programs without transcompiling to Javascript.
 
-The main engine here is runtime.coffee, which directly evaluates expressions from the AST.  Here is the script:
+The main engine here is runtime.coffee, which directly evaluates expressions from the AST.  It uses
+the output of nodes_to_json.coffee, as show below.
+
+
 
 ```
+> cat coffeecoffee
 #!/bin/sh
 filename=$1
 shift
