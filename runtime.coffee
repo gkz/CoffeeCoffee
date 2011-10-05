@@ -351,7 +351,9 @@ AST =
         'instanceof': -> operand1 instanceof operand2
       }
       if ops[op]
-        return ops[op]()
+        val = ops[op]()
+        debug ast, "Op: #{operand1} #{op} #{operand2} -> #{val}"
+        return val
     else
       operand1 = Eval scope, ast.first
       ops = {
@@ -580,6 +582,9 @@ pp = (obj, description) ->
   util.debug "-----"
   util.debug description if description?
   util.debug JSON.stringify obj, null, "  "
+
+debug = (ast, s) ->
+  console.log "(interpreter)", s
 
 fs = require 'fs'
 [fn] = process.argv.splice 2, 1
