@@ -433,9 +433,11 @@ AST =
       else if key == 'Access'
         key = Eval scope, property
         obj = obj[key]
+        debug "deref #{key} -> #{obj}"
       else if key == "Index"
         key = Eval scope, property
         obj = obj[key]
+        debug "deref [#{key}] -> #{obj}"
       else
         throw "unexpected key #{key}"      
     return obj
@@ -508,7 +510,7 @@ Scope = (params, parent_scope, this_value, args) ->
       closure_wrapper = self.get_closure_wrapper(var_name)
       if closure_wrapper
         value = closure_wrapper.obj
-        debug "get #{value} (#{var_name})"
+        debug "deref #{var_name} -> #{value}"
         return value
 
       # builtins
