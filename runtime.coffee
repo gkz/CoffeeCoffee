@@ -161,6 +161,7 @@ AST =
     else
       parent_class = null
     klass = build_class proto, parent_class
+    klass.toString = -> "[class #{class_name}]"
     scope.set class_name, klass
     
   Code: (scope, ast) ->
@@ -490,6 +491,7 @@ Scope = (params, parent_scope, this_value, args) ->
         assigned_val
       else if context == "="
         # first reference to local variable
+        debug "first assignment: #{var_name} = #{value}"
         set_local_value(var_name, value)
         value
       else
