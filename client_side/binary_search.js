@@ -1,18 +1,14 @@
-window.COFFEECOFFEE_PROGRAM = [
+COFFEECOFFEE_PROGRAM = [
   {
     "Assign": {
       "variable": {
         "Value": {
           "base": {
             "Literal": {
-              "value": "index",
-              "firstLineNumber": 4,
-              "lastLineNumber": 4
+              "value": "index"
             }
           },
-          "properties": [],
-          "firstLineNumber": 4,
-          "lastLineNumber": 4
+          "properties": []
         }
       },
       "value": {
@@ -22,26 +18,18 @@ window.COFFEECOFFEE_PROGRAM = [
               "Param": {
                 "name": {
                   "Literal": {
-                    "value": "list",
-                    "firstLineNumber": 4,
-                    "lastLineNumber": 4
+                    "value": "list"
                   }
-                },
-                "firstLineNumber": 4,
-                "lastLineNumber": 4
+                }
               }
             },
             {
               "Param": {
                 "name": {
                   "Literal": {
-                    "value": "target",
-                    "firstLineNumber": 4,
-                    "lastLineNumber": 4
+                    "value": "target"
                   }
-                },
-                "firstLineNumber": 4,
-                "lastLineNumber": 4
+                }
               }
             }
           ],
@@ -59,38 +47,26 @@ window.COFFEECOFFEE_PROGRAM = [
                                 "Value": {
                                   "base": {
                                     "Literal": {
-                                      "value": "low",
-                                      "firstLineNumber": 5,
-                                      "lastLineNumber": 5
+                                      "value": "low"
                                     }
                                   },
-                                  "properties": [],
-                                  "firstLineNumber": 5,
-                                  "lastLineNumber": 5
+                                  "properties": []
                                 }
                               },
                               {
                                 "Value": {
                                   "base": {
                                     "Literal": {
-                                      "value": "high",
-                                      "firstLineNumber": 5,
-                                      "lastLineNumber": 5
+                                      "value": "high"
                                     }
                                   },
-                                  "properties": [],
-                                  "firstLineNumber": 5,
-                                  "lastLineNumber": 5
+                                  "properties": []
                                 }
                               }
-                            ],
-                            "firstLineNumber": 5,
-                            "lastLineNumber": 5
+                            ]
                           }
                         },
-                        "properties": [],
-                        "firstLineNumber": 5,
-                        "lastLineNumber": 5
+                        "properties": []
                       }
                     },
                     "value": {
@@ -102,23 +78,17 @@ window.COFFEECOFFEE_PROGRAM = [
                                 "Value": {
                                   "base": {
                                     "Literal": {
-                                      "value": "0",
-                                      "firstLineNumber": 5,
-                                      "lastLineNumber": 5
+                                      "value": "0"
                                     }
                                   },
-                                  "properties": [],
-                                  "firstLineNumber": 5,
-                                  "lastLineNumber": 5
+                                  "properties": []
                                 }
                               },
                               {
                                 "Value": {
                                   "base": {
                                     "Literal": {
-                                      "value": "list",
-                                      "firstLineNumber": 5,
-                                      "lastLineNumber": 5
+                                      "value": "list"
                                     }
                                   },
                                   "properties": [
@@ -127,33 +97,22 @@ window.COFFEECOFFEE_PROGRAM = [
                                         "name": {
                                           "Literal": {
                                             "value": "length",
-                                            "firstLineNumber": 5,
-                                            "lastLineNumber": 5,
                                             "asKey": true
                                           }
                                         },
-                                        "soak": false,
-                                        "firstLineNumber": 5,
-                                        "lastLineNumber": 5
+                                        "proto": "",
+                                        "soak": false
                                       }
                                     }
-                                  ],
-                                  "firstLineNumber": 5,
-                                  "lastLineNumber": 5
+                                  ]
                                 }
                               }
-                            ],
-                            "firstLineNumber": 6,
-                            "lastLineNumber": 6
+                            ]
                           }
                         },
-                        "properties": [],
-                        "firstLineNumber": 6,
-                        "lastLineNumber": 6
+                        "properties": []
                       }
-                    },
-                    "firstLineNumber": 5,
-                    "lastLineNumber": 6
+                    }
                   }
                 },
                 {
@@ -165,37 +124,25 @@ window.COFFEECOFFEE_PROGRAM = [
                           "Value": {
                             "base": {
                               "Literal": {
-                                "value": "low",
-                                "firstLineNumber": 6,
-                                "lastLineNumber": 6
+                                "value": "low"
                               }
                             },
-                            "properties": [],
-                            "firstLineNumber": 6,
-                            "lastLineNumber": 6
+                            "properties": []
                           }
                         },
                         "second": {
                           "Value": {
                             "base": {
                               "Literal": {
-                                "value": "high",
-                                "firstLineNumber": 7,
-                                "lastLineNumber": 7
+                                "value": "high"
                               }
                             },
-                            "properties": [],
-                            "firstLineNumber": 7,
-                            "lastLineNumber": 7
+                            "properties": []
                           }
                         },
-                        "flip": false,
-                        "firstLineNumber": 6,
-                        "lastLineNumber": 7
+                        "flip": false
                       }
                     },
-                    "firstLineNumber": 7,
-                    "lastLineNumber": 11,
                     "body": {
                       "Block": {
                         "expressions": [
@@ -205,14 +152,10 @@ window.COFFEECOFFEE_PROGRAM = [
                                 "Value": {
                                   "base": {
                                     "Literal": {
-                                      "value": "mid",
-                                      "firstLineNumber": 7,
-                                      "lastLineNumber": 7
+                                      "value": "mid"
                                     }
                                   },
-                                  "properties": [],
-                                  "firstLineNumber": 7,
-                                  "lastLineNumber": 7
+                                  "properties": []
                                 }
                               },
                               "value": {
@@ -232,70 +175,46 @@ window.COFFEECOFFEE_PROGRAM = [
                                                       "Value": {
                                                         "base": {
                                                           "Literal": {
-                                                            "value": "low",
-                                                            "firstLineNumber": 7,
-                                                            "lastLineNumber": 7
+                                                            "value": "low"
                                                           }
                                                         },
-                                                        "properties": [],
-                                                        "firstLineNumber": 7,
-                                                        "lastLineNumber": 7
+                                                        "properties": []
                                                       }
                                                     },
                                                     "second": {
                                                       "Value": {
                                                         "base": {
                                                           "Literal": {
-                                                            "value": "high",
-                                                            "firstLineNumber": 7,
-                                                            "lastLineNumber": 7
+                                                            "value": "high"
                                                           }
                                                         },
-                                                        "properties": [],
-                                                        "firstLineNumber": 7,
-                                                        "lastLineNumber": 7
+                                                        "properties": []
                                                       }
                                                     },
-                                                    "flip": false,
-                                                    "firstLineNumber": 7,
-                                                    "lastLineNumber": 7
+                                                    "flip": false
                                                   }
                                                 }
-                                              ],
-                                              "firstLineNumber": 7,
-                                              "lastLineNumber": 7
+                                              ]
                                             }
-                                          },
-                                          "firstLineNumber": 7,
-                                          "lastLineNumber": 7
+                                          }
                                         }
                                       },
-                                      "properties": [],
-                                      "firstLineNumber": 7,
-                                      "lastLineNumber": 7
+                                      "properties": []
                                     }
                                   },
                                   "second": {
                                     "Value": {
                                       "base": {
                                         "Literal": {
-                                          "value": "1",
-                                          "firstLineNumber": 8,
-                                          "lastLineNumber": 8
+                                          "value": "1"
                                         }
                                       },
-                                      "properties": [],
-                                      "firstLineNumber": 8,
-                                      "lastLineNumber": 8
+                                      "properties": []
                                     }
                                   },
-                                  "flip": false,
-                                  "firstLineNumber": 7,
-                                  "lastLineNumber": 8
+                                  "flip": false
                                 }
-                              },
-                              "firstLineNumber": 7,
-                              "lastLineNumber": 8
+                              }
                             }
                           },
                           {
@@ -304,23 +223,17 @@ window.COFFEECOFFEE_PROGRAM = [
                                 "Value": {
                                   "base": {
                                     "Literal": {
-                                      "value": "val",
-                                      "firstLineNumber": 8,
-                                      "lastLineNumber": 8
+                                      "value": "val"
                                     }
                                   },
-                                  "properties": [],
-                                  "firstLineNumber": 8,
-                                  "lastLineNumber": 8
+                                  "properties": []
                                 }
                               },
                               "value": {
                                 "Value": {
                                   "base": {
                                     "Literal": {
-                                      "value": "list",
-                                      "firstLineNumber": 8,
-                                      "lastLineNumber": 8
+                                      "value": "list"
                                     }
                                   },
                                   "properties": [
@@ -330,27 +243,17 @@ window.COFFEECOFFEE_PROGRAM = [
                                           "Value": {
                                             "base": {
                                               "Literal": {
-                                                "value": "mid",
-                                                "firstLineNumber": 8,
-                                                "lastLineNumber": 8
+                                                "value": "mid"
                                               }
                                             },
-                                            "properties": [],
-                                            "firstLineNumber": 8,
-                                            "lastLineNumber": 8
+                                            "properties": []
                                           }
-                                        },
-                                        "firstLineNumber": 8,
-                                        "lastLineNumber": 9
+                                        }
                                       }
                                     }
-                                  ],
-                                  "firstLineNumber": 8,
-                                  "lastLineNumber": 9
+                                  ]
                                 }
-                              },
-                              "firstLineNumber": 8,
-                              "lastLineNumber": 9
+                              }
                             }
                           },
                           {
@@ -364,18 +267,12 @@ window.COFFEECOFFEE_PROGRAM = [
                                           "Value": {
                                             "base": {
                                               "Literal": {
-                                                "value": "mid",
-                                                "firstLineNumber": 9,
-                                                "lastLineNumber": 9
+                                                "value": "mid"
                                               }
                                             },
-                                            "properties": [],
-                                            "firstLineNumber": 9,
-                                            "lastLineNumber": 9
+                                            "properties": []
                                           }
-                                        },
-                                        "firstLineNumber": 9,
-                                        "lastLineNumber": 9
+                                        }
                                       }
                                     }
                                   ]
@@ -388,39 +285,27 @@ window.COFFEECOFFEE_PROGRAM = [
                                     "Value": {
                                       "base": {
                                         "Literal": {
-                                          "value": "val",
-                                          "firstLineNumber": 9,
-                                          "lastLineNumber": 9
+                                          "value": "val"
                                         }
                                       },
-                                      "properties": [],
-                                      "firstLineNumber": 9,
-                                      "lastLineNumber": 9
+                                      "properties": []
                                     }
                                   },
                                   "second": {
                                     "Value": {
                                       "base": {
                                         "Literal": {
-                                          "value": "target",
-                                          "firstLineNumber": 10,
-                                          "lastLineNumber": 10
+                                          "value": "target"
                                         }
                                       },
-                                      "properties": [],
-                                      "firstLineNumber": 10,
-                                      "lastLineNumber": 10
+                                      "properties": []
                                     }
                                   },
-                                  "flip": false,
-                                  "firstLineNumber": 9,
-                                  "lastLineNumber": 10
+                                  "flip": false
                                 }
                               },
                               "elseBody": null,
-                              "isChain": false,
-                              "firstLineNumber": 9,
-                              "lastLineNumber": 10
+                              "isChain": false
                             }
                           },
                           {
@@ -434,14 +319,10 @@ window.COFFEECOFFEE_PROGRAM = [
                                           "Value": {
                                             "base": {
                                               "Literal": {
-                                                "value": "low",
-                                                "firstLineNumber": 10,
-                                                "lastLineNumber": 10
+                                                "value": "low"
                                               }
                                             },
-                                            "properties": [],
-                                            "firstLineNumber": 10,
-                                            "lastLineNumber": 10
+                                            "properties": []
                                           }
                                         },
                                         "value": {
@@ -451,42 +332,28 @@ window.COFFEECOFFEE_PROGRAM = [
                                               "Value": {
                                                 "base": {
                                                   "Literal": {
-                                                    "value": "mid",
-                                                    "firstLineNumber": 10,
-                                                    "lastLineNumber": 10
+                                                    "value": "mid"
                                                   }
                                                 },
-                                                "properties": [],
-                                                "firstLineNumber": 10,
-                                                "lastLineNumber": 10
+                                                "properties": []
                                               }
                                             },
                                             "second": {
                                               "Value": {
                                                 "base": {
                                                   "Literal": {
-                                                    "value": "1",
-                                                    "firstLineNumber": 10,
-                                                    "lastLineNumber": 10
+                                                    "value": "1"
                                                   }
                                                 },
-                                                "properties": [],
-                                                "firstLineNumber": 10,
-                                                "lastLineNumber": 10
+                                                "properties": []
                                               }
                                             },
-                                            "flip": false,
-                                            "firstLineNumber": 10,
-                                            "lastLineNumber": 10
+                                            "flip": false
                                           }
-                                        },
-                                        "firstLineNumber": 10,
-                                        "lastLineNumber": 10
+                                        }
                                       }
                                     }
-                                  ],
-                                  "firstLineNumber": 10,
-                                  "lastLineNumber": 10
+                                  ]
                                 }
                               },
                               "condition": {
@@ -496,33 +363,23 @@ window.COFFEECOFFEE_PROGRAM = [
                                     "Value": {
                                       "base": {
                                         "Literal": {
-                                          "value": "val",
-                                          "firstLineNumber": 10,
-                                          "lastLineNumber": 10
+                                          "value": "val"
                                         }
                                       },
-                                      "properties": [],
-                                      "firstLineNumber": 10,
-                                      "lastLineNumber": 10
+                                      "properties": []
                                     }
                                   },
                                   "second": {
                                     "Value": {
                                       "base": {
                                         "Literal": {
-                                          "value": "target",
-                                          "firstLineNumber": 10,
-                                          "lastLineNumber": 10
+                                          "value": "target"
                                         }
                                       },
-                                      "properties": [],
-                                      "firstLineNumber": 10,
-                                      "lastLineNumber": 10
+                                      "properties": []
                                     }
                                   },
-                                  "flip": false,
-                                  "firstLineNumber": 10,
-                                  "lastLineNumber": 10
+                                  "flip": false
                                 }
                               },
                               "elseBody": {
@@ -534,47 +391,31 @@ window.COFFEECOFFEE_PROGRAM = [
                                           "Value": {
                                             "base": {
                                               "Literal": {
-                                                "value": "high",
-                                                "firstLineNumber": 10,
-                                                "lastLineNumber": 10
+                                                "value": "high"
                                               }
                                             },
-                                            "properties": [],
-                                            "firstLineNumber": 10,
-                                            "lastLineNumber": 10
+                                            "properties": []
                                           }
                                         },
                                         "value": {
                                           "Value": {
                                             "base": {
                                               "Literal": {
-                                                "value": "mid",
-                                                "firstLineNumber": 10,
-                                                "lastLineNumber": 10
+                                                "value": "mid"
                                               }
                                             },
-                                            "properties": [],
-                                            "firstLineNumber": 10,
-                                            "lastLineNumber": 10
+                                            "properties": []
                                           }
-                                        },
-                                        "firstLineNumber": 10,
-                                        "lastLineNumber": 10
+                                        }
                                       }
                                     }
-                                  ],
-                                  "firstLineNumber": 10,
-                                  "lastLineNumber": 11
+                                  ]
                                 }
                               },
-                              "isChain": false,
-                              "firstLineNumber": 10,
-                              "lastLineNumber": 11
+                              "isChain": false
                             }
                           }
-                        ],
-                        "firstLineNumber": 7,
-                        "lastLineNumber": 11
+                        ]
                       }
                     }
                   }
@@ -588,37 +429,23 @@ window.COFFEECOFFEE_PROGRAM = [
                           "Value": {
                             "base": {
                               "Literal": {
-                                "value": "1",
-                                "firstLineNumber": 13,
-                                "lastLineNumber": 13
+                                "value": "1"
                               }
                             },
-                            "properties": [],
-                            "firstLineNumber": 13,
-                            "lastLineNumber": 13
+                            "properties": []
                           }
                         },
-                        "flip": false,
-                        "firstLineNumber": 13,
-                        "lastLineNumber": 13
+                        "flip": false
                       }
-                    },
-                    "firstLineNumber": 13,
-                    "lastLineNumber": 13
+                    }
                   }
                 }
-              ],
-              "firstLineNumber": 5,
-              "lastLineNumber": 13
+              ]
             }
           },
-          "bound": false,
-          "firstLineNumber": 13,
-          "lastLineNumber": 13
+          "bound": false
         }
-      },
-      "firstLineNumber": 4,
-      "lastLineNumber": 13
+      }
     }
   },
   {
@@ -631,14 +458,10 @@ window.COFFEECOFFEE_PROGRAM = [
               "Value": {
                 "base": {
                   "Literal": {
-                    "value": "2",
-                    "firstLineNumber": 13,
-                    "lastLineNumber": 13
+                    "value": "2"
                   }
                 },
-                "properties": [],
-                "firstLineNumber": 13,
-                "lastLineNumber": 13
+                "properties": []
               }
             },
             "second": {
@@ -653,94 +476,66 @@ window.COFFEECOFFEE_PROGRAM = [
                               "Value": {
                                 "base": {
                                   "Literal": {
-                                    "value": "10",
-                                    "firstLineNumber": 13,
-                                    "lastLineNumber": 13
+                                    "value": "10"
                                   }
                                 },
-                                "properties": [],
-                                "firstLineNumber": 13,
-                                "lastLineNumber": 13
+                                "properties": []
                               }
                             },
                             {
                               "Value": {
                                 "base": {
                                   "Literal": {
-                                    "value": "20",
-                                    "firstLineNumber": 13,
-                                    "lastLineNumber": 13
+                                    "value": "20"
                                   }
                                 },
-                                "properties": [],
-                                "firstLineNumber": 13,
-                                "lastLineNumber": 13
+                                "properties": []
                               }
                             },
                             {
                               "Value": {
                                 "base": {
                                   "Literal": {
-                                    "value": "30",
-                                    "firstLineNumber": 13,
-                                    "lastLineNumber": 13
+                                    "value": "30"
                                   }
                                 },
-                                "properties": [],
-                                "firstLineNumber": 13,
-                                "lastLineNumber": 13
+                                "properties": []
                               }
                             },
                             {
                               "Value": {
                                 "base": {
                                   "Literal": {
-                                    "value": "40",
-                                    "firstLineNumber": 13,
-                                    "lastLineNumber": 13
+                                    "value": "40"
                                   }
                                 },
-                                "properties": [],
-                                "firstLineNumber": 13,
-                                "lastLineNumber": 13
+                                "properties": []
                               }
                             },
                             {
                               "Value": {
                                 "base": {
                                   "Literal": {
-                                    "value": "50",
-                                    "firstLineNumber": 13,
-                                    "lastLineNumber": 13
+                                    "value": "50"
                                   }
                                 },
-                                "properties": [],
-                                "firstLineNumber": 13,
-                                "lastLineNumber": 13
+                                "properties": []
                               }
                             }
-                          ],
-                          "firstLineNumber": 13,
-                          "lastLineNumber": 13
+                          ]
                         }
                       },
-                      "properties": [],
-                      "firstLineNumber": 13,
-                      "lastLineNumber": 13
+                      "properties": []
                     }
                   },
                   {
                     "Value": {
                       "base": {
                         "Literal": {
-                          "value": "30",
-                          "firstLineNumber": 14,
-                          "lastLineNumber": 14
+                          "value": "30"
                         }
                       },
-                      "properties": [],
-                      "firstLineNumber": 14,
-                      "lastLineNumber": 14
+                      "properties": []
                     }
                   }
                 ],
@@ -751,23 +546,15 @@ window.COFFEECOFFEE_PROGRAM = [
                   "Value": {
                     "base": {
                       "Literal": {
-                        "value": "index",
-                        "firstLineNumber": 13,
-                        "lastLineNumber": 13
+                        "value": "index"
                       }
                     },
-                    "properties": [],
-                    "firstLineNumber": 13,
-                    "lastLineNumber": 13
+                    "properties": []
                   }
-                },
-                "firstLineNumber": 13,
-                "lastLineNumber": 14
+                }
               }
             },
-            "flip": false,
-            "firstLineNumber": 13,
-            "lastLineNumber": 14
+            "flip": false
           }
         }
       ],
@@ -778,9 +565,7 @@ window.COFFEECOFFEE_PROGRAM = [
         "Value": {
           "base": {
             "Literal": {
-              "value": "console",
-              "firstLineNumber": 13,
-              "lastLineNumber": 13
+              "value": "console"
             }
           },
           "properties": [
@@ -789,23 +574,16 @@ window.COFFEECOFFEE_PROGRAM = [
                 "name": {
                   "Literal": {
                     "value": "log",
-                    "firstLineNumber": 13,
-                    "lastLineNumber": 13,
                     "asKey": true
                   }
                 },
-                "soak": false,
-                "firstLineNumber": 13,
-                "lastLineNumber": 13
+                "proto": "",
+                "soak": false
               }
             }
-          ],
-          "firstLineNumber": 13,
-          "lastLineNumber": 13
+          ]
         }
-      },
-      "firstLineNumber": 13,
-      "lastLineNumber": 14
+      }
     }
   },
   {
@@ -818,14 +596,10 @@ window.COFFEECOFFEE_PROGRAM = [
               "Value": {
                 "base": {
                   "Literal": {
-                    "value": "4",
-                    "firstLineNumber": 14,
-                    "lastLineNumber": 14
+                    "value": "4"
                   }
                 },
-                "properties": [],
-                "firstLineNumber": 14,
-                "lastLineNumber": 14
+                "properties": []
               }
             },
             "second": {
@@ -843,99 +617,69 @@ window.COFFEECOFFEE_PROGRAM = [
                                   "Value": {
                                     "base": {
                                       "Literal": {
-                                        "value": "97",
-                                        "firstLineNumber": 14,
-                                        "lastLineNumber": 14
+                                        "value": "97"
                                       }
                                     },
-                                    "properties": [],
-                                    "firstLineNumber": 14,
-                                    "lastLineNumber": 14
+                                    "properties": []
                                   }
                                 },
-                                "flip": false,
-                                "firstLineNumber": 14,
-                                "lastLineNumber": 14
+                                "flip": false
                               }
                             },
                             {
                               "Value": {
                                 "base": {
                                   "Literal": {
-                                    "value": "35",
-                                    "firstLineNumber": 14,
-                                    "lastLineNumber": 14
+                                    "value": "35"
                                   }
                                 },
-                                "properties": [],
-                                "firstLineNumber": 14,
-                                "lastLineNumber": 14
+                                "properties": []
                               }
                             },
                             {
                               "Value": {
                                 "base": {
                                   "Literal": {
-                                    "value": "67",
-                                    "firstLineNumber": 14,
-                                    "lastLineNumber": 14
+                                    "value": "67"
                                   }
                                 },
-                                "properties": [],
-                                "firstLineNumber": 14,
-                                "lastLineNumber": 14
+                                "properties": []
                               }
                             },
                             {
                               "Value": {
                                 "base": {
                                   "Literal": {
-                                    "value": "88",
-                                    "firstLineNumber": 14,
-                                    "lastLineNumber": 14
+                                    "value": "88"
                                   }
                                 },
-                                "properties": [],
-                                "firstLineNumber": 14,
-                                "lastLineNumber": 14
+                                "properties": []
                               }
                             },
                             {
                               "Value": {
                                 "base": {
                                   "Literal": {
-                                    "value": "1200",
-                                    "firstLineNumber": 14,
-                                    "lastLineNumber": 14
+                                    "value": "1200"
                                   }
                                 },
-                                "properties": [],
-                                "firstLineNumber": 14,
-                                "lastLineNumber": 14
+                                "properties": []
                               }
                             }
-                          ],
-                          "firstLineNumber": 14,
-                          "lastLineNumber": 14
+                          ]
                         }
                       },
-                      "properties": [],
-                      "firstLineNumber": 14,
-                      "lastLineNumber": 14
+                      "properties": []
                     }
                   },
                   {
                     "Value": {
                       "base": {
                         "Literal": {
-                          "value": "1200",
-                          "firstLineNumber": 15,
-                          "lastLineNumber": 15
+                          "value": "1200"
                         }
                       },
-                      "properties": [],
-                      "firstLineNumber": 15,
-                      "lastLineNumber": 15
+                      "properties": []
                     }
                   }
                 ],
@@ -946,23 +690,15 @@ window.COFFEECOFFEE_PROGRAM = [
                   "Value": {
                     "base": {
                       "Literal": {
-                        "value": "index",
-                        "firstLineNumber": 14,
-                        "lastLineNumber": 14
+                        "value": "index"
                       }
                     },
-                    "properties": [],
-                    "firstLineNumber": 14,
-                    "lastLineNumber": 14
+                    "properties": []
                   }
-                },
-                "firstLineNumber": 14,
-                "lastLineNumber": 15
+                }
               }
             },
-            "flip": false,
-            "firstLineNumber": 14,
-            "lastLineNumber": 15
+            "flip": false
           }
         }
       ],
@@ -973,9 +709,7 @@ window.COFFEECOFFEE_PROGRAM = [
         "Value": {
           "base": {
             "Literal": {
-              "value": "console",
-              "firstLineNumber": 14,
-              "lastLineNumber": 14
+              "value": "console"
             }
           },
           "properties": [
@@ -984,23 +718,16 @@ window.COFFEECOFFEE_PROGRAM = [
                 "name": {
                   "Literal": {
                     "value": "log",
-                    "firstLineNumber": 14,
-                    "lastLineNumber": 14,
                     "asKey": true
                   }
                 },
-                "soak": false,
-                "firstLineNumber": 14,
-                "lastLineNumber": 14
+                "proto": "",
+                "soak": false
               }
             }
-          ],
-          "firstLineNumber": 14,
-          "lastLineNumber": 14
+          ]
         }
-      },
-      "firstLineNumber": 14,
-      "lastLineNumber": 15
+      }
     }
   },
   {
@@ -1013,14 +740,10 @@ window.COFFEECOFFEE_PROGRAM = [
               "Value": {
                 "base": {
                   "Literal": {
-                    "value": "0",
-                    "firstLineNumber": 15,
-                    "lastLineNumber": 15
+                    "value": "0"
                   }
                 },
-                "properties": [],
-                "firstLineNumber": 15,
-                "lastLineNumber": 15
+                "properties": []
               }
             },
             "second": {
@@ -1035,66 +758,46 @@ window.COFFEECOFFEE_PROGRAM = [
                               "Value": {
                                 "base": {
                                   "Literal": {
-                                    "value": "0",
-                                    "firstLineNumber": 15,
-                                    "lastLineNumber": 15
+                                    "value": "0"
                                   }
                                 },
-                                "properties": [],
-                                "firstLineNumber": 15,
-                                "lastLineNumber": 15
+                                "properties": []
                               }
                             },
                             {
                               "Value": {
                                 "base": {
                                   "Literal": {
-                                    "value": "45",
-                                    "firstLineNumber": 15,
-                                    "lastLineNumber": 15
+                                    "value": "45"
                                   }
                                 },
-                                "properties": [],
-                                "firstLineNumber": 15,
-                                "lastLineNumber": 15
+                                "properties": []
                               }
                             },
                             {
                               "Value": {
                                 "base": {
                                   "Literal": {
-                                    "value": "70",
-                                    "firstLineNumber": 15,
-                                    "lastLineNumber": 15
+                                    "value": "70"
                                   }
                                 },
-                                "properties": [],
-                                "firstLineNumber": 15,
-                                "lastLineNumber": 15
+                                "properties": []
                               }
                             }
-                          ],
-                          "firstLineNumber": 15,
-                          "lastLineNumber": 15
+                          ]
                         }
                       },
-                      "properties": [],
-                      "firstLineNumber": 15,
-                      "lastLineNumber": 15
+                      "properties": []
                     }
                   },
                   {
                     "Value": {
                       "base": {
                         "Literal": {
-                          "value": "0",
-                          "firstLineNumber": 15,
-                          "lastLineNumber": 15
+                          "value": "0"
                         }
                       },
-                      "properties": [],
-                      "firstLineNumber": 15,
-                      "lastLineNumber": 15
+                      "properties": []
                     }
                   }
                 ],
@@ -1105,23 +808,15 @@ window.COFFEECOFFEE_PROGRAM = [
                   "Value": {
                     "base": {
                       "Literal": {
-                        "value": "index",
-                        "firstLineNumber": 15,
-                        "lastLineNumber": 15
+                        "value": "index"
                       }
                     },
-                    "properties": [],
-                    "firstLineNumber": 15,
-                    "lastLineNumber": 15
+                    "properties": []
                   }
-                },
-                "firstLineNumber": 15,
-                "lastLineNumber": 15
+                }
               }
             },
-            "flip": false,
-            "firstLineNumber": 15,
-            "lastLineNumber": 15
+            "flip": false
           }
         }
       ],
@@ -1132,9 +827,7 @@ window.COFFEECOFFEE_PROGRAM = [
         "Value": {
           "base": {
             "Literal": {
-              "value": "console",
-              "firstLineNumber": 15,
-              "lastLineNumber": 15
+              "value": "console"
             }
           },
           "properties": [
@@ -1143,23 +836,16 @@ window.COFFEECOFFEE_PROGRAM = [
                 "name": {
                   "Literal": {
                     "value": "log",
-                    "firstLineNumber": 15,
-                    "lastLineNumber": 15,
                     "asKey": true
                   }
                 },
-                "soak": false,
-                "firstLineNumber": 15,
-                "lastLineNumber": 15
+                "proto": "",
+                "soak": false
               }
             }
-          ],
-          "firstLineNumber": 15,
-          "lastLineNumber": 15
+          ]
         }
-      },
-      "firstLineNumber": 15,
-      "lastLineNumber": 15
+      }
     }
   }
 ]
