@@ -3,8 +3,7 @@
 # 
 # USAGE: coffee nodes_to_json.coffee hello_world.coffee
 
-CoffeeScript = require "coffee-script"
-fs = require "fs"
+CoffeeScript = require "coffee-script" unless window?
   
 wrap = (expressions) ->
   expressions = expressions.map (expression) ->
@@ -72,16 +71,21 @@ handle_data = (data) ->
   expressions = CoffeeScript.nodes(data).expressions
   console.log JSON.stringify wrap(expressions), null, "  "
 
-fs = require 'fs'
-fn = process.argv[2]
-if fn
-  data = fs.readFileSync(fn).toString()
-  handle_data(data)
+if window?
+  window.nodes_to_json = (code) ->
+    expressions = window.CoffeeScript.nodes(code).expressions
+    wrap(expressions)
 else
-  data = ''
-  stdin = process.openStdin()
-  stdin.on 'data', (buffer) ->
-    data += buffer.toString() if buffer
-  stdin.on 'end', ->
+  fs = require 'fs'
+  fn = process.argv[2]
+  if fn
+    data = fs.readFileSync(fn).toString()
     handle_data(data)
+  else
+    data = ''
+    stdin = process.openStdin()
+    stdin.on 'data', (buffer) ->
+      data += buffer.toString() if buffer
+    stdin.on 'end', ->
+      handle_data(data)
 
