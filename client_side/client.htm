@@ -4,7 +4,15 @@
   <script type="text/javascript" src="../runtime.js"></script>
   <script type="text/javascript" src="../nodes_to_json.js"></script>
   <script type="text/javascript" src="client.js"></script>
+  <link rel="stylesheet" href="client.css">
 </head>
 <body>
-  <h3>Open the console--that is where the action is.</h3>
+  <h3>Open the console--that is where most of the action will be (for now).</h3>
+  <div id="output">
+  </div>
+  <form>
+    <textarea id="code">
+    </textarea>
+    <input type="submit" class="code" value="Run!">
+  </form>
 </body>

@@ -3,10 +3,20 @@ jQuery(document).ready ->
   # MINIFY=false bin/cake build:browser
   code = '''
     [a, b] = [1, 1]
-    while a < 1000000
+    n = 1000000
+    while b < n
       [a, b] = [b, a+b]
       console.log a
+    $("#output").html "biggest fib number < #{n} = #{a}"
     '''
-  ast = window.nodes_to_json(code);
-  # console.log(JSON.stringify(ast, null, "   "));
-  window.coffeecoffee(ast)
+  $("#code").val(code)
+  $("input.code").click ->
+    try
+      code = $("#code").val()
+      ast = window.nodes_to_json(code);
+      # console.log(JSON.stringify(ast, null, "   "));
+      window.coffeecoffee(ast)
+    catch e
+      alert e
+    finally
+      return false
