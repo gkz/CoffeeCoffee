@@ -10,6 +10,9 @@
 # using Scope to manage our variables.
 handle_data = (data) ->
   program = JSON.parse data
+  coffeecoffee(program)
+  
+coffeecoffee = (program) ->
   scope = Scope()
   for stmt in program
     Eval scope, stmt
@@ -521,7 +524,10 @@ Scope = (params, parent_scope, this_value, args) ->
 
       # builtins
       debug "deref #{var_name} (builtin)"
-      val = root[var_name]
+      if root?
+        val = root[var_name]
+      else
+        val = window[var_name]
       internal_throw "reference", "ReferenceError: #{var_name} is not defined" unless val?
       val
       
@@ -593,18 +599,17 @@ the_key_of = (ast) ->
   for key of ast
     return key
       
-util = require 'util'
-
 pp = (obj, description) ->
+  util = require 'util'
   util.debug "-----"
   util.debug description if description?
   util.debug JSON.stringify obj, null, "  "
 
 debug = (s) ->
-  # console.log "(interpreter)", s
+  console.log "(interpreter)", s
 
 if window?
-  window.coffeecoffee = handle_data
+  window.coffeecoffee = coffeecoffee
 else
   # assume we're running node side for now
   fs = require 'fs'
