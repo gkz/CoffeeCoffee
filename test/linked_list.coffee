@@ -1,12 +1,13 @@
 # "Classic" linked list implementation that doesn't keep track of its size.
 class LinkedList
 
-  console.log "building LinkedList class"
+  constructor: ->
+    
+    console.log "building LinkedList object"
 
   # Appends some data to the end of the list. This method traverses the existing
   # list and places the value at the end in a new node.
   add: (data) ->
-
     # Create a new node object to wrap the data.
     node = data: data, next: null
 
@@ -79,13 +80,16 @@ class LinkedList
     while current
       result.push current.data
       current = current.next
-
     result
 
 
   # The string representation of the linked list.
-  toString: -> this.toArray().toString()
-
+  toString: ->
+    # We cannot implement toString() with debugging turned on, as
+    # it causes an infinite loop.
+    return "(LIST)"
+    this.toArray().toString()
+    
 
 # Tests.
 list = new LinkedList

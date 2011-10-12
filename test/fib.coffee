@@ -8,8 +8,8 @@ class Fib
     while n < @n
       n += 1
       [a, b] = [b, a+b]
-      console.log "(program output)", a
+      console.log a
     
 n = process.argv[2]
-f = new Fib(n)
-f.calc()
+fibber = new Fib(n)
+fibber.calc()

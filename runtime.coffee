@@ -1,4 +1,4 @@
-# This is an experiment in having CS interpret itself. One use case would
+  # This is an experiment in having CS interpret itself. One use case would
 # be educational environments, where students are learning CS and need
 # to be able to pause/resume applications, etc.
 
@@ -117,8 +117,9 @@ AST =
     properties = variable.properties
 
     if ast.isNew
-      # need to handle properties better
+      # may need to handle properties better
       val = newify obj, args
+      debug "new #{obj} with args: #{args}" 
       return val
 
     if properties.length == 0
@@ -130,6 +131,7 @@ AST =
       old_method_name = CURRENT_OBJECT_METHOD_NAME
       CURRENT_OBJECT_METHOD_NAME = key
       try
+        debug "call #{key} with args: #{args}"
         val = obj[key].apply obj, args
       finally
         CURRENT_OBJECT_METHOD_NAME = old_method_name
@@ -443,7 +445,11 @@ AST =
     return obj
 
   While: (scope, ast) ->
-    while Eval scope, ast.condition
+    while true
+      debug "while <condition>..."
+      cond = Eval scope, ast.condition
+      break unless cond
+      debug "(cond true)"
       try
         val = Eval scope, ast.body
       catch e
@@ -495,7 +501,7 @@ Scope = (params, parent_scope, this_value, args) ->
         assigned_val
       else if context == "="
         # first reference to local variable
-        debug "first assignment: #{var_name} = #{value}"
+        debug "#{var_name} = #{value} (original set)"
         set_local_value(var_name, value)
         value
       else
@@ -514,6 +520,7 @@ Scope = (params, parent_scope, this_value, args) ->
         return value
 
       # builtins
+      debug "deref #{var_name} (builtin)"
       val = root[var_name]
       internal_throw "reference", "ReferenceError: #{var_name} is not defined" unless val?
       val
@@ -594,17 +601,21 @@ pp = (obj, description) ->
   util.debug JSON.stringify obj, null, "  "
 
 debug = (s) ->
-  console.log "(interpreter)", s
+  # console.log "(interpreter)", s
 
-fs = require 'fs'
-[fn] = process.argv.splice 2, 1
-if fn == '-'
-  data = ''
-  stdin = process.openStdin()
-  stdin.on 'data', (buffer) ->
-    data += buffer.toString() if buffer
-  stdin.on 'end', ->
-    handle_data(data)
+if window?
+  window.coffeecoffee = handle_data
 else
-  data = fs.readFileSync(fn).toString()
-  handle_data(data)
+  # assume we're running node side for now
+  fs = require 'fs'
+  [fn] = process.argv.splice 2, 1
+  if fn == '-'
+    data = ''
+    stdin = process.openStdin()
+    stdin.on 'data', (buffer) ->
+      data += buffer.toString() if buffer
+    stdin.on 'end', ->
+      handle_data(data)
+  else
+    data = fs.readFileSync(fn).toString()
+    handle_data(data)
