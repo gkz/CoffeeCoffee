@@ -15,7 +15,7 @@ jQuery(document).ready ->
     try
       code = $("#code").val()
       ast = window.nodes_to_json(code);
-       # console.log(JSON.stringify(ast, null, "   "));
+      # console.log(JSON.stringify(ast, null, "   "));
       window.coffeecoffee(ast)
     catch e
       alert e

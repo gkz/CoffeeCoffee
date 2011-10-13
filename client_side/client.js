@@ -8,7 +8,6 @@
       try {
         code = $("#code").val();
         ast = window.nodes_to_json(code);
-        console.log(JSON.stringify(ast, null, "   "));
         return window.coffeecoffee(ast);
       } catch (e) {
         return alert(e);

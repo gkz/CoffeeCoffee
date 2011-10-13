@@ -122,7 +122,7 @@ AST =
     if ast.isNew
       # may need to handle properties better
       val = newify obj, args
-      debug "new #{obj} with args: #{args}" 
+      Debugger.info "new #{obj} with args: #{args}" 
       return val
 
     if properties.length == 0
@@ -134,7 +134,7 @@ AST =
       old_method_name = CURRENT_OBJECT_METHOD_NAME
       CURRENT_OBJECT_METHOD_NAME = key
       try
-        debug "call #{key} with args: #{args}"
+        Debugger.info "call #{key} with args: #{args}"
         val = obj[key].apply obj, args
       finally
         CURRENT_OBJECT_METHOD_NAME = old_method_name
@@ -358,7 +358,7 @@ AST =
       }
       if ops[op]
         val = ops[op]()
-        debug "Op: #{operand1} #{op} #{operand2} -> #{val}"
+        Debugger.info "Op: #{operand1} #{op} #{operand2} -> #{val}"
         return val
     else
       operand1 = Eval scope, ast.first
@@ -438,21 +438,21 @@ AST =
       else if key == 'Access'
         key = Eval scope, property
         obj = obj[key]
-        debug "deref #{key} -> #{obj}"
+        Debugger.info "deref #{key} -> #{obj}"
       else if key == "Index"
         key = Eval scope, property
         obj = obj[key]
-        debug "deref [#{key}] -> #{obj}"
+        Debugger.info "deref [#{key}] -> #{obj}"
       else
         throw "unexpected key #{key}"      
     return obj
 
   While: (scope, ast) ->
     while true
-      debug "while <condition>..."
+      Debugger.info "while <condition>..."
       cond = Eval scope, ast.condition
       break unless cond
-      debug "(cond true)"
+      Debugger.info "(cond true)"
       try
         val = Eval scope, ast.body
       catch e
@@ -498,13 +498,13 @@ Scope = (params, parent_scope, this_value, args) ->
       if closure_wrapper
         # we have a previous reference
         if context != '='
-          debug "#{var_name} = #{closure_wrapper.obj}..."
+          Debugger.info "#{var_name} = #{closure_wrapper.obj}..."
         assigned_val = update_variable_reference(closure_wrapper, "obj", value, context)
-        debug "#{var_name} #{context} #{value} -> #{assigned_val}"
+        Debugger.info "#{var_name} #{context} #{value} -> #{assigned_val}"
         assigned_val
       else if context == "="
         # first reference to local variable
-        debug "#{var_name} = #{value} (original set)"
+        Debugger.info "#{var_name} = #{value} (original set)"
         set_local_value(var_name, value)
         value
       else
@@ -519,11 +519,11 @@ Scope = (params, parent_scope, this_value, args) ->
       closure_wrapper = self.get_closure_wrapper(var_name)
       if closure_wrapper
         value = closure_wrapper.obj
-        debug "deref #{var_name} -> #{value}"
+        Debugger.info "deref #{var_name} -> #{value}"
         return value
 
       # builtins
-      debug "deref #{var_name} (builtin)"
+      Debugger.info "deref #{var_name} (builtin)"
       if root?
         val = root[var_name]
       else
@@ -605,8 +605,9 @@ pp = (obj, description) ->
   util.debug description if description?
   util.debug JSON.stringify obj, null, "  "
 
-debug = (s) ->
-  console.log "(interpreter)", s
+Debugger =
+  info: (s) ->
+    console.log "(interpreter)", s
 
 if window?
   window.coffeecoffee = coffeecoffee
