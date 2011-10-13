@@ -1,5 +1,5 @@
 (function() {
-  var AST, CURRENT_OBJECT_METHOD_NAME, Eval, Scope, build_class, coffeecoffee, data, debug, fn, fs, handle_data, internal_throw, newify, pp, stdin, the_key_of, update_variable_reference;
+  var AST, CURRENT_OBJECT_METHOD_NAME, Debugger, Eval, Scope, build_class, coffeecoffee, data, fn, fs, handle_data, internal_throw, newify, pp, stdin, the_key_of, update_variable_reference;
   var __slice = Array.prototype.slice, __indexOf = Array.prototype.indexOf || function(item) {
     for (var i = 0, l = this.length; i < l; i++) {
       if (this[i] === item) return i;
@@ -22,11 +22,13 @@
     return _results;
   };
   Eval = function(scope, ast) {
-    var method, name;
+    var method, name, node;
     name = the_key_of(ast);
     method = AST[name];
     if (method) {
-      return method(scope, ast[name]);
+      node = ast[name];
+      Debugger.set_line_number(node);
+      return method(scope, node);
     }
     throw "" + name + " not supported yet";
   };
@@ -144,7 +146,7 @@
       properties = variable.properties;
       if (ast.isNew) {
         val = newify(obj, args);
-        debug("new " + obj + " with args: " + args);
+        Debugger.info("new " + obj + " with args: " + args);
         return val;
       }
       if (properties.length === 0) {
@@ -157,7 +159,7 @@
         old_method_name = CURRENT_OBJECT_METHOD_NAME;
         CURRENT_OBJECT_METHOD_NAME = key;
         try {
-          debug("call " + key + " with args: " + args);
+          Debugger.info("call " + key + " with args: " + args);
           val = obj[key].apply(obj, args);
         } finally {
           CURRENT_OBJECT_METHOD_NAME = old_method_name;
@@ -506,7 +508,7 @@
         };
         if (ops[op]) {
           val = ops[op]();
-          debug("Op: " + operand1 + " " + op + " " + operand2 + " -> " + val);
+          Debugger.info("Op: " + operand1 + " " + op + " " + operand2 + " -> " + val);
           return val;
         }
       } else {
@@ -639,11 +641,11 @@
         } else if (key === 'Access') {
           key = Eval(scope, property);
           obj = obj[key];
-          debug("deref " + key + " -> " + obj);
+          Debugger.info("deref " + key + " -> " + obj);
         } else if (key === "Index") {
           key = Eval(scope, property);
           obj = obj[key];
-          debug("deref [" + key + "] -> " + obj);
+          Debugger.info("deref [" + key + "] -> " + obj);
         } else {
           throw "unexpected key " + key;
         }
@@ -654,12 +656,12 @@
       var cond, val, _results;
       _results = [];
       while (true) {
-        debug("while <condition>...");
+        Debugger.info("while <condition>...");
         cond = Eval(scope, ast.condition);
         if (!cond) {
           break;
         }
-        debug("(cond true)");
+        Debugger.info("(cond true)");
         try {
           val = Eval(scope, ast.body);
         } catch (e) {
@@ -707,13 +709,13 @@
         closure_wrapper = self.get_closure_wrapper(var_name);
         if (closure_wrapper) {
           if (context !== '=') {
-            debug("" + var_name + " = " + closure_wrapper.obj + "...");
+            Debugger.info("" + var_name + " = " + closure_wrapper.obj + "...");
           }
           assigned_val = update_variable_reference(closure_wrapper, "obj", value, context);
-          debug("" + var_name + " " + context + " " + value + " -> " + assigned_val);
+          Debugger.info("" + var_name + " " + context + " " + value + " -> " + assigned_val);
           return assigned_val;
         } else if (context === "=") {
-          debug("" + var_name + " = " + value + " (original set)");
+          Debugger.info("" + var_name + " = " + value + " (original set)");
           set_local_value(var_name, value);
           return value;
         } else {
@@ -732,10 +734,10 @@
         closure_wrapper = self.get_closure_wrapper(var_name);
         if (closure_wrapper) {
           value = closure_wrapper.obj;
-          debug("deref " + var_name + " -> " + value);
+          Debugger.info("deref " + var_name + " -> " + value);
           return value;
         }
-        debug("deref " + var_name + " (builtin)");
+        Debugger.info("deref " + var_name + " (builtin)");
         if (typeof root !== "undefined" && root !== null) {
           val = root[var_name];
         } else {
@@ -855,11 +857,22 @@
     }
     return util.debug(JSON.stringify(obj, null, "  "));
   };
-  debug = function(s) {
-    return console.log("(interpreter)", s);
+  Debugger = {
+    info: function(s) {
+      return console.log("(interpreter)", s);
+    },
+    set_line_number: function(ast) {
+      if (ast.firstLineNumber) {
+        return Debugger.highlight_line(ast.firstLineNumber);
+      }
+    },
+    highlight_line: function(line_number) {
+      return console.log("(interpreter) line = " + line_number);
+    }
   };
   if (typeof window !== "undefined" && window !== null) {
     window.coffeecoffee = coffeecoffee;
+    window.Debugger = Debugger;
   } else {
     fs = require('fs');
     fn = process.argv.splice(2, 1)[0];

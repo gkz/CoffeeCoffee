@@ -1,4 +1,4 @@
-  # This is an experiment in having CS interpret itself. One use case would
+# This is an experiment in having CS interpret itself. One use case would
 # be educational environments, where students are learning CS and need
 # to be able to pause/resume applications, etc.
 
@@ -21,7 +21,9 @@ Eval = (scope, ast) ->
   name = the_key_of(ast)
   method = AST[name]
   if method
-    return method scope, ast[name]  
+    node = ast[name]
+    Debugger.set_line_number(node)
+    return method scope, node  
   throw "#{name} not supported yet"
 
 CURRENT_OBJECT_METHOD_NAME = null # for super
@@ -605,12 +607,19 @@ pp = (obj, description) ->
   util.debug description if description?
   util.debug JSON.stringify obj, null, "  "
 
+# Note that this mostly gets overridden client side.
 Debugger =
   info: (s) ->
     console.log "(interpreter)", s
+  set_line_number: (ast) ->
+    if ast.firstLineNumber
+      Debugger.highlight_line(ast.firstLineNumber)
+  highlight_line: (line_number) ->
+    console.log "(interpreter) line = #{line_number}"
 
 if window?
   window.coffeecoffee = coffeecoffee
+  window.Debugger = Debugger
 else
   # assume we're running node side for now
   fs = require 'fs'

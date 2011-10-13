@@ -2,3 +2,18 @@ textarea {
   height: 120px;
   width: 300px;
 }
+
+div#code_view {
+  padding: 20px;
+  border: 1px black solid;
+}
+
+div#code_view pre {
+  margin: 2px;
+  height: 15px;
+}
+
+div#code_view pre.highlight {
+  font-weight: bold;
+  background-color: #4E4
+}
