@@ -23,16 +23,7 @@ jQuery(document).ready ->
   # to build unminified CS (so we get full introspection)
   # MINIFY=false bin/cake build:browser
   # cp extras/coffee-script.js ../CoffeeCoffee/client_side/coffee-script.js
-  code = '''
-    [a, b] = [1, 1]
-    n = 1000000
-    while b < n
-      [a, b] = [b, a+b]
-      console.log a
-
-    # integrate w/jQuery
-    $("#output").html "biggest fib number < #{n} = #{a}"
-    '''
+  code = EXAMPLES.fib
   $("#code").val(code)
   $("input.code").click ->
     try

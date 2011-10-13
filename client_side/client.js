@@ -30,7 +30,7 @@
   Debugger.highlight_line = highlight_line();
   jQuery(document).ready(function() {
     var code;
-    code = '[a, b] = [1, 1]\nn = 1000000\nwhile b < n\n  [a, b] = [b, a+b]\n  console.log a\n\n# integrate w/jQuery\n$("#output").html "biggest fib number < #{n} = #{a}"';
+    code = EXAMPLES.fib;
     $("#code").val(code);
     return $("input.code").click(function() {
       var ast;
