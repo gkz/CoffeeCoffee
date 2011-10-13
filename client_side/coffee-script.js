@@ -1063,6 +1063,7 @@ this.CoffeeScript = function() {
   var exports = this;
   /* Jison generated parser */
 var parser = (function(){
+undefined
 var parser = {trace: function trace() { },
 yy: {},
 symbols_: {"error":2,"Root":3,"Body":4,"Block":5,"TERMINATOR":6,"Line":7,"Expression":8,"Statement":9,"Return":10,"Throw":11,"Comment":12,"STATEMENT":13,"Value":14,"Invocation":15,"Code":16,"Operation":17,"Assign":18,"If":19,"Try":20,"While":21,"For":22,"Switch":23,"Class":24,"INDENT":25,"OUTDENT":26,"Identifier":27,"IDENTIFIER":28,"AlphaNumeric":29,"NUMBER":30,"STRING":31,"Literal":32,"JS":33,"REGEX":34,"BOOL":35,"Assignable":36,"=":37,"AssignObj":38,"ObjAssignable":39,":":40,"ThisProperty":41,"RETURN":42,"HERECOMMENT":43,"PARAM_START":44,"ParamList":45,"PARAM_END":46,"FuncGlyph":47,"->":48,"=>":49,"OptComma":50,",":51,"Param":52,"ParamVar":53,"...":54,"Array":55,"Object":56,"Splat":57,"SimpleAssignable":58,"Accessor":59,"Parenthetical":60,"Range":61,"This":62,".":63,"?.":64,"::":65,"Index":66,"INDEX_START":67,"IndexValue":68,"INDEX_END":69,"INDEX_SOAK":70,"Slice":71,"{":72,"AssignList":73,"}":74,"CLASS":75,"EXTENDS":76,"OptFuncExist":77,"Arguments":78,"SUPER":79,"FUNC_EXIST":80,"CALL_START":81,"CALL_END":82,"ArgList":83,"THIS":84,"@":85,"[":86,"]":87,"RangeDots":88,"..":89,"Arg":90,"SimpleArgs":91,"TRY":92,"Catch":93,"FINALLY":94,"CATCH":95,"THROW":96,"(":97,")":98,"WhileSource":99,"WHILE":100,"WHEN":101,"UNTIL":102,"Loop":103,"LOOP":104,"ForBody":105,"FOR":106,"ForStart":107,"ForSource":108,"ForVariables":109,"OWN":110,"ForValue":111,"FORIN":112,"FOROF":113,"BY":114,"SWITCH":115,"Whens":116,"ELSE":117,"When":118,"LEADING_WHEN":119,"IfBlock":120,"IF":121,"POST_IF":122,"UNARY":123,"-":124,"+":125,"--":126,"++":127,"?":128,"MATH":129,"SHIFT":130,"COMPARE":131,"LOGIC":132,"RELATION":133,"COMPOUND_ASSIGN":134,"$accept":0,"$end":1},
@@ -1072,15 +1073,33 @@ performAction: function anonymous(yytext,yyleng,yylineno,yy,yystate,$$,_$) {
 
 var $0 = $$.length - 1;
 switch (yystate) {
-case 1:return this.$ = new yy.Block;
+case 1:return this.$ = (function(lstack) {
+  var node = new yy.Block;
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 1);
+  };
+  return node; 
+})(arguments[6])
 break;
 case 2:return this.$ = $$[$0];
 break;
 case 3:return this.$ = $$[$0-1];
 break;
-case 4:this.$ = yy.Block.wrap([$$[$0]]);
+case 4:this.$ = (function(lstack) {
+  var node = yy.Block.wrap([$$[$0]]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 1);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 5:this.$ = $$[$0-2].push($$[$0]);
+case 5:this.$ = (function(lstack) {
+  var node = $$[$0-2].push($$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 3);
+  };
+  return node; 
+})(arguments[6])
 break;
 case 6:this.$ = $$[$0-1];
 break;
@@ -1094,7 +1113,13 @@ case 10:this.$ = $$[$0];
 break;
 case 11:this.$ = $$[$0];
 break;
-case 12:this.$ = new yy.Literal($$[$0]);
+case 12:this.$ = (function(lstack) {
+  var node = new yy.Literal($$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 1);
+  };
+  return node; 
+})(arguments[6])
 break;
 case 13:this.$ = $$[$0];
 break;
@@ -1118,38 +1143,116 @@ case 22:this.$ = $$[$0];
 break;
 case 23:this.$ = $$[$0];
 break;
-case 24:this.$ = new yy.Block;
+case 24:this.$ = (function(lstack) {
+  var node = new yy.Block;
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 2);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 25:this.$ = $$[$0-1];
+case 25:this.$ = (function(lstack) {
+  var node = $$[$0-1];
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 3);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 26:this.$ = new yy.Literal($$[$0]);
+case 26:this.$ = (function(lstack) {
+  var node = new yy.Literal($$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 1);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 27:this.$ = new yy.Literal($$[$0]);
+case 27:this.$ = (function(lstack) {
+  var node = new yy.Literal($$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 1);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 28:this.$ = new yy.Literal($$[$0]);
+case 28:this.$ = (function(lstack) {
+  var node = new yy.Literal($$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 1);
+  };
+  return node; 
+})(arguments[6])
 break;
 case 29:this.$ = $$[$0];
 break;
-case 30:this.$ = new yy.Literal($$[$0]);
+case 30:this.$ = (function(lstack) {
+  var node = new yy.Literal($$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 1);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 31:this.$ = new yy.Literal($$[$0]);
+case 31:this.$ = (function(lstack) {
+  var node = new yy.Literal($$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 1);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 32:this.$ = (function () {
+case 32:this.$ = (function(lstack) {
+  var node = (function () {
         var val;
         val = new yy.Literal($$[$0]);
         if ($$[$0] === 'undefined') val.isUndefined = true;
         return val;
       }());
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 1);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 33:this.$ = new yy.Assign($$[$0-2], $$[$0]);
+case 33:this.$ = (function(lstack) {
+  var node = new yy.Assign($$[$0-2], $$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 3);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 34:this.$ = new yy.Assign($$[$0-4], $$[$0-1]);
+case 34:this.$ = (function(lstack) {
+  var node = new yy.Assign($$[$0-4], $$[$0-1]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 5);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 35:this.$ = new yy.Value($$[$0]);
+case 35:this.$ = (function(lstack) {
+  var node = new yy.Value($$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 1);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 36:this.$ = new yy.Assign(new yy.Value($$[$0-2]), $$[$0], 'object');
+case 36:this.$ = (function(lstack) {
+  var node = new yy.Assign(new yy.Value($$[$0-2]), $$[$0], 'object');
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 3);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 37:this.$ = new yy.Assign(new yy.Value($$[$0-4]), $$[$0-1], 'object');
+case 37:this.$ = (function(lstack) {
+  var node = new yy.Assign(new yy.Value($$[$0-4]), $$[$0-1], 'object');
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 5);
+  };
+  return node; 
+})(arguments[6])
 break;
 case 38:this.$ = $$[$0];
 break;
@@ -1159,35 +1262,113 @@ case 40:this.$ = $$[$0];
 break;
 case 41:this.$ = $$[$0];
 break;
-case 42:this.$ = new yy.Return($$[$0]);
+case 42:this.$ = (function(lstack) {
+  var node = new yy.Return($$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 2);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 43:this.$ = new yy.Return;
+case 43:this.$ = (function(lstack) {
+  var node = new yy.Return;
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 1);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 44:this.$ = new yy.Comment($$[$0]);
+case 44:this.$ = (function(lstack) {
+  var node = new yy.Comment($$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 1);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 45:this.$ = new yy.Code($$[$0-3], $$[$0], $$[$0-1]);
+case 45:this.$ = (function(lstack) {
+  var node = new yy.Code($$[$0-3], $$[$0], $$[$0-1]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 5);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 46:this.$ = new yy.Code([], $$[$0], $$[$0-1]);
+case 46:this.$ = (function(lstack) {
+  var node = new yy.Code([], $$[$0], $$[$0-1]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 2);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 47:this.$ = 'func';
+case 47:this.$ = (function(lstack) {
+  var node = 'func';
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 1);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 48:this.$ = 'boundfunc';
+case 48:this.$ = (function(lstack) {
+  var node = 'boundfunc';
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 1);
+  };
+  return node; 
+})(arguments[6])
 break;
 case 49:this.$ = $$[$0];
 break;
 case 50:this.$ = $$[$0];
 break;
-case 51:this.$ = [];
+case 51:this.$ = (function(lstack) {
+  var node = [];
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 1);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 52:this.$ = [$$[$0]];
+case 52:this.$ = (function(lstack) {
+  var node = [$$[$0]];
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 1);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 53:this.$ = $$[$0-2].concat($$[$0]);
+case 53:this.$ = (function(lstack) {
+  var node = $$[$0-2].concat($$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 3);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 54:this.$ = new yy.Param($$[$0]);
+case 54:this.$ = (function(lstack) {
+  var node = new yy.Param($$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 1);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 55:this.$ = new yy.Param($$[$0-1], null, true);
+case 55:this.$ = (function(lstack) {
+  var node = new yy.Param($$[$0-1], null, true);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 2);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 56:this.$ = new yy.Param($$[$0-2], $$[$0]);
+case 56:this.$ = (function(lstack) {
+  var node = new yy.Param($$[$0-2], $$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 3);
+  };
+  return node; 
+})(arguments[6])
 break;
 case 57:this.$ = $$[$0];
 break;
@@ -1197,127 +1378,457 @@ case 59:this.$ = $$[$0];
 break;
 case 60:this.$ = $$[$0];
 break;
-case 61:this.$ = new yy.Splat($$[$0-1]);
+case 61:this.$ = (function(lstack) {
+  var node = new yy.Splat($$[$0-1]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 2);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 62:this.$ = new yy.Value($$[$0]);
+case 62:this.$ = (function(lstack) {
+  var node = new yy.Value($$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 1);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 63:this.$ = $$[$0-1].add($$[$0]);
+case 63:this.$ = (function(lstack) {
+  var node = $$[$0-1].add($$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 2);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 64:this.$ = new yy.Value($$[$0-1], [$$[$0]]);
+case 64:this.$ = (function(lstack) {
+  var node = new yy.Value($$[$0-1], [$$[$0]]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 2);
+  };
+  return node; 
+})(arguments[6])
 break;
 case 65:this.$ = $$[$0];
 break;
 case 66:this.$ = $$[$0];
 break;
-case 67:this.$ = new yy.Value($$[$0]);
+case 67:this.$ = (function(lstack) {
+  var node = new yy.Value($$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 1);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 68:this.$ = new yy.Value($$[$0]);
+case 68:this.$ = (function(lstack) {
+  var node = new yy.Value($$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 1);
+  };
+  return node; 
+})(arguments[6])
 break;
 case 69:this.$ = $$[$0];
 break;
-case 70:this.$ = new yy.Value($$[$0]);
+case 70:this.$ = (function(lstack) {
+  var node = new yy.Value($$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 1);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 71:this.$ = new yy.Value($$[$0]);
+case 71:this.$ = (function(lstack) {
+  var node = new yy.Value($$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 1);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 72:this.$ = new yy.Value($$[$0]);
+case 72:this.$ = (function(lstack) {
+  var node = new yy.Value($$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 1);
+  };
+  return node; 
+})(arguments[6])
 break;
 case 73:this.$ = $$[$0];
 break;
-case 74:this.$ = new yy.Access($$[$0]);
+case 74:this.$ = (function(lstack) {
+  var node = new yy.Access($$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 2);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 75:this.$ = new yy.Access($$[$0], 'soak');
+case 75:this.$ = (function(lstack) {
+  var node = new yy.Access($$[$0], 'soak');
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 2);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 76:this.$ = [new yy.Access(new yy.Literal('prototype')), new yy.Access($$[$0])];
+case 76:this.$ = (function(lstack) {
+  var node = [new yy.Access(new yy.Literal('prototype')), new yy.Access($$[$0])];
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 2);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 77:this.$ = new yy.Access(new yy.Literal('prototype'));
+case 77:this.$ = (function(lstack) {
+  var node = new yy.Access(new yy.Literal('prototype'));
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 1);
+  };
+  return node; 
+})(arguments[6])
 break;
 case 78:this.$ = $$[$0];
 break;
-case 79:this.$ = $$[$0-1];
+case 79:this.$ = (function(lstack) {
+  var node = $$[$0-1];
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 3);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 80:this.$ = yy.extend($$[$0], {
+case 80:this.$ = (function(lstack) {
+  var node = yy.extend($$[$0], {
           soak: true
         });
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 2);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 81:this.$ = new yy.Index($$[$0]);
+case 81:this.$ = (function(lstack) {
+  var node = new yy.Index($$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 1);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 82:this.$ = new yy.Slice($$[$0]);
+case 82:this.$ = (function(lstack) {
+  var node = new yy.Slice($$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 1);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 83:this.$ = new yy.Obj($$[$0-2], $$[$0-3].generated);
+case 83:this.$ = (function(lstack) {
+  var node = new yy.Obj($$[$0-2], $$[$0-3].generated);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 4);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 84:this.$ = [];
+case 84:this.$ = (function(lstack) {
+  var node = [];
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 1);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 85:this.$ = [$$[$0]];
+case 85:this.$ = (function(lstack) {
+  var node = [$$[$0]];
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 1);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 86:this.$ = $$[$0-2].concat($$[$0]);
+case 86:this.$ = (function(lstack) {
+  var node = $$[$0-2].concat($$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 3);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 87:this.$ = $$[$0-3].concat($$[$0]);
+case 87:this.$ = (function(lstack) {
+  var node = $$[$0-3].concat($$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 4);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 88:this.$ = $$[$0-5].concat($$[$0-2]);
+case 88:this.$ = (function(lstack) {
+  var node = $$[$0-5].concat($$[$0-2]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 6);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 89:this.$ = new yy.Class;
+case 89:this.$ = (function(lstack) {
+  var node = new yy.Class;
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 1);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 90:this.$ = new yy.Class(null, null, $$[$0]);
+case 90:this.$ = (function(lstack) {
+  var node = new yy.Class(null, null, $$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 2);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 91:this.$ = new yy.Class(null, $$[$0]);
+case 91:this.$ = (function(lstack) {
+  var node = new yy.Class(null, $$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 3);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 92:this.$ = new yy.Class(null, $$[$0-1], $$[$0]);
+case 92:this.$ = (function(lstack) {
+  var node = new yy.Class(null, $$[$0-1], $$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 4);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 93:this.$ = new yy.Class($$[$0]);
+case 93:this.$ = (function(lstack) {
+  var node = new yy.Class($$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 2);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 94:this.$ = new yy.Class($$[$0-1], null, $$[$0]);
+case 94:this.$ = (function(lstack) {
+  var node = new yy.Class($$[$0-1], null, $$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 3);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 95:this.$ = new yy.Class($$[$0-2], $$[$0]);
+case 95:this.$ = (function(lstack) {
+  var node = new yy.Class($$[$0-2], $$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 4);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 96:this.$ = new yy.Class($$[$0-3], $$[$0-1], $$[$0]);
+case 96:this.$ = (function(lstack) {
+  var node = new yy.Class($$[$0-3], $$[$0-1], $$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 5);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 97:this.$ = new yy.Call($$[$0-2], $$[$0], $$[$0-1]);
+case 97:this.$ = (function(lstack) {
+  var node = new yy.Call($$[$0-2], $$[$0], $$[$0-1]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 3);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 98:this.$ = new yy.Call($$[$0-2], $$[$0], $$[$0-1]);
+case 98:this.$ = (function(lstack) {
+  var node = new yy.Call($$[$0-2], $$[$0], $$[$0-1]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 3);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 99:this.$ = new yy.Call('super', [new yy.Splat(new yy.Literal('arguments'))]);
+case 99:this.$ = (function(lstack) {
+  var node = new yy.Call('super', [new yy.Splat(new yy.Literal('arguments'))]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 1);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 100:this.$ = new yy.Call('super', $$[$0]);
+case 100:this.$ = (function(lstack) {
+  var node = new yy.Call('super', $$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 2);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 101:this.$ = false;
+case 101:this.$ = (function(lstack) {
+  var node = false;
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 1);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 102:this.$ = true;
+case 102:this.$ = (function(lstack) {
+  var node = true;
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 1);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 103:this.$ = [];
+case 103:this.$ = (function(lstack) {
+  var node = [];
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 2);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 104:this.$ = $$[$0-2];
+case 104:this.$ = (function(lstack) {
+  var node = $$[$0-2];
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 4);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 105:this.$ = new yy.Value(new yy.Literal('this'));
+case 105:this.$ = (function(lstack) {
+  var node = new yy.Value(new yy.Literal('this'));
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 1);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 106:this.$ = new yy.Value(new yy.Literal('this'));
+case 106:this.$ = (function(lstack) {
+  var node = new yy.Value(new yy.Literal('this'));
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 1);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 107:this.$ = new yy.Value(new yy.Literal('this'), [new yy.Access($$[$0])], 'this');
+case 107:this.$ = (function(lstack) {
+  var node = new yy.Value(new yy.Literal('this'), [new yy.Access($$[$0])], 'this');
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 2);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 108:this.$ = new yy.Arr([]);
+case 108:this.$ = (function(lstack) {
+  var node = new yy.Arr([]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 2);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 109:this.$ = new yy.Arr($$[$0-2]);
+case 109:this.$ = (function(lstack) {
+  var node = new yy.Arr($$[$0-2]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 4);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 110:this.$ = 'inclusive';
+case 110:this.$ = (function(lstack) {
+  var node = 'inclusive';
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 1);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 111:this.$ = 'exclusive';
+case 111:this.$ = (function(lstack) {
+  var node = 'exclusive';
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 1);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 112:this.$ = new yy.Range($$[$0-3], $$[$0-1], $$[$0-2]);
+case 112:this.$ = (function(lstack) {
+  var node = new yy.Range($$[$0-3], $$[$0-1], $$[$0-2]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 5);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 113:this.$ = new yy.Range($$[$0-2], $$[$0], $$[$0-1]);
+case 113:this.$ = (function(lstack) {
+  var node = new yy.Range($$[$0-2], $$[$0], $$[$0-1]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 3);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 114:this.$ = new yy.Range($$[$0-1], null, $$[$0]);
+case 114:this.$ = (function(lstack) {
+  var node = new yy.Range($$[$0-1], null, $$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 2);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 115:this.$ = new yy.Range(null, $$[$0], $$[$0-1]);
+case 115:this.$ = (function(lstack) {
+  var node = new yy.Range(null, $$[$0], $$[$0-1]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 2);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 116:this.$ = [$$[$0]];
+case 116:this.$ = (function(lstack) {
+  var node = [$$[$0]];
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 1);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 117:this.$ = $$[$0-2].concat($$[$0]);
+case 117:this.$ = (function(lstack) {
+  var node = $$[$0-2].concat($$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 3);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 118:this.$ = $$[$0-3].concat($$[$0]);
+case 118:this.$ = (function(lstack) {
+  var node = $$[$0-3].concat($$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 4);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 119:this.$ = $$[$0-2];
+case 119:this.$ = (function(lstack) {
+  var node = $$[$0-2];
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 4);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 120:this.$ = $$[$0-5].concat($$[$0-2]);
+case 120:this.$ = (function(lstack) {
+  var node = $$[$0-5].concat($$[$0-2]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 6);
+  };
+  return node; 
+})(arguments[6])
 break;
 case 121:this.$ = $$[$0];
 break;
@@ -1325,201 +1836,603 @@ case 122:this.$ = $$[$0];
 break;
 case 123:this.$ = $$[$0];
 break;
-case 124:this.$ = [].concat($$[$0-2], $$[$0]);
+case 124:this.$ = (function(lstack) {
+  var node = [].concat($$[$0-2], $$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 3);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 125:this.$ = new yy.Try($$[$0]);
+case 125:this.$ = (function(lstack) {
+  var node = new yy.Try($$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 2);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 126:this.$ = new yy.Try($$[$0-1], $$[$0][0], $$[$0][1]);
+case 126:this.$ = (function(lstack) {
+  var node = new yy.Try($$[$0-1], $$[$0][0], $$[$0][1]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 3);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 127:this.$ = new yy.Try($$[$0-2], null, null, $$[$0]);
+case 127:this.$ = (function(lstack) {
+  var node = new yy.Try($$[$0-2], null, null, $$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 4);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 128:this.$ = new yy.Try($$[$0-3], $$[$0-2][0], $$[$0-2][1], $$[$0]);
+case 128:this.$ = (function(lstack) {
+  var node = new yy.Try($$[$0-3], $$[$0-2][0], $$[$0-2][1], $$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 5);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 129:this.$ = [$$[$0-1], $$[$0]];
+case 129:this.$ = (function(lstack) {
+  var node = [$$[$0-1], $$[$0]];
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 3);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 130:this.$ = new yy.Throw($$[$0]);
+case 130:this.$ = (function(lstack) {
+  var node = new yy.Throw($$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 2);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 131:this.$ = new yy.Parens($$[$0-1]);
+case 131:this.$ = (function(lstack) {
+  var node = new yy.Parens($$[$0-1]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 3);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 132:this.$ = new yy.Parens($$[$0-2]);
+case 132:this.$ = (function(lstack) {
+  var node = new yy.Parens($$[$0-2]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 5);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 133:this.$ = new yy.While($$[$0]);
+case 133:this.$ = (function(lstack) {
+  var node = new yy.While($$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 2);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 134:this.$ = new yy.While($$[$0-2], {
+case 134:this.$ = (function(lstack) {
+  var node = new yy.While($$[$0-2], {
           guard: $$[$0]
         });
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 4);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 135:this.$ = new yy.While($$[$0], {
+case 135:this.$ = (function(lstack) {
+  var node = new yy.While($$[$0], {
           invert: true
         });
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 2);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 136:this.$ = new yy.While($$[$0-2], {
+case 136:this.$ = (function(lstack) {
+  var node = new yy.While($$[$0-2], {
           invert: true,
           guard: $$[$0]
         });
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 4);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 137:this.$ = $$[$0-1].addBody($$[$0]);
+case 137:this.$ = (function(lstack) {
+  var node = $$[$0-1].addBody($$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 2);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 138:this.$ = $$[$0].addBody(yy.Block.wrap([$$[$0-1]]));
+case 138:this.$ = (function(lstack) {
+  var node = $$[$0].addBody(yy.Block.wrap([$$[$0-1]]));
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 2);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 139:this.$ = $$[$0].addBody(yy.Block.wrap([$$[$0-1]]));
+case 139:this.$ = (function(lstack) {
+  var node = $$[$0].addBody(yy.Block.wrap([$$[$0-1]]));
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 2);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 140:this.$ = $$[$0];
+case 140:this.$ = (function(lstack) {
+  var node = $$[$0];
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 1);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 141:this.$ = new yy.While(new yy.Literal('true')).addBody($$[$0]);
+case 141:this.$ = (function(lstack) {
+  var node = new yy.While(new yy.Literal('true')).addBody($$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 2);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 142:this.$ = new yy.While(new yy.Literal('true')).addBody(yy.Block.wrap([$$[$0]]));
+case 142:this.$ = (function(lstack) {
+  var node = new yy.While(new yy.Literal('true')).addBody(yy.Block.wrap([$$[$0]]));
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 2);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 143:this.$ = new yy.For($$[$0-1], $$[$0]);
+case 143:this.$ = (function(lstack) {
+  var node = new yy.For($$[$0-1], $$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 2);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 144:this.$ = new yy.For($$[$0-1], $$[$0]);
+case 144:this.$ = (function(lstack) {
+  var node = new yy.For($$[$0-1], $$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 2);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 145:this.$ = new yy.For($$[$0], $$[$0-1]);
+case 145:this.$ = (function(lstack) {
+  var node = new yy.For($$[$0], $$[$0-1]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 2);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 146:this.$ = {
+case 146:this.$ = (function(lstack) {
+  var node = {
           source: new yy.Value($$[$0])
         };
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 2);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 147:this.$ = (function () {
+case 147:this.$ = (function(lstack) {
+  var node = (function () {
         $$[$0].own = $$[$0-1].own;
         $$[$0].name = $$[$0-1][0];
         $$[$0].index = $$[$0-1][1];
         return $$[$0];
       }());
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 2);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 148:this.$ = $$[$0];
+case 148:this.$ = (function(lstack) {
+  var node = $$[$0];
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 2);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 149:this.$ = (function () {
+case 149:this.$ = (function(lstack) {
+  var node = (function () {
         $$[$0].own = true;
         return $$[$0];
       }());
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 3);
+  };
+  return node; 
+})(arguments[6])
 break;
 case 150:this.$ = $$[$0];
 break;
-case 151:this.$ = new yy.Value($$[$0]);
+case 151:this.$ = (function(lstack) {
+  var node = new yy.Value($$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 1);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 152:this.$ = new yy.Value($$[$0]);
+case 152:this.$ = (function(lstack) {
+  var node = new yy.Value($$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 1);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 153:this.$ = [$$[$0]];
+case 153:this.$ = (function(lstack) {
+  var node = [$$[$0]];
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 1);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 154:this.$ = [$$[$0-2], $$[$0]];
+case 154:this.$ = (function(lstack) {
+  var node = [$$[$0-2], $$[$0]];
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 3);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 155:this.$ = {
+case 155:this.$ = (function(lstack) {
+  var node = {
           source: $$[$0]
         };
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 2);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 156:this.$ = {
+case 156:this.$ = (function(lstack) {
+  var node = {
           source: $$[$0],
           object: true
         };
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 2);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 157:this.$ = {
+case 157:this.$ = (function(lstack) {
+  var node = {
           source: $$[$0-2],
           guard: $$[$0]
         };
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 4);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 158:this.$ = {
+case 158:this.$ = (function(lstack) {
+  var node = {
           source: $$[$0-2],
           guard: $$[$0],
           object: true
         };
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 4);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 159:this.$ = {
+case 159:this.$ = (function(lstack) {
+  var node = {
           source: $$[$0-2],
           step: $$[$0]
         };
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 4);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 160:this.$ = {
+case 160:this.$ = (function(lstack) {
+  var node = {
           source: $$[$0-4],
           guard: $$[$0-2],
           step: $$[$0]
         };
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 6);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 161:this.$ = {
+case 161:this.$ = (function(lstack) {
+  var node = {
           source: $$[$0-4],
           step: $$[$0-2],
           guard: $$[$0]
         };
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 6);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 162:this.$ = new yy.Switch($$[$0-3], $$[$0-1]);
+case 162:this.$ = (function(lstack) {
+  var node = new yy.Switch($$[$0-3], $$[$0-1]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 5);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 163:this.$ = new yy.Switch($$[$0-5], $$[$0-3], $$[$0-1]);
+case 163:this.$ = (function(lstack) {
+  var node = new yy.Switch($$[$0-5], $$[$0-3], $$[$0-1]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 7);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 164:this.$ = new yy.Switch(null, $$[$0-1]);
+case 164:this.$ = (function(lstack) {
+  var node = new yy.Switch(null, $$[$0-1]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 4);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 165:this.$ = new yy.Switch(null, $$[$0-3], $$[$0-1]);
+case 165:this.$ = (function(lstack) {
+  var node = new yy.Switch(null, $$[$0-3], $$[$0-1]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 6);
+  };
+  return node; 
+})(arguments[6])
 break;
 case 166:this.$ = $$[$0];
 break;
-case 167:this.$ = $$[$0-1].concat($$[$0]);
+case 167:this.$ = (function(lstack) {
+  var node = $$[$0-1].concat($$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 2);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 168:this.$ = [[$$[$0-1], $$[$0]]];
+case 168:this.$ = (function(lstack) {
+  var node = [[$$[$0-1], $$[$0]]];
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 3);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 169:this.$ = [[$$[$0-2], $$[$0-1]]];
+case 169:this.$ = (function(lstack) {
+  var node = [[$$[$0-2], $$[$0-1]]];
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 4);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 170:this.$ = new yy.If($$[$0-1], $$[$0], {
+case 170:this.$ = (function(lstack) {
+  var node = new yy.If($$[$0-1], $$[$0], {
           type: $$[$0-2]
         });
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 3);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 171:this.$ = $$[$0-4].addElse(new yy.If($$[$0-1], $$[$0], {
+case 171:this.$ = (function(lstack) {
+  var node = $$[$0-4].addElse(new yy.If($$[$0-1], $$[$0], {
           type: $$[$0-2]
         }));
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 5);
+  };
+  return node; 
+})(arguments[6])
 break;
 case 172:this.$ = $$[$0];
 break;
-case 173:this.$ = $$[$0-2].addElse($$[$0]);
+case 173:this.$ = (function(lstack) {
+  var node = $$[$0-2].addElse($$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 3);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 174:this.$ = new yy.If($$[$0], yy.Block.wrap([$$[$0-2]]), {
+case 174:this.$ = (function(lstack) {
+  var node = new yy.If($$[$0], yy.Block.wrap([$$[$0-2]]), {
           type: $$[$0-1],
           statement: true
         });
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 3);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 175:this.$ = new yy.If($$[$0], yy.Block.wrap([$$[$0-2]]), {
+case 175:this.$ = (function(lstack) {
+  var node = new yy.If($$[$0], yy.Block.wrap([$$[$0-2]]), {
           type: $$[$0-1],
           statement: true
         });
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 3);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 176:this.$ = new yy.Op($$[$0-1], $$[$0]);
+case 176:this.$ = (function(lstack) {
+  var node = new yy.Op($$[$0-1], $$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 2);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 177:this.$ = new yy.Op('-', $$[$0]);
+case 177:this.$ = (function(lstack) {
+  var node = new yy.Op('-', $$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 2);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 178:this.$ = new yy.Op('+', $$[$0]);
+case 178:this.$ = (function(lstack) {
+  var node = new yy.Op('+', $$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 2);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 179:this.$ = new yy.Op('--', $$[$0]);
+case 179:this.$ = (function(lstack) {
+  var node = new yy.Op('--', $$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 2);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 180:this.$ = new yy.Op('++', $$[$0]);
+case 180:this.$ = (function(lstack) {
+  var node = new yy.Op('++', $$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 2);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 181:this.$ = new yy.Op('--', $$[$0-1], null, true);
+case 181:this.$ = (function(lstack) {
+  var node = new yy.Op('--', $$[$0-1], null, true);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 2);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 182:this.$ = new yy.Op('++', $$[$0-1], null, true);
+case 182:this.$ = (function(lstack) {
+  var node = new yy.Op('++', $$[$0-1], null, true);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 2);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 183:this.$ = new yy.Existence($$[$0-1]);
+case 183:this.$ = (function(lstack) {
+  var node = new yy.Existence($$[$0-1]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 2);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 184:this.$ = new yy.Op('+', $$[$0-2], $$[$0]);
+case 184:this.$ = (function(lstack) {
+  var node = new yy.Op('+', $$[$0-2], $$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 3);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 185:this.$ = new yy.Op('-', $$[$0-2], $$[$0]);
+case 185:this.$ = (function(lstack) {
+  var node = new yy.Op('-', $$[$0-2], $$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 3);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 186:this.$ = new yy.Op($$[$0-1], $$[$0-2], $$[$0]);
+case 186:this.$ = (function(lstack) {
+  var node = new yy.Op($$[$0-1], $$[$0-2], $$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 3);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 187:this.$ = new yy.Op($$[$0-1], $$[$0-2], $$[$0]);
+case 187:this.$ = (function(lstack) {
+  var node = new yy.Op($$[$0-1], $$[$0-2], $$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 3);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 188:this.$ = new yy.Op($$[$0-1], $$[$0-2], $$[$0]);
+case 188:this.$ = (function(lstack) {
+  var node = new yy.Op($$[$0-1], $$[$0-2], $$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 3);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 189:this.$ = new yy.Op($$[$0-1], $$[$0-2], $$[$0]);
+case 189:this.$ = (function(lstack) {
+  var node = new yy.Op($$[$0-1], $$[$0-2], $$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 3);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 190:this.$ = (function () {
+case 190:this.$ = (function(lstack) {
+  var node = (function () {
         if ($$[$0-1].charAt(0) === '!') {
           return new yy.Op($$[$0-1].slice(1), $$[$0-2], $$[$0]).invert();
         } else {
           return new yy.Op($$[$0-1], $$[$0-2], $$[$0]);
         }
       }());
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 3);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 191:this.$ = new yy.Assign($$[$0-2], $$[$0], $$[$0-1]);
+case 191:this.$ = (function(lstack) {
+  var node = new yy.Assign($$[$0-2], $$[$0], $$[$0-1]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 3);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 192:this.$ = new yy.Assign($$[$0-4], $$[$0-1], $$[$0-3]);
+case 192:this.$ = (function(lstack) {
+  var node = new yy.Assign($$[$0-4], $$[$0-1], $$[$0-3]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 5);
+  };
+  return node; 
+})(arguments[6])
 break;
-case 193:this.$ = new yy.Extends($$[$0-2], $$[$0]);
+case 193:this.$ = (function(lstack) {
+  var node = new yy.Extends($$[$0-2], $$[$0]);
+  if (node.updateJisonMetadata) {
+    node.updateJisonMetadata(yylineno, lstack, 3);
+  };
+  return node; 
+})(arguments[6])
 break;
 }
 },
@@ -1977,15 +2890,29 @@ if (typeof module !== 'undefined' && require.main === module) {
     };
 
     Base.prototype.toString = function(idt, name) {
-      var tree;
+      var lineno, tree;
       if (idt == null) idt = '';
       if (name == null) name = this.constructor.name;
-      tree = '\n' + idt + name;
+      lineno = this.firstLineNumber ? "" + this.firstLineNumber + " " + (this.lastLineNumber - 1) + " " : '    ';
+      tree = '\n' + lineno + idt + name;
       if (this.soak) tree += '?';
       this.eachChild(function(node) {
         return tree += node.toString(idt + TAB);
       });
       return tree;
+    };
+
+    Base.prototype.updateJisonMetadata = function(yylineno, lstack, numTokens) {
+      var n, subnode, tokens, _i, _len, _results;
+      n = lstack.length;
+      tokens = lstack.slice(n - numTokens, n);
+      _results = [];
+      for (_i = 0, _len = tokens.length; _i < _len; _i++) {
+        subnode = tokens[_i];
+        this.firstLineNumber || (this.firstLineNumber = subnode.first_line);
+        _results.push(this.lastLineNumber = subnode.last_line);
+      }
+      return _results;
     };
 
     Base.prototype.eachChild = function(func) {
@@ -4478,8 +5405,15 @@ if (typeof module !== 'undefined' && require.main === module) {
 
   parser.lexer = {
     lex: function() {
-      var tag, _ref2;
-      _ref2 = this.tokens[this.pos++] || [''], tag = _ref2[0], this.yytext = _ref2[1], this.yylineno = _ref2[2];
+      var first_line, tag, _ref2;
+      _ref2 = this.tokens[this.pos] || [''], tag = _ref2[0], this.yytext = _ref2[1], this.yylineno = _ref2[2];
+      first_line = this.yylineno + 1;
+      this.yylloc = {
+        first_line: first_line,
+        last_line: first_line + 1,
+        first_col: this.pos
+      };
+      this.pos++;
       return tag;
     },
     setInput: function(tokens) {
@@ -4488,6 +5422,12 @@ if (typeof module !== 'undefined' && require.main === module) {
     },
     upcomingInput: function() {
       return "";
+    },
+    yylloc: {
+      first_line: 0,
+      first_col: 0,
+      last_line: 0,
+      last_col: 0
     }
   };
 
