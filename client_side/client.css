@@ -5,12 +5,19 @@ textarea {
 
 div#code_view {
   padding: 20px;
+}
+
+div#code_view table,th {
   border: 1px black solid;
 }
 
+div#code_view tr, td {
+  padding: 0
+}
+
 div#code_view pre {
-  margin: 2px;
-  height: 15px;
+  margin: 0;
+  height: 13px;
 }
 
 div#code_view pre.highlight {

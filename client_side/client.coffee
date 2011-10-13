@@ -1,16 +1,32 @@
 activate_code_view_window = (code) ->
   div = $("#code_view")
   div.empty()
+  table = $("<table>")
+  table.append '''
+    <tr>
+      <th>line #</th>
+      <th>num exprs evaluated</th>
+      <th>stmt</th>
+    </tr>
+    '''
   for line, i in code.split('\n')
-    pre = $('<pre>').html(line)
-    pre.attr "id", "line#{i+1}"
-    div.append pre
+    tr = $("<tr>")
+    table.append tr
+    tr.append """
+      <td>#{i+1}</td>
+      <td id='count#{i+1}'>0</td>
+      <td><pre id='line#{i+1}'>#{line}</pre></td>
+      """
+  div.append table
 
 
 highlight_line = ->
   last_line_number = 0
   (line_number) ->
-    return if line_number == last_line_number
+    count = $("#count#{line_number}")
+    count.html parseInt(count.html()) + 1
+    # NOTE: THIS IS THE STEP DEBUGGING FACILITY.  Close the
+    # inspector if you don't want step debugging.
     debugger
     $("#line#{last_line_number}").removeClass("highlight")
     $("#line#{line_number}").addClass("highlight")

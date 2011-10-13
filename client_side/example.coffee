@@ -8,10 +8,8 @@ window.EXAMPLES =
     fib = (n) ->
       [a, b] = [1, 1]
       while b < n
-        iteration = ->
-          [a, b] = [b, a+b]
-          output a
-        iteration()
+        [a, b] = [b, a+b]
+        output a
       a
         
     n = 1000000
