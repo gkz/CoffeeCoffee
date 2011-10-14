@@ -1,13 +1,21 @@
 (function() {
-  var activate_code_view_window, code_chart, highlight_line;
-  code_chart = function() {
-    var canvas, ctx, x, y;
+  var activate_code_view_window, code_chart, highlight_line, run_code;
+  code_chart = function(update_code_view) {
+    var canvas, canvas_html, ctx, timeline, x, y;
+    canvas_html = '<canvas id="canvas" width="520" height="100" style="border: 1px blue solid">\n</canvas>';
+    $("#code_chart").html(canvas_html);
     canvas = document.getElementById("canvas");
     ctx = canvas.getContext("2d");
-    canvas.width = canvas.width;
     x = 0;
     y = 0;
     ctx.moveTo(x, 0);
+    timeline = {};
+    $(canvas).mousemove(function() {
+      x = event.pageX - $(canvas).offset().left;
+      if (timeline[x]) {
+        return update_code_view(timeline[x]);
+      }
+    });
     return {
       go_to_line: function(line_number) {
         if (y === line_number) {
@@ -15,6 +23,7 @@
         }
         y = line_number;
         x += 1;
+        timeline[x] = y;
         ctx.lineTo(x, y);
         return ctx.stroke();
       }
@@ -25,7 +34,7 @@
     div = $("#code_view");
     div.empty();
     table = $("<table>");
-    table.append('<tr>\n  <th>line #</th>\n  <th>num exprs evaluated</th>\n  <th>stmt</th>\n</tr>');
+    table.append('<tr>\n  <th>line #</th>\n  <th>num visits</th>\n  <th>stmt</th>\n</tr>');
     _ref = code.split('\n');
     for (i = 0, _len = _ref.length; i < _len; i++) {
       line = _ref[i];
@@ -36,40 +45,49 @@
     return div.append(table);
   };
   highlight_line = function() {
-    var chart, last_line_number, update_code_view;
+    var chart, last_highlight, last_line_number, update_code_view, visit_line;
     last_line_number = 0;
-    update_code_view = function(line_number) {
+    visit_line = function(line_number) {
       var count;
+      if (line_number === last_line_number) {
+        return;
+      }
       count = $("#count" + line_number);
       count.html(parseInt(count.html()) + 1);
-      debugger;
-      $("#line" + last_line_number).removeClass("highlight");
-      $("#line" + line_number).addClass("highlight");
       return last_line_number = line_number;
     };
-    chart = code_chart();
+    last_highlight = 0;
+    update_code_view = function(line_number) {
+      $("#line" + last_highlight).removeClass("highlight");
+      $("#line" + line_number).addClass("highlight");
+      return last_highlight = line_number;
+    };
+    chart = code_chart(update_code_view);
     return function(line_number) {
-      update_code_view(line_number);
+      visit_line(line_number);
       return chart.go_to_line(line_number);
     };
+  };
+  run_code = function() {
+    var ast, code;
+    try {
+      code = $("#code").val();
+      activate_code_view_window(code);
+      Debugger.highlight_line = highlight_line();
+      ast = window.nodes_to_json(code);
+      return window.coffeecoffee(ast);
+    } catch (e) {
+      return alert(e);
+    } finally {
+      return false;
+    }
   };
   jQuery(document).ready(function() {
     var code;
     code = EXAMPLES.fib;
     $("#code").val(code);
     return $("input.code").click(function() {
-      var ast;
-      try {
-        code = $("#code").val();
-        activate_code_view_window(code);
-        Debugger.highlight_line = highlight_line();
-        ast = window.nodes_to_json(code);
-        return window.coffeecoffee(ast);
-      } catch (e) {
-        return alert(e);
-      } finally {
-        return false;
-      }
+      return run_code();
     });
   });
 }).call(this);

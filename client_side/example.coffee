@@ -12,7 +12,7 @@ window.EXAMPLES =
         output a
       a
         
-    n = 1000000
+    n = 1000000000000
     answer = fib(n)
     output "biggest fib number < #{n} = #{answer}"
     '''
