@@ -2,8 +2,9 @@
   var activate_code_view_window, code_chart, highlight_line, populate_examples_dropdown, reset_example, run_code;
   code_chart = function(update_code_view) {
     var canvas, canvas_html, ctx, timeline, x, y;
+    $("#code_chart").html('<h6>Hover over graph to review the program execution.</h6>');
     canvas_html = '<canvas id="canvas" width="520" height="100" style="border: 1px blue solid">\n</canvas>';
-    $("#code_chart").html(canvas_html);
+    $("#code_chart").append(canvas_html);
     canvas = document.getElementById("canvas");
     ctx = canvas.getContext("2d");
     x = 0;
