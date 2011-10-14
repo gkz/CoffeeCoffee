@@ -1,5 +1,5 @@
 (function() {
-  var activate_code_view_window, code_chart, highlight_line, run_code;
+  var activate_code_view_window, code_chart, highlight_line, populate_examples_dropdown, reset_example, run_code;
   code_chart = function(update_code_view) {
     var canvas, canvas_html, ctx, timeline, x, y;
     canvas_html = '<canvas id="canvas" width="520" height="100" style="border: 1px blue solid">\n</canvas>';
@@ -82,9 +82,26 @@
       return false;
     }
   };
+  reset_example = function() {
+    $("#code_chart").empty();
+    return $("#code_view").empty();
+  };
+  populate_examples_dropdown = function(examples) {
+    var example, html, select;
+    select = $("#examples");
+    for (example in examples) {
+      html = "<option value=" + example + ">" + example + "</option>";
+      select.append(html);
+    }
+    return select.change(function() {
+      $("#code").val(examples[select.val()]);
+      return reset_example();
+    });
+  };
   jQuery(document).ready(function() {
     var code;
     code = EXAMPLES.fib;
+    populate_examples_dropdown(EXAMPLES);
     $("#code").val(code);
     return $("input.code").click(function() {
       return run_code();

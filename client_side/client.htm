@@ -8,10 +8,6 @@
   <link rel="stylesheet" href="client.css">
 </head>
 <body>
-  <p>
-    For debugging, if you open the console, you will be in step debug mode.  Hit the play button to continue.
-    Close the console to let the program run at full speed.
-  </p>
   <div id="code_chart">
   </div>
   <table>
@@ -21,6 +17,8 @@
           (output will show here)
         </div>
         <form>
+          <select id="examples">
+          </select>
           <input type="submit" class="code" value="Run!">
           <br />
           <textarea id="code">

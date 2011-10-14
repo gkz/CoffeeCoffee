@@ -79,11 +79,25 @@ run_code = ->
   finally
     return false
 
+reset_example = ->
+  $("#code_chart").empty()
+  $("#code_view").empty()
+
+populate_examples_dropdown = (examples) ->
+  select = $("#examples")
+  for example of examples
+    html = "<option value=#{example}>#{example}</option>"
+    select.append html
+  select.change ->
+    $("#code").val examples[select.val()]
+    reset_example()
+
 jQuery(document).ready ->
   # to build unminified CS (so we get full introspection)
   # MINIFY=false bin/cake build:browser
   # cp extras/coffee-script.js ../CoffeeCoffee/client_side/coffee-script.js
   code = EXAMPLES.fib
+  populate_examples_dropdown(EXAMPLES)
   $("#code").val(code)
   $("input.code").click ->
     run_code()
