@@ -1,5 +1,25 @@
 (function() {
-  var activate_code_view_window, highlight_line;
+  var activate_code_view_window, code_chart, highlight_line;
+  code_chart = function() {
+    var canvas, ctx, x, y;
+    canvas = document.getElementById("canvas");
+    ctx = canvas.getContext("2d");
+    canvas.width = canvas.width;
+    x = 0;
+    y = 0;
+    ctx.moveTo(x, 0);
+    return {
+      go_to_line: function(line_number) {
+        if (y === line_number) {
+          return;
+        }
+        y = line_number;
+        x += 1;
+        ctx.lineTo(x, y);
+        return ctx.stroke();
+      }
+    };
+  };
   activate_code_view_window = function(code) {
     var div, i, line, table, tr, _len, _ref;
     div = $("#code_view");
@@ -16,9 +36,9 @@
     return div.append(table);
   };
   highlight_line = function() {
-    var last_line_number;
+    var chart, last_line_number, update_code_view;
     last_line_number = 0;
-    return function(line_number) {
+    update_code_view = function(line_number) {
       var count;
       count = $("#count" + line_number);
       count.html(parseInt(count.html()) + 1);
@@ -27,8 +47,12 @@
       $("#line" + line_number).addClass("highlight");
       return last_line_number = line_number;
     };
+    chart = code_chart();
+    return function(line_number) {
+      update_code_view(line_number);
+      return chart.go_to_line(line_number);
+    };
   };
-  Debugger.highlight_line = highlight_line();
   jQuery(document).ready(function() {
     var code;
     code = EXAMPLES.fib;
@@ -38,7 +62,7 @@
       try {
         code = $("#code").val();
         activate_code_view_window(code);
-        highlight_line(1);
+        Debugger.highlight_line = highlight_line();
         ast = window.nodes_to_json(code);
         return window.coffeecoffee(ast);
       } catch (e) {

@@ -1,3 +1,18 @@
+code_chart = ->
+  canvas = document.getElementById("canvas")
+  ctx = canvas.getContext("2d")
+  canvas.width = canvas.width
+  x = 0
+  y = 0
+  ctx.moveTo(x,0)
+
+  go_to_line: (line_number) ->
+    return if y == line_number
+    y = line_number
+    x += 1
+    ctx.lineTo(x, y)
+    ctx.stroke()
+
 activate_code_view_window = (code) ->
   div = $("#code_view")
   div.empty()
@@ -22,7 +37,7 @@ activate_code_view_window = (code) ->
 
 highlight_line = ->
   last_line_number = 0
-  (line_number) ->
+  update_code_view = (line_number) ->
     count = $("#count#{line_number}")
     count.html parseInt(count.html()) + 1
     # NOTE: THIS IS THE STEP DEBUGGING FACILITY.  Close the
@@ -31,9 +46,10 @@ highlight_line = ->
     $("#line#{last_line_number}").removeClass("highlight")
     $("#line#{line_number}").addClass("highlight")
     last_line_number = line_number
-
-Debugger.highlight_line = highlight_line()
-
+  chart = code_chart()
+  (line_number) ->
+    update_code_view(line_number)
+    chart.go_to_line(line_number)
 
 jQuery(document).ready ->
   # to build unminified CS (so we get full introspection)
@@ -45,7 +61,7 @@ jQuery(document).ready ->
     try
       code = $("#code").val()
       activate_code_view_window(code)
-      highlight_line(1)
+      Debugger.highlight_line = highlight_line()
       ast = window.nodes_to_json(code);
       # console.log(JSON.stringify(ast, null, "   "));
       window.coffeecoffee(ast)
