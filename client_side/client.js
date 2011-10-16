@@ -1,10 +1,11 @@
 (function() {
   var Timeline_tracker, activate_code_view_window, code_chart, populate_examples_dropdown, reset_example, run_code;
   code_chart = function(update_code_view) {
-    var max_y, timeline, y;
+    var debug_info, max_y, timeline, y;
     timeline = [];
     y = 0;
     max_y = 0;
+    debug_info = {};
     return {
       go_to_line: function(line_number) {
         y = line_number;
@@ -12,6 +13,14 @@
           max_y = y;
         }
         return timeline.push(y);
+      },
+      info: function(s) {
+        var t;
+        t = timeline.length;
+        if (debug_info[t] == null) {
+          debug_info[t] = [];
+        }
+        return debug_info[t].push(s);
       },
       draw_graph: function() {
         var canvas, canvas_html, ctx, height, width, x, x_scale, y, y_scale, _len;
@@ -37,11 +46,14 @@
           ctx.stroke();
         }
         return $(canvas).mousemove(function() {
-          var xx;
+          var t, xx;
           xx = event.pageX - $(canvas).offset().left;
-          x = Math.floor((xx - 1) / x_scale);
-          if (timeline[x]) {
-            return update_code_view(timeline[x]);
+          t = Math.floor((xx - 1) / x_scale);
+          if (timeline[t]) {
+            update_code_view(timeline[t]);
+          }
+          if (debug_info[t]) {
+            return console.log(debug_info[t]);
           }
         });
       }
@@ -97,6 +109,7 @@
       code = $("#code").val();
       timeline_tracker = Timeline_tracker();
       Debugger.highlight_line = timeline_tracker.highlight_line;
+      Debugger.info = timeline_tracker.chart.info;
       ast = window.nodes_to_json(code);
       window.coffeecoffee(ast);
       activate_code_view_window(code, timeline_tracker.num_visits);

@@ -2,12 +2,18 @@ code_chart = (update_code_view) ->
   timeline = []
   y = 0
   max_y = 0
+  debug_info = {}
 
   go_to_line: (line_number) ->
     # return if y == line_number
     y = line_number
     max_y = y if y > max_y
     timeline.push y
+    
+  info: (s) ->
+    t = timeline.length
+    debug_info[t] = [] unless debug_info[t]?
+    debug_info[t].push s
     
   draw_graph: ->
     width = 1000
@@ -34,10 +40,11 @@ code_chart = (update_code_view) ->
 
     $(canvas).mousemove ->
       xx = event.pageX - $(canvas).offset().left
-      x = Math.floor((xx - 1) / x_scale)
-      if timeline[x]
-        update_code_view(timeline[x])
-
+      t = Math.floor((xx - 1) / x_scale)
+      if timeline[t]
+        update_code_view(timeline[t])
+      if debug_info[t]
+        console.log debug_info[t]
 
 activate_code_view_window = (code, num_visits) ->
   div = $("#code_view")
@@ -87,6 +94,7 @@ run_code = ->
     code = $("#code").val()
     timeline_tracker = Timeline_tracker()
     Debugger.highlight_line = timeline_tracker.highlight_line
+    Debugger.info = timeline_tracker.chart.info
     ast = window.nodes_to_json(code);
     # console.log(JSON.stringify(ast, null, "   "));
     window.coffeecoffee(ast)
