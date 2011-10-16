@@ -16,14 +16,14 @@
       },
       info: function(s) {
         var t;
-        t = timeline.length;
+        t = timeline.length - 1;
         if (debug_info[t] == null) {
           debug_info[t] = [];
         }
         return debug_info[t].push(s);
       },
       draw_graph: function() {
-        var canvas, canvas_html, ctx, height, width, x, x_scale, y, y_scale, _len;
+        var canvas, canvas_html, ctx, height, width, write_debug_info, x, x_scale, y, y_scale, _len;
         width = 1000;
         height = 100;
         y_scale = Math.floor(height / max_y);
@@ -45,6 +45,11 @@
           ctx.lineTo(x * x_scale + 1, y * y_scale);
           ctx.stroke();
         }
+        write_debug_info = function(s) {
+          var debug_html;
+          debug_html = $("<pre>").html(s.join('\n'));
+          return $("#debug_info_view").html(debug_html);
+        };
         return $(canvas).mousemove(function() {
           var t, xx;
           xx = event.pageX - $(canvas).offset().left;
@@ -53,7 +58,7 @@
             update_code_view(timeline[t]);
           }
           if (debug_info[t]) {
-            return console.log(debug_info[t]);
+            return write_debug_info(debug_info[t]);
           }
         });
       }

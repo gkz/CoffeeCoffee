@@ -11,7 +11,7 @@ code_chart = (update_code_view) ->
     timeline.push y
     
   info: (s) ->
-    t = timeline.length
+    t = timeline.length - 1
     debug_info[t] = [] unless debug_info[t]?
     debug_info[t].push s
     
@@ -38,13 +38,17 @@ code_chart = (update_code_view) ->
       ctx.lineTo(x * x_scale + 1, y * y_scale)
       ctx.stroke()
 
+    write_debug_info = (s) ->
+      debug_html = $("<pre>").html s.join('\n')
+      $("#debug_info_view").html debug_html
+
     $(canvas).mousemove ->
       xx = event.pageX - $(canvas).offset().left
       t = Math.floor((xx - 1) / x_scale)
       if timeline[t]
         update_code_view(timeline[t])
       if debug_info[t]
-        console.log debug_info[t]
+        write_debug_info debug_info[t]
 
 activate_code_view_window = (code, num_visits) ->
   div = $("#code_view")

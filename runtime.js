@@ -28,6 +28,7 @@
     if (method) {
       node = ast[name];
       Debugger.set_line_number(node);
+      Debugger.info(name);
       return method(scope, node);
     }
     throw "" + name + " not supported yet";
@@ -247,6 +248,9 @@
           return f.apply(obj, args);
         };
       }
+      f.toString = function() {
+        return "[function]";
+      };
       return f;
     },
     Existence: function(scope, ast) {
@@ -858,17 +862,13 @@
     return util.debug(JSON.stringify(obj, null, "  "));
   };
   Debugger = {
-    info: function(s) {
-      return console.log("(interpreter)", s);
-    },
+    info: function(s) {},
     set_line_number: function(ast) {
       if (ast.firstLineNumber) {
         return Debugger.highlight_line(ast.firstLineNumber);
       }
     },
-    highlight_line: function(line_number) {
-      return console.log("(interpreter) line = " + line_number);
-    }
+    highlight_line: function(line_number) {}
   };
   if (typeof window !== "undefined" && window !== null) {
     window.coffeecoffee = coffeecoffee;

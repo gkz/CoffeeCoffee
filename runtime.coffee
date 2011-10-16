@@ -23,6 +23,7 @@ Eval = (scope, ast) ->
   if method
     node = ast[name]
     Debugger.set_line_number(node)
+    Debugger.info(name)
     return method scope, node  
   throw "#{name} not supported yet"
 
@@ -200,6 +201,7 @@ AST =
       obj = scope.get "this"
       return (args...) ->
         f.apply(obj, args)
+    f.toString = -> "[function]"
     f
 
   Existence: (scope, ast) ->
@@ -610,12 +612,12 @@ pp = (obj, description) ->
 # Note that this mostly gets overridden client side.
 Debugger =
   info: (s) ->
-    console.log "(interpreter)", s
+    # console.log "(interpreter)", s
   set_line_number: (ast) ->
     if ast.firstLineNumber
       Debugger.highlight_line(ast.firstLineNumber)
   highlight_line: (line_number) ->
-    console.log "(interpreter) line = #{line_number}"
+    # console.log "(interpreter) line = #{line_number}"
 
 if window?
   window.coffeecoffee = coffeecoffee
