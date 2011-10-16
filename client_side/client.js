@@ -1,22 +1,10 @@
 (function() {
-  var activate_code_view_window, code_chart, highlight_line, populate_examples_dropdown, reset_example, run_code;
+  var Timeline_tracker, activate_code_view_window, code_chart, populate_examples_dropdown, reset_example, run_code;
   code_chart = function(update_code_view) {
-    var canvas, canvas_html, ctx, timeline, x, y;
-    $("#code_chart").html('<h6>Hover over graph to review the program execution.</h6>');
-    canvas_html = '<canvas id="canvas" width="520" height="100" style="border: 1px blue solid">\n</canvas>';
-    $("#code_chart").append(canvas_html);
-    canvas = document.getElementById("canvas");
-    ctx = canvas.getContext("2d");
+    var timeline, x, y;
+    timeline = {};
     x = 0;
     y = 0;
-    ctx.moveTo(x, 0);
-    timeline = {};
-    $(canvas).mousemove(function() {
-      x = event.pageX - $(canvas).offset().left;
-      if (timeline[x]) {
-        return update_code_view(timeline[x]);
-      }
-    });
     return {
       go_to_line: function(line_number) {
         if (y === line_number) {
@@ -24,9 +12,27 @@
         }
         y = line_number;
         x += 1;
-        timeline[x] = y;
-        ctx.lineTo(x, y);
-        return ctx.stroke();
+        return timeline[x] = y;
+      },
+      draw_graph: function() {
+        var canvas, canvas_html, ctx, x;
+        $("#code_chart").html('<h6>Hover over graph to review the program execution.</h6>');
+        canvas_html = '<canvas id="canvas" width="620" height="100" style="border: 1px blue solid">\n</canvas>';
+        $("#code_chart").append(canvas_html);
+        canvas = document.getElementById("canvas");
+        ctx = canvas.getContext("2d");
+        ctx.moveTo(x, 0);
+        for (x in timeline) {
+          y = timeline[x];
+          ctx.lineTo(x, y);
+          ctx.stroke();
+        }
+        return $(canvas).mousemove(function() {
+          x = event.pageX - $(canvas).offset().left;
+          if (timeline[x]) {
+            return update_code_view(timeline[x]);
+          }
+        });
       }
     };
   };
@@ -45,7 +51,7 @@
     }
     return div.append(table);
   };
-  highlight_line = function() {
+  Timeline_tracker = function() {
     var chart, last_highlight, last_line_number, update_code_view, visit_line;
     last_line_number = 0;
     visit_line = function(line_number) {
@@ -64,19 +70,24 @@
       return last_highlight = line_number;
     };
     chart = code_chart(update_code_view);
-    return function(line_number) {
-      visit_line(line_number);
-      return chart.go_to_line(line_number);
+    return {
+      highlight_line: function(line_number) {
+        visit_line(line_number);
+        return chart.go_to_line(line_number);
+      },
+      chart: chart
     };
   };
   run_code = function() {
-    var ast, code;
+    var ast, code, timeline_tracker;
     try {
       code = $("#code").val();
-      activate_code_view_window(code);
-      Debugger.highlight_line = highlight_line();
+      timeline_tracker = Timeline_tracker();
+      Debugger.highlight_line = timeline_tracker.highlight_line;
       ast = window.nodes_to_json(code);
-      return window.coffeecoffee(ast);
+      window.coffeecoffee(ast);
+      activate_code_view_window(code);
+      return timeline_tracker.chart.draw_graph();
     } catch (e) {
       return alert(e);
     } finally {

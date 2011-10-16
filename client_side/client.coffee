@@ -1,30 +1,36 @@
 code_chart = (update_code_view) ->
-  $("#code_chart").html '<h6>Hover over graph to review the program execution.</h6>'
-  canvas_html = '''
-    <canvas id="canvas" width="520" height="100" style="border: 1px blue solid">
-    </canvas>
-  '''
-  $("#code_chart").append canvas_html
-  
-  canvas = document.getElementById("canvas")
-  ctx = canvas.getContext("2d")
+  timeline = {}
   x = 0
   y = 0
-  ctx.moveTo(x,0)
-  timeline = {}
-
-  $(canvas).mousemove ->
-    x = event.pageX - $(canvas).offset().left
-    if timeline[x]
-      update_code_view(timeline[x])
 
   go_to_line: (line_number) ->
     return if y == line_number
     y = line_number
     x += 1
     timeline[x] = y
-    ctx.lineTo(x, y)
-    ctx.stroke()
+    
+  draw_graph: ->
+    $("#code_chart").html '<h6>Hover over graph to review the program execution.</h6>'
+    canvas_html = '''
+      <canvas id="canvas" width="620" height="100" style="border: 1px blue solid">
+      </canvas>
+    '''
+    $("#code_chart").append canvas_html
+
+    canvas = document.getElementById("canvas")
+    ctx = canvas.getContext("2d")
+    ctx.moveTo(x,0)
+
+    for x of timeline
+      y = timeline[x]
+      ctx.lineTo(x, y)
+      ctx.stroke()
+
+    $(canvas).mousemove ->
+      x = event.pageX - $(canvas).offset().left
+      if timeline[x]
+        update_code_view(timeline[x])
+
 
 activate_code_view_window = (code) ->
   div = $("#code_view")
@@ -47,7 +53,7 @@ activate_code_view_window = (code) ->
       """
   div.append table
 
-highlight_line = ->
+Timeline_tracker = ->
   last_line_number = 0
 
   visit_line = (line_number) ->
@@ -63,18 +69,21 @@ highlight_line = ->
     last_highlight = line_number
 
   chart = code_chart(update_code_view)
-  (line_number) ->
+  highlight_line: (line_number) ->
     visit_line(line_number)
     chart.go_to_line(line_number)
+  chart: chart
 
 run_code = ->
   try
     code = $("#code").val()
-    activate_code_view_window(code)
-    Debugger.highlight_line = highlight_line()
+    timeline_tracker = Timeline_tracker()
+    Debugger.highlight_line = timeline_tracker.highlight_line
     ast = window.nodes_to_json(code);
     # console.log(JSON.stringify(ast, null, "   "));
     window.coffeecoffee(ast)
+    activate_code_view_window(code)
+    timeline_tracker.chart.draw_graph()
   catch e
     alert e
   finally
