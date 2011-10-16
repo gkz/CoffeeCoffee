@@ -6,7 +6,7 @@ window.EXAMPLES =
         [a, b] = [b, a+b]
       a
         
-    n = 1000000000000
+    n = 100000
     answer = fib(n)
     alert "biggest fib number < #{n} = #{answer}"
     '''
@@ -21,5 +21,5 @@ window.EXAMPLES =
       list
 
     # Test the function.
-    alert bubble_sort([9, 2, 7, 0, 1, 5, 4, 3, 8]).join(' ')
+    alert bubble_sort([9, 2, 0, 4, 3, 8]).join(' ')
     '''

@@ -1,66 +1,72 @@
 code_chart = (update_code_view) ->
-  timeline = {}
-  x = 0
+  timeline = []
   y = 0
+  max_y = 0
 
   go_to_line: (line_number) ->
-    return if y == line_number
+    # return if y == line_number
     y = line_number
-    x += 1
-    timeline[x] = y
+    max_y = y if y > max_y
+    timeline.push y
     
   draw_graph: ->
+    width = 1000
+    height = 100
+    y_scale = Math.floor(height / max_y)
+    y_scale = 1 if y_scale == 0
+    x_scale = Math.floor(width / timeline.length)
+    x_scale = 1 if x_scale == 0
+    
     $("#code_chart").html '<h6>Hover over graph to review the program execution.</h6>'
-    canvas_html = '''
-      <canvas id="canvas" width="620" height="100" style="border: 1px blue solid">
+    canvas_html = """
+      <canvas id='canvas' width='#{width}' height='#{height}' style='border: 1px blue solid'>
       </canvas>
-    '''
+    """
     $("#code_chart").append canvas_html
 
     canvas = document.getElementById("canvas")
     ctx = canvas.getContext("2d")
     ctx.moveTo(x,0)
 
-    for x of timeline
-      y = timeline[x]
-      ctx.lineTo(x, y)
+    for y, x in timeline
+      ctx.lineTo(x * x_scale + 1, y * y_scale)
       ctx.stroke()
 
     $(canvas).mousemove ->
-      x = event.pageX - $(canvas).offset().left
+      xx = event.pageX - $(canvas).offset().left
+      x = Math.floor((xx - 1) / x_scale)
       if timeline[x]
         update_code_view(timeline[x])
 
 
-activate_code_view_window = (code) ->
+activate_code_view_window = (code, num_visits) ->
   div = $("#code_view")
   div.empty()
   table = $("<table>")
   table.append '''
     <tr>
       <th>line #</th>
-      <th>num visits</th>
+      <th>num evals</th>
       <th>stmt</th>
     </tr>
     '''
-  for line, i in code.split('\n')
+  for line, index in code.split('\n')
+    i = index+1
+    num_visits[i] = 0 unless num_visits[i]?
     tr = $("<tr>")
     table.append tr
     tr.append """
-      <td>#{i+1}</td>
-      <td id='count#{i+1}'>0</td>
-      <td><pre id='line#{i+1}'>#{line}</pre></td>
+      <td>#{i}</td>
+      <td id='count#{i}'>#{num_visits[i]}</td>
+      <td><pre id='line#{i}'>#{line}</pre></td>
       """
   div.append table
 
 Timeline_tracker = ->
-  last_line_number = 0
-
+  num_visits = {}
   visit_line = (line_number) ->
-    return if line_number == last_line_number
-    count = $("#count#{line_number}")
-    count.html parseInt(count.html()) + 1
-    last_line_number = line_number
+    num_visits[line_number] = 0 unless num_visits[line_number]?
+    num_visits[line_number] += 1
     
   last_highlight = 0
   update_code_view = (line_number) ->
@@ -69,10 +75,12 @@ Timeline_tracker = ->
     last_highlight = line_number
 
   chart = code_chart(update_code_view)
+  
   highlight_line: (line_number) ->
     visit_line(line_number)
     chart.go_to_line(line_number)
   chart: chart
+  num_visits: num_visits
 
 run_code = ->
   try
@@ -82,7 +90,7 @@ run_code = ->
     ast = window.nodes_to_json(code);
     # console.log(JSON.stringify(ast, null, "   "));
     window.coffeecoffee(ast)
-    activate_code_view_window(code)
+    activate_code_view_window(code, timeline_tracker.num_visits)
     timeline_tracker.chart.draw_graph()
   catch e
     alert e

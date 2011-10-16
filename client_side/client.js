@@ -1,34 +1,45 @@
 (function() {
   var Timeline_tracker, activate_code_view_window, code_chart, populate_examples_dropdown, reset_example, run_code;
   code_chart = function(update_code_view) {
-    var timeline, x, y;
-    timeline = {};
-    x = 0;
+    var max_y, timeline, y;
+    timeline = [];
     y = 0;
+    max_y = 0;
     return {
       go_to_line: function(line_number) {
-        if (y === line_number) {
-          return;
-        }
         y = line_number;
-        x += 1;
-        return timeline[x] = y;
+        if (y > max_y) {
+          max_y = y;
+        }
+        return timeline.push(y);
       },
       draw_graph: function() {
-        var canvas, canvas_html, ctx, x;
+        var canvas, canvas_html, ctx, height, width, x, x_scale, y, y_scale, _len;
+        width = 1000;
+        height = 100;
+        y_scale = Math.floor(height / max_y);
+        if (y_scale === 0) {
+          y_scale = 1;
+        }
+        x_scale = Math.floor(width / timeline.length);
+        if (x_scale === 0) {
+          x_scale = 1;
+        }
         $("#code_chart").html('<h6>Hover over graph to review the program execution.</h6>');
-        canvas_html = '<canvas id="canvas" width="620" height="100" style="border: 1px blue solid">\n</canvas>';
+        canvas_html = "<canvas id='canvas' width='" + width + "' height='" + height + "' style='border: 1px blue solid'>\n</canvas>";
         $("#code_chart").append(canvas_html);
         canvas = document.getElementById("canvas");
         ctx = canvas.getContext("2d");
         ctx.moveTo(x, 0);
-        for (x in timeline) {
+        for (x = 0, _len = timeline.length; x < _len; x++) {
           y = timeline[x];
-          ctx.lineTo(x, y);
+          ctx.lineTo(x * x_scale + 1, y * y_scale);
           ctx.stroke();
         }
         return $(canvas).mousemove(function() {
-          x = event.pageX - $(canvas).offset().left;
+          var xx;
+          xx = event.pageX - $(canvas).offset().left;
+          x = Math.floor((xx - 1) / x_scale);
           if (timeline[x]) {
             return update_code_view(timeline[x]);
           }
@@ -36,32 +47,33 @@
       }
     };
   };
-  activate_code_view_window = function(code) {
-    var div, i, line, table, tr, _len, _ref;
+  activate_code_view_window = function(code, num_visits) {
+    var div, i, index, line, table, tr, _len, _ref;
     div = $("#code_view");
     div.empty();
     table = $("<table>");
-    table.append('<tr>\n  <th>line #</th>\n  <th>num visits</th>\n  <th>stmt</th>\n</tr>');
+    table.append('<tr>\n  <th>line #</th>\n  <th>num evals</th>\n  <th>stmt</th>\n</tr>');
     _ref = code.split('\n');
-    for (i = 0, _len = _ref.length; i < _len; i++) {
-      line = _ref[i];
+    for (index = 0, _len = _ref.length; index < _len; index++) {
+      line = _ref[index];
+      i = index + 1;
+      if (num_visits[i] == null) {
+        num_visits[i] = 0;
+      }
       tr = $("<tr>");
       table.append(tr);
-      tr.append("<td>" + (i + 1) + "</td>\n<td id='count" + (i + 1) + "'>0</td>\n<td><pre id='line" + (i + 1) + "'>" + line + "</pre></td>");
+      tr.append("<td>" + i + "</td>\n<td id='count" + i + "'>" + num_visits[i] + "</td>\n<td><pre id='line" + i + "'>" + line + "</pre></td>");
     }
     return div.append(table);
   };
   Timeline_tracker = function() {
-    var chart, last_highlight, last_line_number, update_code_view, visit_line;
-    last_line_number = 0;
+    var chart, last_highlight, num_visits, update_code_view, visit_line;
+    num_visits = {};
     visit_line = function(line_number) {
-      var count;
-      if (line_number === last_line_number) {
-        return;
+      if (num_visits[line_number] == null) {
+        num_visits[line_number] = 0;
       }
-      count = $("#count" + line_number);
-      count.html(parseInt(count.html()) + 1);
-      return last_line_number = line_number;
+      return num_visits[line_number] += 1;
     };
     last_highlight = 0;
     update_code_view = function(line_number) {
@@ -75,7 +87,8 @@
         visit_line(line_number);
         return chart.go_to_line(line_number);
       },
-      chart: chart
+      chart: chart,
+      num_visits: num_visits
     };
   };
   run_code = function() {
@@ -86,7 +99,7 @@
       Debugger.highlight_line = timeline_tracker.highlight_line;
       ast = window.nodes_to_json(code);
       window.coffeecoffee(ast);
-      activate_code_view_window(code);
+      activate_code_view_window(code, timeline_tracker.num_visits);
       return timeline_tracker.chart.draw_graph();
     } catch (e) {
       return alert(e);
