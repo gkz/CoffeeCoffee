@@ -8,6 +8,9 @@
     debug_info = {};
     return {
       go_to_line: function(line_number) {
+        if (y === line_number) {
+          return;
+        }
         y = line_number;
         if (y > max_y) {
           max_y = y;
@@ -24,7 +27,7 @@
       },
       draw_graph: function() {
         var canvas, canvas_html, ctx, height, width, write_debug_info, x, x_scale, y, y_scale, _len;
-        width = 1000;
+        width = 800;
         height = 100;
         y_scale = Math.floor(height / max_y);
         if (y_scale === 0) {
@@ -42,7 +45,8 @@
         ctx.moveTo(x, 0);
         for (x = 0, _len = timeline.length; x < _len; x++) {
           y = timeline[x];
-          ctx.lineTo(x * x_scale + 1, y * y_scale);
+          ctx.moveTo(x * x_scale, y * y_scale);
+          ctx.lineTo((x + 1) * x_scale, y * y_scale);
           ctx.stroke();
         }
         write_debug_info = function(s) {
@@ -53,7 +57,7 @@
         return $(canvas).mousemove(function() {
           var t, xx;
           xx = event.pageX - $(canvas).offset().left;
-          t = Math.floor((xx - 1) / x_scale);
+          t = Math.floor(xx / x_scale);
           if (timeline[t]) {
             update_code_view(timeline[t]);
           }
@@ -127,7 +131,8 @@
   };
   reset_example = function() {
     $("#code_chart").empty();
-    return $("#code_view").empty();
+    $("#code_view").empty();
+    return $("#debug_info_view").empty();
   };
   populate_examples_dropdown = function(examples) {
     var example, html, select;

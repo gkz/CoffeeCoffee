@@ -218,6 +218,8 @@ AST =
       key_var = ast.index.Literal.value
       val_var = ast.name && AST.name ast
       for key_val, val_val of obj
+        Debugger.set_line_number(ast)
+        Debugger.info "loop on #{key_var}"
         scope.set key_var, key_val
         if val_var?
           scope.set val_var, val_val
@@ -232,6 +234,8 @@ AST =
       range = Eval scope, ast.source
       step_var = AST.name ast
       for step_val in range
+        Debugger.set_line_number(ast)
+        Debugger.info "loop on #{step_var}"
         scope.set step_var, step_val
         try
           val = Eval scope, ast.body

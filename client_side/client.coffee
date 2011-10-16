@@ -5,7 +5,7 @@ code_chart = (update_code_view) ->
   debug_info = {}
 
   go_to_line: (line_number) ->
-    # return if y == line_number
+    return if y == line_number
     y = line_number
     max_y = y if y > max_y
     timeline.push y
@@ -16,7 +16,7 @@ code_chart = (update_code_view) ->
     debug_info[t].push s
     
   draw_graph: ->
-    width = 1000
+    width = 800
     height = 100
     y_scale = Math.floor(height / max_y)
     y_scale = 1 if y_scale == 0
@@ -35,7 +35,8 @@ code_chart = (update_code_view) ->
     ctx.moveTo(x,0)
 
     for y, x in timeline
-      ctx.lineTo(x * x_scale + 1, y * y_scale)
+      ctx.moveTo(x * x_scale, y * y_scale)
+      ctx.lineTo((x+1) * x_scale, y * y_scale)
       ctx.stroke()
 
     write_debug_info = (s) ->
@@ -44,7 +45,7 @@ code_chart = (update_code_view) ->
 
     $(canvas).mousemove ->
       xx = event.pageX - $(canvas).offset().left
-      t = Math.floor((xx - 1) / x_scale)
+      t = Math.floor(xx / x_scale)
       if timeline[t]
         update_code_view(timeline[t])
       if debug_info[t]
@@ -112,6 +113,7 @@ run_code = ->
 reset_example = ->
   $("#code_chart").empty()
   $("#code_view").empty()
+  $("#debug_info_view").empty()
 
 populate_examples_dropdown = (examples) ->
   select = $("#examples")

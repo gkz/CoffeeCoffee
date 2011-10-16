@@ -274,6 +274,8 @@
         _results = [];
         for (key_val in obj) {
           val_val = obj[key_val];
+          Debugger.set_line_number(ast);
+          Debugger.info("loop on " + key_var);
           scope.set(key_var, key_val);
           if (val_var != null) {
             scope.set(val_var, val_val);
@@ -298,6 +300,8 @@
         _results2 = [];
         for (_i = 0, _len = range.length; _i < _len; _i++) {
           step_val = range[_i];
+          Debugger.set_line_number(ast);
+          Debugger.info("loop on " + step_var);
           scope.set(step_var, step_val);
           try {
             val = Eval(scope, ast.body);
