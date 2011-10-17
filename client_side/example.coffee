@@ -1,4 +1,19 @@
 window.EXAMPLES =
+  classes: '''
+    class Counter
+      constructor: (@number) ->
+      incr: ->
+        @number += 1
+    
+    output = $("#output")
+    print = (s) ->
+      output.append s
+      
+    c = new Counter(41)
+    c.incr()
+    print c.number
+    '''
+
   fib: '''
     fib = (n) ->
       [a, b] = [1, 1]

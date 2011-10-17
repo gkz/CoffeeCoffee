@@ -225,6 +225,7 @@
           }
           if ((_ref2 = param.name.Value) != null ? _ref2.properties : void 0) {
             field = AST.name(param.name.Value.properties[0].Access);
+            Debugger.info("this." + field + " = " + val);
             this[field] = val;
           } else {
             field = AST.name(param);
@@ -407,7 +408,8 @@
           Literal: function(ast, value) {
             var lhs;
             lhs = ast.value;
-            return obj[lhs] = value;
+            obj[lhs] = value;
+            return Debugger.info("Obj: " + lhs + ": " + value);
           },
           Value: function(ast, value) {
             return LHS.set(ast.base, value);

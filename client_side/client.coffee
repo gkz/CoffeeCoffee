@@ -114,6 +114,7 @@ reset_example = ->
   $("#code_chart").empty()
   $("#code_view").empty()
   $("#debug_info_view").empty()
+  $("#output").empty()
 
 populate_examples_dropdown = (examples) ->
   select = $("#examples")
@@ -128,7 +129,7 @@ jQuery(document).ready ->
   # to build unminified CS (so we get full introspection)
   # MINIFY=false bin/cake build:browser
   # cp extras/coffee-script.js ../CoffeeCoffee/client_side/coffee-script.js
-  code = EXAMPLES.fib
+  code = EXAMPLES.classes
   populate_examples_dropdown(EXAMPLES)
   $("#code").val(code)
   $("input.code").click ->

@@ -132,7 +132,8 @@
   reset_example = function() {
     $("#code_chart").empty();
     $("#code_view").empty();
-    return $("#debug_info_view").empty();
+    $("#debug_info_view").empty();
+    return $("#output").empty();
   };
   populate_examples_dropdown = function(examples) {
     var example, html, select;
@@ -148,7 +149,7 @@
   };
   jQuery(document).ready(function() {
     var code;
-    code = EXAMPLES.fib;
+    code = EXAMPLES.classes;
     populate_examples_dropdown(EXAMPLES);
     $("#code").val(code);
     return $("input.code").click(function() {

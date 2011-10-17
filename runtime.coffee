@@ -188,6 +188,7 @@ AST =
           val = Eval scope, param.value
         if param.name.Value?.properties
           field = AST.name param.name.Value.properties[0].Access
+          Debugger.info "this.#{field} = #{val}"
           this[field] = val
         else
           field = AST.name param
@@ -305,6 +306,7 @@ AST =
         Literal: (ast, value) ->
           lhs = ast.value
           obj[lhs] = value
+          Debugger.info "Obj: #{lhs}: #{value}"
 
         Value: (ast, value) ->    
           LHS.set ast.base, value
