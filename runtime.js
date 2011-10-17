@@ -28,7 +28,6 @@
     if (method) {
       node = ast[name];
       Debugger.set_line_number(node);
-      Debugger.info(name);
       return method(scope, node);
     }
     throw "" + name + " not supported yet";
@@ -146,12 +145,13 @@
       obj = Eval(scope, variable.base);
       properties = variable.properties;
       if (ast.isNew) {
-        val = newify(obj, args);
         Debugger.info("new " + obj + " with args: " + args);
+        val = newify(obj, args);
         return val;
       }
       if (properties.length === 0) {
-        return val = obj.apply(null, args);
+        Debugger.info("call with args: " + args);
+        val = obj.apply(null, args);
       } else {
         _ref2 = AST.deref_properties(scope, obj, properties), obj = _ref2[0], key = _ref2[1];
         if (!(obj[key] != null)) {
@@ -165,8 +165,9 @@
         } finally {
           CURRENT_OBJECT_METHOD_NAME = old_method_name;
         }
-        return val;
       }
+      Debugger.info("return " + val);
+      return val;
     },
     Class: function(scope, ast) {
       var block_ast, class_code, class_name, expressions, klass, parent_class, proto;
@@ -340,9 +341,10 @@
       return Eval(scope, ast.index);
     },
     Literal: function(scope, ast) {
-      var match, regex, value;
+      var literal, val, value;
       value = ast.value;
-      if (value) {
+      literal = function() {
+        var match, regex;
         if (value === 'false') {
           return false;
         }
@@ -380,7 +382,10 @@
           return RegExp(match[1], match[2]);
         }
         return scope.get(value);
-      }
+      };
+      val = literal();
+      Debugger.info("Literal: " + val);
+      return val;
     },
     Obj: function(scope, ast) {
       var LHS, obj, property, value, _i, _len, _ref;
@@ -666,10 +671,12 @@
       while (true) {
         Debugger.info("while <condition>...");
         cond = Eval(scope, ast.condition);
-        if (!cond) {
+        if (cond) {
+          Debugger.info("(while cond true)");
+        } else {
+          Debugger.info("(while cond false)");
           break;
         }
-        Debugger.info("(cond true)");
         try {
           val = Eval(scope, ast.body);
         } catch (e) {

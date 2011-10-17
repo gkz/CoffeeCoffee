@@ -23,7 +23,7 @@ Eval = (scope, ast) ->
   if method
     node = ast[name]
     Debugger.set_line_number(node)
-    Debugger.info(name)
+    # Debugger.info(name)
     return method scope, node  
   throw "#{name} not supported yet"
 
@@ -124,11 +124,12 @@ AST =
 
     if ast.isNew
       # may need to handle properties better
-      val = newify obj, args
       Debugger.info "new #{obj} with args: #{args}" 
+      val = newify obj, args
       return val
 
     if properties.length == 0
+      Debugger.info "call with args: #{args}"
       val = obj args...
     else
       [obj, key] = AST.deref_properties scope, obj, properties
@@ -141,7 +142,8 @@ AST =
         val = obj[key].apply obj, args
       finally
         CURRENT_OBJECT_METHOD_NAME = old_method_name
-      val
+    Debugger.info "return #{val}"
+    val
   
   Class: (scope, ast) ->
     class_name = ast.variable.Value.base.Literal.value
@@ -263,7 +265,7 @@ AST =
 
   Literal: (scope, ast) ->
     value = ast.value
-    if value
+    literal = ->
       return false if value == 'false'
       return true if value == 'true'
       return null if value == 'null'
@@ -283,6 +285,9 @@ AST =
         match = regex.exec(value)
         return RegExp match[1], match[2]
       return scope.get(value)
+    val = literal()
+    Debugger.info "Literal: #{val}"
+    val
       
   Obj: (scope, ast) ->
     obj = {}
@@ -459,8 +464,11 @@ AST =
     while true
       Debugger.info "while <condition>..."
       cond = Eval scope, ast.condition
-      break unless cond
-      Debugger.info "(cond true)"
+      if cond
+        Debugger.info "(while cond true)"
+      else
+        Debugger.info "(while cond false)"
+        break
       try
         val = Eval scope, ast.body
       catch e
