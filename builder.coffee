@@ -56,18 +56,9 @@ AST =
 
   Assign: (ast) ->
     context = ast.context || '='
-    LHS = (lhs) ->
-      if lhs.Value?
-        LHS lhs.Value.base 
-      else if lhs.Literal?
-        PUT lhs.Literal.value
-      else
-        PUT "ARR", ->
-          for object in lhs.Arr.objects
-            LHS object.Value.base
 
     PUT "ASSIGN #{context}", ->
-      LHS ast.variable
+      Build ast.variable
       Build ast.value
     return
 
@@ -124,6 +115,7 @@ AST =
     
   Call: (ast) ->
     PUT "CALL", ->
+      Build ast.variable
       PUT "ARGS", ->
         for arg in ast.args
           Build arg
@@ -202,7 +194,7 @@ AST =
       PUT 'PARAMS', ->
         for param in ast.params
           PUT param.Param.name.Literal.value
-          Build ast.body
+      Build ast.body
     return
     f = (args...) ->
       my_args = arg for arg in args
@@ -236,15 +228,11 @@ AST =
     f.toString = -> "[function]"
     f
 
-  Existence: (scope, ast) ->
-    try
-      val = Build scope, ast.expression
-    catch e
-      throw e unless e.__meta?
-      return false
-    val?
+  Existence: (ast) ->
+    PUT "EXISTENCE", ->
+      Build ast.expression
 
-  For: (scope, ast) ->
+  For: (ast) ->
     if ast.index
       obj = Build scope, ast.source
       key_var = ast.index.Literal.value
@@ -263,6 +251,12 @@ AST =
           throw e
         val
     else
+      PUT "FOR_IN", ->
+        PUT ast.name.Literal.value
+        Build ast.source
+        Build ast.body
+      return
+
       range = Build scope, ast.source
       step_var = AST.name ast
       for step_val in range
@@ -325,7 +319,12 @@ AST =
       PUT "EVAL #{value}"
     literal()
       
-  Obj: (scope, ast) ->
+  Obj: (ast) ->
+    PUT "OBJ", ->
+      for property in ast.properties
+        Build property
+    return
+
     obj = {}
     for property in ast.properties
       ast = property.Assign
@@ -401,13 +400,11 @@ AST =
     else
       return Build body
 
-  Range: (scope, ast) ->
-    from_val = Build scope, ast.from
-    to_val = Build scope, ast.to
-    if ast.exclusive
-      [from_val...to_val]
-    else
-      [from_val..to_val]
+  Range: (ast) ->
+    PUT "RANGE", ->
+      PUT ast.exclusive
+      Build ast.from
+      Build ast.to
 
   Return: (ast) ->
     PUT "RETURN", ->
@@ -466,6 +463,10 @@ AST =
         PUT "INDEX", ->
           prior()
           Build last_property.Index.index
+      else if last_property.Slice?
+        PUT "SLICE", ->
+          prior()
+          Build last_property.Slice.range
       else
         throw "yo"
       return

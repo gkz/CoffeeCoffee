@@ -82,26 +82,8 @@
     Assign: function(ast) {
       var LHS, context, rhs, set;
       context = ast.context || '=';
-      LHS = function(lhs) {
-        if (lhs.Value != null) {
-          return LHS(lhs.Value.base);
-        } else if (lhs.Literal != null) {
-          return PUT(lhs.Literal.value);
-        } else {
-          return PUT("ARR", function() {
-            var object, _i, _len, _ref, _results;
-            _ref = lhs.Arr.objects;
-            _results = [];
-            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-              object = _ref[_i];
-              _results.push(LHS(object.Value.base));
-            }
-            return _results;
-          });
-        }
-      };
       PUT("ASSIGN " + context, function() {
-        LHS(ast.variable);
+        Build(ast.variable);
         return Build(ast.value);
       });
       return;
@@ -171,6 +153,7 @@
     Call: function(ast) {
       var CURRENT_OBJECT_METHOD_NAME, arg, args, key, obj, old_method_name, properties, this_var, val, variable, _i, _len, _ref, _ref2;
       PUT("CALL", function() {
+        Build(ast.variable);
         return PUT("ARGS", function() {
           var arg, _i, _len, _ref, _results;
           _ref = ast.args;
@@ -261,17 +244,17 @@
     Code: function(ast) {
       var f, obj;
       PUT('CODE', function() {
-        return PUT('PARAMS', function() {
+        PUT('PARAMS', function() {
           var param, _i, _len, _ref, _results;
           _ref = ast.params;
           _results = [];
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             param = _ref[_i];
-            PUT(param.Param.name.Literal.value);
-            _results.push(Build(ast.body));
+            _results.push(PUT(param.Param.name.Literal.value));
           }
           return _results;
         });
+        return Build(ast.body);
       });
       return;
       f = function() {
@@ -326,19 +309,12 @@
       };
       return f;
     },
-    Existence: function(scope, ast) {
-      var val;
-      try {
-        val = Build(scope, ast.expression);
-      } catch (e) {
-        if (e.__meta == null) {
-          throw e;
-        }
-        return false;
-      }
-      return val != null;
+    Existence: function(ast) {
+      return PUT("EXISTENCE", function() {
+        return Build(ast.expression);
+      });
     },
-    For: function(scope, ast) {
+    For: function(ast) {
       var key_val, key_var, obj, range, step_val, step_var, val, val_val, val_var, _i, _len, _results, _results2;
       if (ast.index) {
         obj = Build(scope, ast.source);
@@ -368,6 +344,12 @@
         }
         return _results;
       } else {
+        PUT("FOR_IN", function() {
+          PUT(ast.name.Literal.value);
+          Build(ast.source);
+          return Build(ast.body);
+        });
+        return;
         range = Build(scope, ast.source);
         step_var = AST.name(ast);
         _results2 = [];
@@ -467,8 +449,19 @@
       };
       return literal();
     },
-    Obj: function(scope, ast) {
+    Obj: function(ast) {
       var LHS, obj, property, value, _i, _len, _ref;
+      PUT("OBJ", function() {
+        var property, _i, _len, _ref, _results;
+        _ref = ast.properties;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          property = _ref[_i];
+          _results.push(Build(property));
+        }
+        return _results;
+      });
+      return;
       obj = {};
       _ref = ast.properties;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -561,23 +554,12 @@
         return Build(body);
       }
     },
-    Range: function(scope, ast) {
-      var from_val, to_val, _i, _j, _results, _results2;
-      from_val = Build(scope, ast.from);
-      to_val = Build(scope, ast.to);
-      if (ast.exclusive) {
-        return (function() {
-          _results = [];
-          for (var _i = from_val; from_val <= to_val ? _i < to_val : _i > to_val; from_val <= to_val ? _i++ : _i--){ _results.push(_i); }
-          return _results;
-        }).apply(this, arguments);
-      } else {
-        return (function() {
-          _results2 = [];
-          for (var _j = from_val; from_val <= to_val ? _j <= to_val : _j >= to_val; from_val <= to_val ? _j++ : _j--){ _results2.push(_j); }
-          return _results2;
-        }).apply(this, arguments);
-      }
+    Range: function(ast) {
+      return PUT("RANGE", function() {
+        PUT(ast.exclusive);
+        Build(ast.from);
+        return Build(ast.to);
+      });
     },
     Return: function(ast) {
       return PUT("RETURN", function() {
@@ -660,6 +642,11 @@
           PUT("INDEX", function() {
             prior();
             return Build(last_property.Index.index);
+          });
+        } else if (last_property.Slice != null) {
+          PUT("SLICE", function() {
+            prior();
+            return Build(last_property.Slice.range);
           });
         } else {
           throw "yo";
