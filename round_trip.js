@@ -1,57 +1,5 @@
 (function() {
   var Block, Build, Comma, Eval, Indent, Join, Shift, data, fn, fs, handle_data, indenter, parser, stdin;
-  Eval = function(block) {
-    var arg, args, line, name, prefix, _ref;
-    _ref = indenter.small_block(block), prefix = _ref[0], line = _ref[1], block = _ref[2];
-    if (line.length === 0) {
-      return '';
-    }
-    args = line.split(' ');
-    name = args[0];
-    arg = args.slice(1, args.length).join(' ');
-    if (Build[name]) {
-      return Build[name](arg, block);
-    } else {
-      return console.log("unknown " + name);
-    }
-  };
-  Join = function(s1, s2) {
-    var lines;
-    lines = s2.split('\n');
-    if (lines.length === 1) {
-      return s1 + ' ' + s2;
-    } else {
-      return Indent(s1, s2);
-    }
-  };
-  Indent = function(s1, s2) {
-    var lines, s;
-    lines = s2.split('\n');
-    return s1 + '\n' + ((function() {
-      var _i, _len, _results;
-      _results = [];
-      for (_i = 0, _len = lines.length; _i < _len; _i++) {
-        s = lines[_i];
-        _results.push('  ' + s);
-      }
-      return _results;
-    })()).join('\n');
-  };
-  Block = function(block) {
-    var s;
-    s = '';
-    while (block.len() > 0) {
-      s += Eval(block);
-      s += '\n';
-    }
-    return s;
-  };
-  Shift = function(block) {
-    return block.shift()[1];
-  };
-  Comma = function(arr) {
-    return arr.join(', ');
-  };
   Build = {
     'ACCESS': function(arg, block) {
       var access, val;
@@ -214,6 +162,58 @@
       body = Eval(block);
       return Join(cond, body);
     }
+  };
+  Eval = function(block) {
+    var arg, args, line, name, prefix, _ref;
+    _ref = indenter.small_block(block), prefix = _ref[0], line = _ref[1], block = _ref[2];
+    if (line.length === 0) {
+      return '';
+    }
+    args = line.split(' ');
+    name = args[0];
+    arg = args.slice(1, args.length).join(' ');
+    if (Build[name]) {
+      return Build[name](arg, block);
+    } else {
+      return console.log("unknown " + name);
+    }
+  };
+  Join = function(s1, s2) {
+    var lines;
+    lines = s2.split('\n');
+    if (lines.length === 1) {
+      return s1 + ' ' + s2;
+    } else {
+      return Indent(s1, s2);
+    }
+  };
+  Indent = function(s1, s2) {
+    var lines, s;
+    lines = s2.split('\n');
+    return s1 + '\n' + ((function() {
+      var _i, _len, _results;
+      _results = [];
+      for (_i = 0, _len = lines.length; _i < _len; _i++) {
+        s = lines[_i];
+        _results.push('  ' + s);
+      }
+      return _results;
+    })()).join('\n');
+  };
+  Block = function(block) {
+    var s;
+    s = '';
+    while (block.len() > 0) {
+      s += Eval(block);
+      s += '\n';
+    }
+    return s;
+  };
+  Shift = function(block) {
+    return block.shift()[1];
+  };
+  Comma = function(arr) {
+    return arr.join(', ');
   };
   parser = function(indented_lines) {
     var _results;

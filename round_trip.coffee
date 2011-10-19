@@ -1,43 +1,9 @@
-# Create an intermediate language that is easy to parse and step-debug.
+# Create CS code from our intermediate language.  This code is mostly used to validate
+# that the transformation to the intermediate language is not lossy.
+
 
 # Example usage:
-#  coffee nodes_to_json.coffee test/binary_search.coffee | coffee builder.coffee -
-#
-
-Eval = (block) ->
-  [prefix, line, block] = indenter.small_block(block)
-  return '' if line.length == 0
-  args = line.split(' ')
-  name = args[0]
-  arg = args[1...args.length].join ' ' # gross, need regex
-  if Build[name]
-    Build[name](arg, block)
-  else
-    console.log "unknown #{name}"
-
-Join = (s1, s2) ->
-  lines = s2.split '\n'
-  if lines.length == 1
-    s1 + ' ' + s2
-  else
-    Indent s1, s2
-    
-Indent = (s1, s2) ->
-  lines = s2.split '\n'
-  s1 + '\n' + ('  ' + s for s in lines).join('\n')
-
-Block = (block) ->
-  s = ''
-  while block.len() > 0
-    s += Eval block
-    s += '\n'
-  s
-
-Shift = (block) ->
-  block.shift()[1]
-
-Comma = (arr) ->
-  arr.join ', '
+#  coffee nodes_to_json.coffee test/cubes.coffee | node builder.js - | node round_trip.js - 
 
 Build =
   'ACCESS': (arg, block) ->
@@ -171,6 +137,42 @@ Build =
     cond = "while #{Eval block}"
     body = Eval block
     Join cond, body
+
+Eval = (block) ->
+  [prefix, line, block] = indenter.small_block(block)
+  return '' if line.length == 0
+  args = line.split(' ')
+  name = args[0]
+  arg = args[1...args.length].join ' ' # gross, need regex
+  if Build[name]
+    Build[name](arg, block)
+  else
+    console.log "unknown #{name}"
+
+Join = (s1, s2) ->
+  lines = s2.split '\n'
+  if lines.length == 1
+    s1 + ' ' + s2
+  else
+    Indent s1, s2
+
+Indent = (s1, s2) ->
+  lines = s2.split '\n'
+  s1 + '\n' + ('  ' + s for s in lines).join('\n')
+
+Block = (block) ->
+  s = ''
+  while block.len() > 0
+    s += Eval block
+    s += '\n'
+  s
+
+Shift = (block) ->
+  block.shift()[1]
+
+Comma = (arr) ->
+  arr.join ', '
+
 
 parser = (indented_lines) ->
   while indented_lines.len() > 0
