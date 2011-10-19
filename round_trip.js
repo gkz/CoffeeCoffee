@@ -1,5 +1,5 @@
 (function() {
-  var Block, Build, Comma, Eval, Join, Shift, data, fn, fs, handle_data, indenter, parser, stdin;
+  var Block, Build, Comma, Eval, Indent, Join, Shift, data, fn, fs, handle_data, indenter, parser, stdin;
   Eval = function(block) {
     var arg, args, line, name, prefix, _ref;
     _ref = indenter.small_block(block), prefix = _ref[0], line = _ref[1], block = _ref[2];
@@ -16,21 +16,26 @@
     }
   };
   Join = function(s1, s2) {
-    var lines, s;
+    var lines;
     lines = s2.split('\n');
     if (lines.length === 1) {
       return s1 + ' ' + s2;
     } else {
-      return s1 + '\n' + ((function() {
-        var _i, _len, _results;
-        _results = [];
-        for (_i = 0, _len = lines.length; _i < _len; _i++) {
-          s = lines[_i];
-          _results.push('  ' + s);
-        }
-        return _results;
-      })()).join('\n');
+      return Indent(s1, s2);
     }
+  };
+  Indent = function(s1, s2) {
+    var lines, s;
+    lines = s2.split('\n');
+    return s1 + '\n' + ((function() {
+      var _i, _len, _results;
+      _results = [];
+      for (_i = 0, _len = lines.length; _i < _len; _i++) {
+        s = lines[_i];
+        _results.push('  ' + s);
+      }
+      return _results;
+    })()).join('\n');
   };
   Block = function(block) {
     var s;
@@ -74,7 +79,7 @@
       var my_var, value;
       my_var = Eval(block);
       value = Eval(block);
-      return "" + my_var + " = " + value;
+      return Join("" + my_var + " =", value);
     },
     'CALL': function(arg, block) {
       var args, my_var;
@@ -104,7 +109,7 @@
       step_var = Shift(block);
       range_var = Eval(block);
       for_stmt = "for " + step_var + " in " + range_var;
-      return Join(for_stmt, Eval(block));
+      return Indent(for_stmt, Eval(block));
     },
     'IF': function(arg, block) {
       var body, cond, elseBody, stmt;
@@ -125,6 +130,16 @@
     },
     'NUMBER': function(arg, block) {
       return arg;
+    },
+    'OBJ': function(arg, block) {
+      var name, s;
+      s = '';
+      while (block.len() > 0) {
+        name = Shift(block);
+        s += Join("" + name + ":", Eval(block));
+        s += '\n';
+      }
+      return s;
     },
     'OP_BINARY': function(arg, block) {
       var op, operand1, operand2;
@@ -170,6 +185,9 @@
       return "return " + val;
     },
     'STRING': function(arg, block) {
+      return arg;
+    },
+    'VALUE': function(arg, block) {
       return arg;
     },
     'WHILE': function(arg, block) {

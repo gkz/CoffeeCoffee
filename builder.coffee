@@ -300,10 +300,8 @@ AST =
   Literal: (ast) ->
     value = ast.value
     literal = ->
-      return false if value == 'false'
-      return true if value == 'true'
-      return null if value == 'null'
-      return undefined if value == 'undefined'
+      if value == 'false' || value == 'true' || value == 'undefined' || value == 'undefined'
+        return PUT "VALUE #{value}"
       if value == 'break'
         throw __meta_break: true
       if value == 'continue'
@@ -320,11 +318,14 @@ AST =
         return RegExp match[1], match[2]
       PUT "EVAL #{value}"
     literal()
-      
+       
   Obj: (ast) ->
     PUT "OBJ", ->
       for property in ast.properties
-        Build property
+        name = property.Assign.variable.Value.base.Literal.value
+        PUT name
+        Build property.Assign.value
+        # Build property
     return
 
     obj = {}

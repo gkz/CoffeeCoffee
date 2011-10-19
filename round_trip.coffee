@@ -20,7 +20,11 @@ Join = (s1, s2) ->
   if lines.length == 1
     s1 + ' ' + s2
   else
-    s1 + '\n' + ('  ' + s for s in lines).join('\n')
+    Indent s1, s2
+    
+Indent = (s1, s2) ->
+  lines = s2.split '\n'
+  s1 + '\n' + ('  ' + s for s in lines).join('\n')
 
 Block = (block) ->
   s = ''
@@ -56,7 +60,7 @@ Build =
   'ASSIGN': (arg, block) ->
     my_var = Eval block
     value = Eval block
-    "#{my_var} = #{value}"
+    Join "#{my_var} =", value
 
   'CALL': (arg, block) ->
     my_var = Eval block
@@ -83,7 +87,7 @@ Build =
     step_var = Shift block
     range_var = Eval block
     for_stmt = "for #{step_var} in #{range_var}"
-    Join for_stmt, Eval block
+    Indent for_stmt, Eval block
     
   'IF': (arg, block) ->
     cond = "if #{Eval block}"
@@ -101,6 +105,14 @@ Build =
 
   'NUMBER': (arg, block) ->
     arg
+
+  'OBJ': (arg, block) ->
+    s = ''
+    while block.len() > 0
+      name = Shift block
+      s += Join "#{name}:", Eval block
+      s += '\n'
+    s
 
   'OP_BINARY': (arg, block) ->
     op = arg
@@ -135,6 +147,9 @@ Build =
     "return #{val}"
 
   'STRING': (arg, block) ->
+    arg
+
+  'VALUE': (arg, block) ->
     arg
 
   'WHILE': (arg, block) ->

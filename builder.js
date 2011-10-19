@@ -413,17 +413,8 @@
       value = ast.value;
       literal = function() {
         var c, float, match, regex;
-        if (value === 'false') {
-          return false;
-        }
-        if (value === 'true') {
-          return true;
-        }
-        if (value === 'null') {
-          return null;
-        }
-        if (value === 'undefined') {
-          return;
+        if (value === 'false' || value === 'true' || value === 'undefined' || value === 'undefined') {
+          return PUT("VALUE " + value);
         }
         if (value === 'break') {
           throw {
@@ -455,12 +446,14 @@
     Obj: function(ast) {
       var LHS, obj, property, value, _i, _len, _ref;
       PUT("OBJ", function() {
-        var property, _i, _len, _ref, _results;
+        var name, property, _i, _len, _ref, _results;
         _ref = ast.properties;
         _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           property = _ref[_i];
-          _results.push(Build(property));
+          name = property.Assign.variable.Value.base.Literal.value;
+          PUT(name);
+          _results.push(Build(property.Assign.value));
         }
         return _results;
       });
