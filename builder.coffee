@@ -33,16 +33,6 @@ INDENT = -> TAB += '  '
 DEDENT = -> TAB = TAB[0...TAB.length - 2]
 
 AST =
-  deref_properties: (scope, obj, properties) ->
-    for accessor in properties.slice(0, properties.length - 1)
-      key = Build scope, accessor
-      obj = obj[key]
-    last_property = properties[properties.length - 1]
-    if last_property.Access?.proto == ".prototype"
-      obj = obj.prototype
-    key = Build scope, last_property
-    [obj, key]
-
   name: (ast) ->
     return ast.name.Literal.value
 
@@ -61,52 +51,6 @@ AST =
       Build ast.variable
       Build ast.value
     return
-
-    context = ast.context
-    
-    set = (scope, ast, value) ->
-      name = the_key_of(ast)
-      method = LHS[name]
-      if method
-        return method scope, ast[name], value
-      throw "#{name} not supported yet on LHS"
-
-    LHS = 
-      Arr: (scope, ast, value) ->
-        for object, i in ast.objects
-          if object.Splat?
-            num_to_grab = value.length - ast.objects.length + 1
-            set scope, object.Splat.name, value[i...i+num_to_grab]
-          else
-            set scope, object, value[i]
-          
-      Obj: (scope, ast, value) ->
-        for property in ast.properties
-          if property.Assign?
-            key = property.Assign.variable.Value.base.Literal.value
-            val = value[key]
-            set scope, property.Assign.value, val
-          else
-            name = property.Value.base.Literal.value
-            scope.set name, value[name]
-        
-      Value: (scope, ast, value) ->
-        if ast.properties.length == 0
-          base_key = the_key_of(ast.base)
-          if base_key == "Arr" || base_key == "Obj"
-            set scope, ast.base, value
-          else
-            lhs = ast.base.Literal.value 
-            PUT "ASSIGN #{context}"
-            PUT lhs
-            PUT value
-        else
-          lhs = Build scope, ast.base
-          [lhs, key] = AST.deref_properties scope, lhs, ast.properties
-          update_variable_reference lhs, key, value, context
-
-    rhs = Build scope, ast.value
-    set scope, ast.variable, rhs
 
   Block: (ast) ->
     code = ast.expressions
@@ -151,14 +95,6 @@ AST =
         if block_ast
           Build block_ast
     return
-        
-    if ast.parent
-      parent_class = Build scope, ast.parent 
-    else
-      parent_class = null
-    klass = build_class proto, parent_class
-    klass.toString = -> "[class #{class_name}]"
-    scope.set class_name, klass
     
   Code: (ast) ->
     PUT 'CODE', ->
@@ -173,38 +109,6 @@ AST =
             name += "..."
           PUT name
       Build ast.body
-    return
-    f = (args...) ->
-      my_args = arg for arg in args
-      parms = {}
-      for param in ast.params
-        param = param.Param
-        if param.splat
-          val = args
-        else
-          val = args.shift()
-        if val == undefined && param.value
-          val = Build scope, param.value
-        if param.name.Value?.properties
-          field = AST.name param.name.Value.properties[0].Access
-          Debugger.info "this.#{field} = #{val}"
-          this[field] = val
-        else
-          field = AST.name param
-          parms[field] = val
-      sub_scope = Scope(parms, scope, this, my_args)
-      try
-        return Build sub_scope, ast.body
-      catch e
-        if e.retval?
-          return e.retval.obj
-        throw e
-    if ast.bound
-      obj = scope.get "this"
-      return (args...) ->
-        f.apply(obj, args)
-    f.toString = -> "[function]"
-    f
 
   Existence: (ast) ->
     PUT "EXISTENCE", ->
@@ -219,45 +123,12 @@ AST =
         Build ast.source
         PUT "DO", ->
           Build ast.body
-      return
-        
-      obj = Build scope, ast.source
-      key_var = ast.index.Literal.value
-      val_var = ast.name && AST.name ast
-      for key_val, val_val of obj
-        Debugger.set_line_number(ast)
-        Debugger.info "loop on #{key_var}"
-        scope.set key_var, key_val
-        if val_var?
-          scope.set val_var, val_val
-        try
-          val = Build scope, ast.body
-        catch e
-          break if e.__meta_break
-          continue if e.__meta_continue
-          throw e
-        val
     else
       PUT "FOR_IN", ->
         PUT ast.name.Literal.value
         Build ast.source
         PUT "DO", ->
           Build ast.body
-      return
-
-      range = Build scope, ast.source
-      step_var = AST.name ast
-      for step_val in range
-        Debugger.set_line_number(ast)
-        Debugger.info "loop on #{step_var}"
-        scope.set step_var, step_val
-        try
-          val = Build scope, ast.body
-        catch e
-          break if e.__meta_break
-          continue if e.__meta_continue
-          throw e
-        val
       
   If: (ast) ->
     PUT "IF", ->
@@ -270,11 +141,6 @@ AST =
           Build ast.elseBody
     return
     
-    if Build scope, ast.condition
-      Build scope, ast.body
-    else if ast.elseBody
-      Build scope, ast.elseBody
-      
   In: (ast) ->
     name = if ast.negated
       "NOT_IN"
@@ -284,9 +150,6 @@ AST =
       Build ast.object
       Build ast.array
     
-  Index: (scope, ast) ->
-    return Build scope, ast.index
-
   Literal: (ast) ->
     value = ast.value
     literal = ->
@@ -319,31 +182,6 @@ AST =
         else
           Build property
           PUT "NADA"
-    return
-
-    obj = {}
-    for property in ast.properties
-      ast = property.Assign
-
-      LHS = 
-        set: (ast, value) ->
-          name = the_key_of(ast)
-          method = LHS[name]
-          if method
-            return method ast[name], value
-          throw "#{name} not supported yet on Obj LHS"
-
-        Literal: (ast, value) ->
-          lhs = ast.value
-          obj[lhs] = value
-          Debugger.info "Obj: #{lhs}: #{value}"
-
-        Value: (ast, value) ->    
-          LHS.set ast.base, value
-          
-      value = Build scope, ast.value
-      LHS.set ast.variable, value
-    obj
 
   Op: (ast) ->
     is_chainable = (op) ->
@@ -368,13 +206,6 @@ AST =
           Build ast.first
       return
     
-    if op == "?"
-      try
-        return Build scope, ast.first
-      catch e
-        if e.__meta && e.__type == 'reference'
-          return Build scope, ast.second
-      
     if op == 'new'
       class_name = ast.first.Value.base.Literal.value
       PUT "NEW_BARE", ->
@@ -419,14 +250,6 @@ AST =
     PUT "RETURN", ->
       Build ast.expression
 
-  Slice: (scope, ast) ->
-    range = ast.range.Range
-    from_val = Build scope, range.from
-    to_val = Build scope, range.to
-    to_val += 1 if !range.exclusive
-    from_val: from_val
-    to_val: to_val
-    
   Splat: (ast) ->
     PUT "SPLAT", ->
       Build ast.name
@@ -484,24 +307,6 @@ AST =
       else
         throw "yo"
       return
-      
-    for property in ast.properties
-      break if property.Access?.soak && !obj?
-      key = the_key_of(property)
-      if key == 'Slice'
-        slice = Build scope, property
-        obj = obj.slice(slice.from_val, slice.to_val)
-      else if key == 'Access'
-        key = Build scope, property
-        obj = obj[key]
-        Debugger.info "deref #{key} -> #{obj}"
-      else if key == "Index"
-        key = Build scope, property
-        obj = obj[key]
-        Debugger.info "deref [#{key}] -> #{obj}"
-      else
-        throw "unexpected key #{key}"      
-    return obj
 
   While: (ast) ->
     PUT "WHILE", ->
@@ -509,22 +314,6 @@ AST =
         Build ast.condition
       PUT "DO", ->
         Build ast.body
-    return
-    while true
-      Debugger.info "while <condition>..."
-      cond = Build scope, ast.condition
-      if cond
-        Debugger.info "(while cond true)"
-      else
-        Debugger.info "(while cond false)"
-        break
-      try
-        val = Build scope, ast.body
-      catch e
-        break if e.__meta_break
-        continue if e.__meta_continue
-        throw e
-      val
 
 the_key_of = (ast) ->
   # there is just one key
