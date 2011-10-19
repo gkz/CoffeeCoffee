@@ -308,10 +308,9 @@ AST =
         throw __meta_break: true
       if value == 'continue'
         throw __meta_continue: true
-      if value.charAt(0) == '"'
-        return JSON.parse value
-      if value.charAt(0) == "'"
-        return JSON.parse '"' + value.substring(1, value.length-1) + '"'
+      c = value.charAt(0)
+      if c == "'" || c == '"'
+        return PUT "STRING #{value}"
       if value.match(/\d+/) != null
         float = parseFloat(value)
         return PUT "NUMBER #{float}"
@@ -376,9 +375,6 @@ AST =
       class_function = scope.get(class_name)
       return newify class_function, []
     
-    if op == '&&'
-      return Build(scope, ast.first) && Build(scope, ast.second)
-      
     if ast.second
       if is_chainable(op) && the_key_of(ast.first) == "Op" && is_chainable(ast.first.Op.operator)
         return false if !operand1
@@ -405,8 +401,11 @@ AST =
       return Build body
 
   Range: (ast) ->
-    PUT "RANGE", ->
-      PUT ast.exclusive
+    if ast.exclusive
+      stmt = "RANGE_EXCLUSIVE"
+    else
+      stmt = "RANGE_INCLUSIVE"
+    PUT stmt, ->
       Build ast.from
       Build ast.to
 

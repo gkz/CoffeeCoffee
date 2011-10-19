@@ -4,26 +4,14 @@
 #  coffee nodes_to_json.coffee test/binary_search.coffee | coffee builder.coffee -
 #
 
-TAB = ''
-
-PUT = (s, f) ->
-  code = TAB + s
-  if f
-    INDENT()
-    code += f()
-    DEDENT()
-  code
-
-INDENT = -> TAB += '  '
-DEDENT = -> TAB = TAB[0...TAB.length - 2]
-
 Eval = (block) ->
   [prefix, line, block] = indenter.small_block(block)
   return '' if line.length == 0
   args = line.split(' ')
   name = args[0]
+  arg = args[1...args.length].join ' ' # gross, need regex
   if Build[name]
-    Build[name](args, block)
+    Build[name](arg, block)
   else
     console.log "unknown #{name}"
 
@@ -48,47 +36,56 @@ Comma = (arr) ->
   arr.join ', '
 
 Build =
-  'ACCESS': (args, block) ->
+  'ACCESS': (arg, block) ->
     val = Eval block
     access = Shift block
     "#{val}.#{access}"
 
-  'ARGS': (args, block) ->
+  'ARGS': (arg, block) ->
     my_args = []
     while block.len() > 0
       my_args.push Eval block
     "(#{Comma my_args})"
   
-  'ARR': (args, block) ->
+  'ARR': (arg, block) ->
     elems = []
     while block.len() > 0
       elems.push Eval block
     "[#{Comma elems}]"
   
-  'ASSIGN': (args, block) ->
+  'ASSIGN': (arg, block) ->
     my_var = Eval block
     value = Eval block
-    PUT "#{my_var} = #{value}"
+    "#{my_var} = #{value}"
 
-  'CALL': (args, block) ->
+  'CALL': (arg, block) ->
     my_var = Eval block
     args = Eval block
     "#{my_var}#{args}"
     
-  'CODE': (args, block) ->
+  'CODE': (arg, block) ->
     params = Eval block
-    Join(params, Block block)
+    Join params, Block block
     
-  'COND': (args, block) ->
+  'COND': (arg, block) ->
     Eval block
     
-  'DO': (args, block) ->
+  'DO': (arg, block) ->
     Block block
-
-  'EVAL': (args, block) ->
-    return args[1]
     
-  'IF': (args, block) ->
+  'EXISTENCE': (args, block) ->
+    Eval(block) + '?'
+
+  'EVAL': (arg, block) ->
+    return arg
+
+  'FOR_IN': (arg, block) ->
+    step_var = Shift block
+    range_var = Eval block
+    for_stmt = "for #{step_var} in #{range_var}"
+    Join for_stmt, Eval block
+    
+  'IF': (arg, block) ->
     cond = "if #{Eval block}"
     body = Eval block
     stmt = Join cond, body
@@ -97,41 +94,50 @@ Build =
       stmt = stmt + "\n" + elseBody
     stmt
 
-  'INDEX': (args, block) ->
+  'INDEX': (arg, block) ->
     val = Eval block
     index = Eval block
     "#{val}[#{index}]"
 
-  'NUMBER': (args, block) ->
-    args[1]
+  'NUMBER': (arg, block) ->
+    arg
 
-  'OP_BINARY': (args, block) ->
-    op = args[1]
+  'OP_BINARY': (arg, block) ->
+    op = arg
     op = 'is' if op == '==='
+    op = 'isnt' if op == '!=='
     operand1 = Eval block
     operand2 = Eval block
     "#{operand1} #{op} #{operand2}"
 
-  'OP_UNARY': (args, block) ->
-    op = args[1]
+  'OP_UNARY': (arg, block) ->
+    op = arg
     operand = Eval block
     "#{op}#{operand}"
     
-  'PARAMS': (args, block) ->
+  'PARAMS': (arg, block) ->
     params = []
     while block.len() > 0
       params.push block.shift()[1]
     "(#{Comma params}) ->"
   
-  'PARENS': (args, block) ->
+  'PARENS': (arg, block) ->
     expr = Eval block
     "(#{expr})"
+    
+  'RANGE_EXCLUSIVE': (arg, block) ->
+    low = Eval block
+    high = Eval block
+    "[#{low}...#{high}]"
 
-  'RETURN': (args, block) ->
+  'RETURN': (arg, block) ->
     val = Eval block
     "return #{val}"
 
-  'WHILE': (args, block) ->
+  'STRING': (arg, block) ->
+    arg
+
+  'WHILE': (arg, block) ->
     cond = "while #{Eval block}"
     body = Eval block
     Join cond, body

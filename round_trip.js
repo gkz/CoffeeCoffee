@@ -1,32 +1,16 @@
 (function() {
-  var Block, Build, Comma, DEDENT, Eval, INDENT, Join, PUT, Shift, TAB, data, fn, fs, handle_data, indenter, parser, stdin;
-  TAB = '';
-  PUT = function(s, f) {
-    var code;
-    code = TAB + s;
-    if (f) {
-      INDENT();
-      code += f();
-      DEDENT();
-    }
-    return code;
-  };
-  INDENT = function() {
-    return TAB += '  ';
-  };
-  DEDENT = function() {
-    return TAB = TAB.slice(0, TAB.length - 2);
-  };
+  var Block, Build, Comma, Eval, Join, Shift, data, fn, fs, handle_data, indenter, parser, stdin;
   Eval = function(block) {
-    var args, line, name, prefix, _ref;
+    var arg, args, line, name, prefix, _ref;
     _ref = indenter.small_block(block), prefix = _ref[0], line = _ref[1], block = _ref[2];
     if (line.length === 0) {
       return '';
     }
     args = line.split(' ');
     name = args[0];
+    arg = args.slice(1, args.length).join(' ');
     if (Build[name]) {
-      return Build[name](args, block);
+      return Build[name](arg, block);
     } else {
       return console.log("unknown " + name);
     }
@@ -64,13 +48,13 @@
     return arr.join(', ');
   };
   Build = {
-    'ACCESS': function(args, block) {
+    'ACCESS': function(arg, block) {
       var access, val;
       val = Eval(block);
       access = Shift(block);
       return "" + val + "." + access;
     },
-    'ARGS': function(args, block) {
+    'ARGS': function(arg, block) {
       var my_args;
       my_args = [];
       while (block.len() > 0) {
@@ -78,7 +62,7 @@
       }
       return "(" + (Comma(my_args)) + ")";
     },
-    'ARR': function(args, block) {
+    'ARR': function(arg, block) {
       var elems;
       elems = [];
       while (block.len() > 0) {
@@ -86,33 +70,43 @@
       }
       return "[" + (Comma(elems)) + "]";
     },
-    'ASSIGN': function(args, block) {
+    'ASSIGN': function(arg, block) {
       var my_var, value;
       my_var = Eval(block);
       value = Eval(block);
-      return PUT("" + my_var + " = " + value);
+      return "" + my_var + " = " + value;
     },
-    'CALL': function(args, block) {
-      var my_var;
+    'CALL': function(arg, block) {
+      var args, my_var;
       my_var = Eval(block);
       args = Eval(block);
       return "" + my_var + args;
     },
-    'CODE': function(args, block) {
+    'CODE': function(arg, block) {
       var params;
       params = Eval(block);
       return Join(params, Block(block));
     },
-    'COND': function(args, block) {
+    'COND': function(arg, block) {
       return Eval(block);
     },
-    'DO': function(args, block) {
+    'DO': function(arg, block) {
       return Block(block);
     },
-    'EVAL': function(args, block) {
-      return args[1];
+    'EXISTENCE': function(args, block) {
+      return Eval(block) + '?';
     },
-    'IF': function(args, block) {
+    'EVAL': function(arg, block) {
+      return arg;
+    },
+    'FOR_IN': function(arg, block) {
+      var for_stmt, range_var, step_var;
+      step_var = Shift(block);
+      range_var = Eval(block);
+      for_stmt = "for " + step_var + " in " + range_var;
+      return Join(for_stmt, Eval(block));
+    },
+    'IF': function(arg, block) {
       var body, cond, elseBody, stmt;
       cond = "if " + (Eval(block));
       body = Eval(block);
@@ -123,32 +117,35 @@
       }
       return stmt;
     },
-    'INDEX': function(args, block) {
+    'INDEX': function(arg, block) {
       var index, val;
       val = Eval(block);
       index = Eval(block);
       return "" + val + "[" + index + "]";
     },
-    'NUMBER': function(args, block) {
-      return args[1];
+    'NUMBER': function(arg, block) {
+      return arg;
     },
-    'OP_BINARY': function(args, block) {
+    'OP_BINARY': function(arg, block) {
       var op, operand1, operand2;
-      op = args[1];
+      op = arg;
       if (op === '===') {
         op = 'is';
+      }
+      if (op === '!==') {
+        op = 'isnt';
       }
       operand1 = Eval(block);
       operand2 = Eval(block);
       return "" + operand1 + " " + op + " " + operand2;
     },
-    'OP_UNARY': function(args, block) {
+    'OP_UNARY': function(arg, block) {
       var op, operand;
-      op = args[1];
+      op = arg;
       operand = Eval(block);
       return "" + op + operand;
     },
-    'PARAMS': function(args, block) {
+    'PARAMS': function(arg, block) {
       var params;
       params = [];
       while (block.len() > 0) {
@@ -156,17 +153,26 @@
       }
       return "(" + (Comma(params)) + ") ->";
     },
-    'PARENS': function(args, block) {
+    'PARENS': function(arg, block) {
       var expr;
       expr = Eval(block);
       return "(" + expr + ")";
     },
-    'RETURN': function(args, block) {
+    'RANGE_EXCLUSIVE': function(arg, block) {
+      var high, low;
+      low = Eval(block);
+      high = Eval(block);
+      return "[" + low + "..." + high + "]";
+    },
+    'RETURN': function(arg, block) {
       var val;
       val = Eval(block);
       return "return " + val;
     },
-    'WHILE': function(args, block) {
+    'STRING': function(arg, block) {
+      return arg;
+    },
+    'WHILE': function(arg, block) {
       var body, cond;
       cond = "while " + (Eval(block));
       body = Eval(block);
