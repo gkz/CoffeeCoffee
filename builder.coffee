@@ -275,8 +275,11 @@ AST =
     PUT "IF", ->
       PUT "COND", ->
         Build ast.condition
-      PUT "THEN", ->
+      PUT "DO", ->
         Build ast.body
+      if ast.elseBody
+        PUT "DO", ->
+          Build ast.elseBody
     return
     
     if Build scope, ast.condition
@@ -381,12 +384,12 @@ AST =
         return false if !operand1
         operand1 = Build scope, ast.first.Op.second
 
-      PUT "BINARY_OP #{op}", ->
+      PUT "OP_BINARY #{op}", ->
         Build ast.first
         Build ast.second
       return
     else
-      PUT "UNARY_OP #{op}", ->
+      PUT "OP_UNARY #{op}", ->
         Build ast.first
       return
     throw "unknown op #{op}"
@@ -396,7 +399,8 @@ AST =
     if body.Block?
       body = body.Block
     if body.expressions
-      return Build body.expressions[0]
+      PUT "PARENS", ->
+        return Build body.expressions[0]
     else
       return Build body
 
@@ -492,7 +496,7 @@ AST =
   While: (ast) ->
     PUT "WHILE", ->
       PUT "COND", ->
-        PUT "cond"
+        Build ast.condition
       PUT "DO", ->
         Build ast.body
     return

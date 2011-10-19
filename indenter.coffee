@@ -66,25 +66,19 @@ small_block = (indented_lines) ->
   block_size = IndentationHelper.number_of_lines_in_indented_block prefix.length, indented_lines
   block = indented_lines.shift_slice(block_size)
   [prefix, line, block]
-  
-parser = (indented_lines) ->
-  while indented_lines.len() > 0
-    [prefix, line, block] = small_block(indented_lines)
-    console.log line
-    parser(block)
-    
-s = '''
-  YO
-    one
-    two
-    three
-  BAR
-  '''
 
 big_block = (s) -> ArrayView (IndentationHelper.find_indentation(line) for line in s.split('\n'))    
+  
+# parser = (indented_lines) ->
+#   while indented_lines.len() > 0
+#     [prefix, line, block] = small_block(indented_lines)
+#     console.log line
+#     parser(block)
+# 
 
-prefix_line_array = big_block(s)
-parser(prefix_line_array)
+if exports?    
+  exports.small_block = small_block
+  exports.big_block = big_block
     
 # if exports?
 #   # node.js has require mechanism

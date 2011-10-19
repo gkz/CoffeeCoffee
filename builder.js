@@ -379,9 +379,14 @@
         PUT("COND", function() {
           return Build(ast.condition);
         });
-        return PUT("THEN", function() {
+        PUT("DO", function() {
           return Build(ast.body);
         });
+        if (ast.elseBody) {
+          return PUT("DO", function() {
+            return Build(ast.elseBody);
+          });
+        }
       });
       return;
       if (Build(scope, ast.condition)) {
@@ -529,13 +534,13 @@
           }
           operand1 = Build(scope, ast.first.Op.second);
         }
-        PUT("BINARY_OP " + op, function() {
+        PUT("OP_BINARY " + op, function() {
           Build(ast.first);
           return Build(ast.second);
         });
         return;
       } else {
-        PUT("UNARY_OP " + op, function() {
+        PUT("OP_UNARY " + op, function() {
           return Build(ast.first);
         });
         return;
@@ -549,7 +554,9 @@
         body = body.Block;
       }
       if (body.expressions) {
-        return Build(body.expressions[0]);
+        return PUT("PARENS", function() {
+          return Build(body.expressions[0]);
+        });
       } else {
         return Build(body);
       }
@@ -681,7 +688,7 @@
       var cond, val, _results;
       PUT("WHILE", function() {
         PUT("COND", function() {
-          return PUT("cond");
+          return Build(ast.condition);
         });
         return PUT("DO", function() {
           return Build(ast.body);
