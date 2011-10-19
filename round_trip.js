@@ -30,15 +30,30 @@
       value = Eval(block);
       return Join("" + my_var + " " + op, value);
     },
+    'BREAK': function(arg, block) {
+      return 'break';
+    },
     'CALL': function(arg, block) {
       var args, my_var;
       my_var = Eval(block);
       args = Eval(block);
       return "" + my_var + args;
     },
+    'CASE': function(arg, block) {
+      return Join("when " + (Eval(block)) + " then", Eval(block));
+    },
+    'CATCH': function(arg, block) {
+      var stmt;
+      stmt = "catch " + (Shift(block));
+      return Indent(stmt, Eval(block));
+    },
     'CLASS': function(arg, block) {
-      var prolog;
+      var parent, prolog;
       prolog = "class " + (Shift(block));
+      parent = Eval(block);
+      if (parent) {
+        prolog += " extends " + parent;
+      }
       return Indent(prolog, Eval(block));
     },
     'CODE': function(arg, block) {
@@ -49,6 +64,12 @@
     'COND': function(arg, block) {
       return Eval(block);
     },
+    'CONTINUE': function(arg, block) {
+      return 'continue';
+    },
+    'DECR_PRE': function(arg, block) {
+      return "--" + (Eval(block));
+    },
     'DO': function(arg, block) {
       return Block(block);
     },
@@ -58,11 +79,21 @@
     'EVAL': function(arg, block) {
       return arg;
     },
+    'FINALLY': function(arg, block) {
+      return Indent("finally", Eval(block));
+    },
     'FOR_IN': function(arg, block) {
       var for_stmt, range_var, step_var;
       step_var = Shift(block);
       range_var = Eval(block);
       for_stmt = "for " + step_var + " in " + range_var;
+      return Indent(for_stmt, Eval(block));
+    },
+    'FOR_OF': function(arg, block) {
+      var for_stmt, range_var, vars;
+      vars = Eval(block);
+      range_var = Eval(block);
+      for_stmt = "for " + vars + " of " + range_var;
       return Indent(for_stmt, Eval(block));
     },
     'IF': function(arg, block) {
@@ -76,11 +107,35 @@
       }
       return stmt;
     },
+    'IN': function(arg, block) {
+      return Join("" + (Eval(block)) + " of", Eval(block));
+    },
+    'INCR_PRE': function(arg, block) {
+      return "++" + (Eval(block));
+    },
     'INDEX': function(arg, block) {
       var index, val;
       val = Eval(block);
       index = Eval(block);
       return "" + val + "[" + index + "]";
+    },
+    'KEY': function(arg, block) {
+      return Eval(block);
+    },
+    'KEY_VALUE': function(arg, block) {
+      var name;
+      name = Shift(block);
+      return Join("" + name + ":", Eval(block));
+    },
+    'METHODS': function(arg, block) {
+      var code, name;
+      code = '';
+      while (block.len() > 0) {
+        name = Shift(block);
+        code += Join("" + name + ":", Eval(block));
+        code += '\n';
+      }
+      return code;
     },
     'NEW': function(arg, block) {
       var args, my_var;
@@ -93,18 +148,20 @@
       my_var = Shift(block);
       return "new " + my_var;
     },
+    'NOT_IN': function(arg, block) {
+      return Join("" + (Eval(block)) + " not of", Eval(block));
+    },
     'NUMBER': function(arg, block) {
       return arg;
     },
     'OBJ': function(arg, block) {
-      var name, s;
+      var s;
       s = '';
       while (block.len() > 0) {
-        name = Shift(block);
-        s += Join("" + name + ":", Eval(block));
+        s += Eval(block);
         s += '\n';
       }
-      return s;
+      return "{" + s + "}";
     },
     'OP_BINARY': function(arg, block) {
       var op, operand1, operand2;
@@ -125,6 +182,9 @@
       operand = Eval(block);
       return "" + op + operand;
     },
+    'OTHERWISE': function(arg, block) {
+      return Join("else", Eval(block));
+    },
     'PARAMS': function(arg, block) {
       var params;
       params = [];
@@ -137,6 +197,13 @@
       var expr;
       expr = Eval(block);
       return "(" + expr + ")";
+    },
+    'PARENTS': function(arg, block) {
+      if (block.len() > 0) {
+        return Eval(block);
+      } else {
+        return null;
+      }
     },
     'RANGE_EXCLUSIVE': function(arg, block) {
       var high, low;
@@ -161,11 +228,49 @@
       index = Eval(block);
       return "" + val + index;
     },
+    'SPLAT': function(arg, block) {
+      var val;
+      val = Eval(block);
+      return "" + val + "...";
+    },
     'STRING': function(arg, block) {
       return arg;
     },
+    'SUPER': function(arg, block) {
+      return Join("super", Eval(block));
+    },
+    'SWITCH': function(arg, block) {
+      var body, prolog;
+      prolog = "switch " + (Eval(block));
+      body = [];
+      while (block.len() > 0) {
+        body.push(Eval(block));
+      }
+      return Indent(prolog, body.join('\n'));
+    },
+    'THROW': function(arg, block) {
+      var val;
+      val = Eval(block);
+      return "throw " + val;
+    },
+    'TRY': function(arg, block) {
+      var stmt;
+      stmt = Indent("try", Eval(block));
+      while (block.len() > 0) {
+        stmt += '\n' + Eval(block);
+      }
+      return stmt;
+    },
     'VALUE': function(arg, block) {
       return arg;
+    },
+    'VARS': function(arg, block) {
+      var vars;
+      vars = [];
+      while (block.len() > 0) {
+        vars.push(Shift(block));
+      }
+      return Comma(vars);
     },
     'WHILE': function(arg, block) {
       var body, cond;

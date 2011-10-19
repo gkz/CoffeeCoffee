@@ -124,9 +124,22 @@
         } else {
           class_code = expressions[0], block_ast = expressions[1];
         }
-        return PUT("DO", function() {
+        PUT("PARENTS", function() {
+          if (ast.parent) {
+            return Build(ast.parent);
+          }
+        });
+        return PUT("METHODS", function() {
+          var method, _i, _len, _ref, _results;
           if (block_ast) {
-            return Build(block_ast);
+            _ref = block_ast.Value.base.Obj.properties;
+            _results = [];
+            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+              method = _ref[_i];
+              PUT(method.Assign.variable.Value.base.Literal.value);
+              _results.push(Build(method.Assign.value));
+            }
+            return _results;
           }
         });
       });
@@ -245,7 +258,12 @@
         _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           property = _ref[_i];
-          _results.push(property.Assign ? (name = property.Assign.variable.Value.base.Literal.value, PUT(name), Build(property.Assign.value)) : (Build(property), PUT("NADA")));
+          _results.push(property.Assign ? (name = property.Assign.variable.Value.base.Literal.value, PUT("KEY_VALUE", function() {
+            PUT(name);
+            return Build(property.Assign.value);
+          })) : PUT("KEY", function() {
+            return Build(property);
+          }));
         }
         return _results;
       });
@@ -364,7 +382,7 @@
     },
     Throw: function(ast) {
       return PUT("THROW", function() {
-        return PUT(ast.expression);
+        return Build(ast.expression);
       });
     },
     Try: function(ast) {

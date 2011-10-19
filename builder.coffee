@@ -89,11 +89,17 @@ AST =
       else
         [class_code, block_ast] = expressions
         
+      PUT "PARENTS", ->
+        if ast.parent
+          Build ast.parent
+
       # if class_code
       #   Build class_code
-      PUT "DO", ->
+      PUT "METHODS", ->
         if block_ast
-          Build block_ast
+          for method in block_ast.Value.base.Obj.properties
+            PUT method.Assign.variable.Value.base.Literal.value
+            Build method.Assign.value
     return
     
   Code: (ast) ->
@@ -177,11 +183,12 @@ AST =
       for property in ast.properties
         if property.Assign
           name = property.Assign.variable.Value.base.Literal.value
-          PUT name
-          Build property.Assign.value
+          PUT "KEY_VALUE", ->
+            PUT name
+            Build property.Assign.value
         else
-          Build property
-          PUT "NADA"
+          PUT "KEY", ->
+            Build property
 
   Op: (ast) ->
     is_chainable = (op) ->
@@ -267,7 +274,7 @@ AST =
     
   Throw: (ast) ->
     PUT "THROW", ->
-      PUT ast.expression
+      Build ast.expression
     
   Try: (ast) ->
     PUT "TRY", ->

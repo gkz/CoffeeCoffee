@@ -29,13 +29,26 @@ Build =
     value = Eval block
     Join "#{my_var} #{op}", value
 
+  'BREAK': (arg, block) ->
+    'break'
+
   'CALL': (arg, block) ->
     my_var = Eval block
     args = Eval block
     "#{my_var}#{args}"
 
+  'CASE': (arg, block) ->
+    Join "when #{Eval block} then", Eval block
+
+  'CATCH': (arg, block) ->
+    stmt = "catch #{Shift block}"
+    Indent stmt, Eval block
+
   'CLASS': (arg, block) ->
     prolog = "class #{Shift block}"
+    parent = Eval block
+    if parent
+      prolog += " extends #{parent}"
     Indent prolog, Eval block
     
   'CODE': (arg, block) ->
@@ -44,6 +57,12 @@ Build =
     
   'COND': (arg, block) ->
     Eval block
+    
+  'CONTINUE': (arg, block) ->
+    'continue'
+
+  'DECR_PRE': (arg, block) ->
+    "--#{Eval block}"
     
   'DO': (arg, block) ->
     Block block
@@ -54,10 +73,19 @@ Build =
   'EVAL': (arg, block) ->
     return arg
 
+  'FINALLY': (arg, block) ->
+    Indent "finally", Eval block
+    
   'FOR_IN': (arg, block) ->
     step_var = Shift block
     range_var = Eval block
     for_stmt = "for #{step_var} in #{range_var}"
+    Indent for_stmt, Eval block
+    
+  'FOR_OF': (arg, block) ->
+    vars = Eval block
+    range_var = Eval block
+    for_stmt = "for #{vars} of #{range_var}"
     Indent for_stmt, Eval block
     
   'IF': (arg, block) ->
@@ -69,10 +97,31 @@ Build =
       stmt = stmt + "\n" + elseBody
     stmt
 
+  'IN': (arg, block) ->
+    Join "#{Eval block} of", Eval block
+
+  'INCR_PRE': (arg, block) ->
+    "++#{Eval block}"
+
   'INDEX': (arg, block) ->
     val = Eval block
     index = Eval block
     "#{val}[#{index}]"
+
+  'KEY': (arg, block) ->
+    Eval block
+
+  'KEY_VALUE': (arg, block) ->
+    name = Shift block
+    Join "#{name}:", Eval block
+
+  'METHODS': (arg, block) ->
+    code = ''
+    while block.len() > 0
+      name = Shift block
+      code += Join "#{name}:", Eval block
+      code += '\n'
+    code
 
   'NEW': (arg, block) ->
     my_var = Eval block
@@ -83,16 +132,18 @@ Build =
     my_var = Shift block
     "new #{my_var}"    
 
+  'NOT_IN': (arg, block) ->
+    Join "#{Eval block} not of", Eval block
+
   'NUMBER': (arg, block) ->
     arg
 
   'OBJ': (arg, block) ->
     s = ''
     while block.len() > 0
-      name = Shift block
-      s += Join "#{name}:", Eval block
+      s += Eval block
       s += '\n'
-    s
+    "{#{s}}"
 
   'OP_BINARY': (arg, block) ->
     op = arg
@@ -107,6 +158,9 @@ Build =
     operand = Eval block
     "#{op}#{operand}"
     
+  'OTHERWISE': (arg, block) ->
+    Join "else", Eval block
+    
   'PARAMS': (arg, block) ->
     params = []
     while block.len() > 0
@@ -116,6 +170,12 @@ Build =
   'PARENS': (arg, block) ->
     expr = Eval block
     "(#{expr})"
+    
+  'PARENTS': (arg, block) ->
+    if block.len() > 0
+      Eval block
+    else
+      null
     
   'RANGE_EXCLUSIVE': (arg, block) ->
     low = Eval block
@@ -136,11 +196,41 @@ Build =
     index = Eval block
     "#{val}#{index}"
 
+  'SPLAT': (arg, block) ->
+    val = Eval block
+    "#{val}..."
+
   'STRING': (arg, block) ->
     arg
+  
+  'SUPER': (arg, block) ->
+    Join "super", Eval block
 
+  'SWITCH': (arg, block) ->
+    prolog = "switch #{Eval block}"
+    body = []
+    while block.len() > 0
+      body.push Eval block
+    Indent prolog, body.join '\n'
+
+  'THROW': (arg, block) ->
+    val = Eval block
+    "throw #{val}"
+  
+  'TRY': (arg, block) ->
+    stmt = Indent "try", Eval block
+    while block.len() > 0
+      stmt += '\n' + Eval block
+    stmt
+       
   'VALUE': (arg, block) ->
     arg
+    
+  'VARS': (arg, block) ->
+    vars = []
+    while block.len() > 0
+      vars.push Shift block
+    Comma vars
 
   'WHILE': (arg, block) ->
     cond = "while #{Eval block}"
