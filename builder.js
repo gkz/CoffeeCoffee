@@ -1,11 +1,6 @@
 (function() {
   var AST, Build, DEDENT, INDENT, PUT, TAB, data, fn, fs, handle_data, pp, stdin, the_key_of, transcompile;
-  var __slice = Array.prototype.slice, __indexOf = Array.prototype.indexOf || function(item) {
-    for (var i = 0, l = this.length; i < l; i++) {
-      if (this[i] === item) return i;
-    }
-    return -1;
-  };
+  var __slice = Array.prototype.slice;
   handle_data = function(data) {
     var program;
     program = JSON.parse(data);
@@ -151,64 +146,36 @@
       return _results;
     },
     Call: function(ast) {
-      var CURRENT_OBJECT_METHOD_NAME, arg, args, key, obj, old_method_name, properties, stmt, this_var, val, variable, _i, _len, _ref, _ref2;
-      stmt = ast.isNew ? "NEW" : "CALL";
-      PUT(stmt, function() {
-        Build(ast.variable);
-        return PUT("ARGS", function() {
-          var arg, _i, _len, _ref, _results;
-          _ref = ast.args;
-          _results = [];
-          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-            arg = _ref[_i];
-            _results.push(Build(arg));
-          }
-          return _results;
-        });
-      });
-      return;
-      args = [];
-      _ref = ast.args;
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        arg = _ref[_i];
-        if (arg.Splat != null) {
-          args = args.concat(Build(scope, arg.Splat.name));
-        } else {
-          args.push(Build(scope, arg));
-        }
-      }
+      var stmt;
       if (ast.isSuper) {
-        this_var = scope.get("this");
-        this_var.__super__[CURRENT_OBJECT_METHOD_NAME].apply(this_var, args);
-        return;
-      }
-      variable = ast.variable.Value;
-      obj = Build(scope, variable.base);
-      properties = variable.properties;
-      if (ast.isNew) {
-        Debugger.info("new " + obj + " with args: " + args);
-        val = newify(obj, args);
-        return val;
-      }
-      if (properties.length === 0) {
-        Debugger.info("call with args: " + args);
-        val = obj.apply(null, args);
+        return PUT("SUPER", function() {
+          return PUT("ARGS", function() {
+            var arg, _i, _len, _ref, _results;
+            _ref = ast.args;
+            _results = [];
+            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+              arg = _ref[_i];
+              _results.push(Build(arg));
+            }
+            return _results;
+          });
+        });
       } else {
-        _ref2 = AST.deref_properties(scope, obj, properties), obj = _ref2[0], key = _ref2[1];
-        if (!(obj[key] != null)) {
-          throw "method " + key + " does not exist for obj " + obj;
-        }
-        old_method_name = CURRENT_OBJECT_METHOD_NAME;
-        CURRENT_OBJECT_METHOD_NAME = key;
-        try {
-          Debugger.info("call " + key + " with args: " + args);
-          val = obj[key].apply(obj, args);
-        } finally {
-          CURRENT_OBJECT_METHOD_NAME = old_method_name;
-        }
+        stmt = ast.isNew ? "NEW" : "CALL";
+        return PUT(stmt, function() {
+          Build(ast.variable);
+          return PUT("ARGS", function() {
+            var arg, _i, _len, _ref, _results;
+            _ref = ast.args;
+            _results = [];
+            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+              arg = _ref[_i];
+              _results.push(Build(arg));
+            }
+            return _results;
+          });
+        });
       }
-      Debugger.info("return " + val);
-      return val;
     },
     Class: function(ast) {
       var class_name, klass, parent_class;
@@ -329,6 +296,19 @@
     For: function(ast) {
       var key_val, key_var, obj, range, step_val, step_var, val, val_val, val_var, _i, _len, _results, _results2;
       if (ast.index) {
+        PUT("FOR_OF", function() {
+          PUT("VARS", function() {
+            PUT(ast.index.Literal.value);
+            if (ast.name) {
+              return PUT(ast.name.Literal.value);
+            }
+          });
+          Build(ast.source);
+          return PUT("DO", function() {
+            return Build(ast.body);
+          });
+        });
+        return;
         obj = Build(scope, ast.source);
         key_var = ast.index.Literal.value;
         val_var = ast.name && AST.name(ast);
@@ -359,7 +339,9 @@
         PUT("FOR_IN", function() {
           PUT(ast.name.Literal.value);
           Build(ast.source);
-          return Build(ast.body);
+          return PUT("DO", function() {
+            return Build(ast.body);
+          });
         });
         return;
         range = Build(scope, ast.source);
@@ -407,15 +389,13 @@
         return Build(scope, ast.elseBody);
       }
     },
-    In: function(scope, ast) {
-      var array, object, val;
-      object = Build(scope, ast.object);
-      array = Build(scope, ast.array);
-      val = __indexOf.call(array, object) >= 0;
-      if (ast.negated) {
-        val = !val;
-      }
-      return val;
+    In: function(ast) {
+      var name;
+      name = ast.negated ? "NOT_IN" : "IN";
+      return PUT(name, function() {
+        Build(ast.object);
+        return Build(ast.array);
+      });
     },
     Index: function(scope, ast) {
       return Build(scope, ast.index);
@@ -429,14 +409,10 @@
           return PUT("VALUE " + value);
         }
         if (value === 'break') {
-          throw {
-            __meta_break: true
-          };
+          return PUT("BREAK");
         }
         if (value === 'continue') {
-          throw {
-            __meta_continue: true
-          };
+          return PUT("CONTINUE");
         }
         c = value.charAt(0);
         if (c === "'" || c === '"') {
@@ -463,9 +439,7 @@
         _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           property = _ref[_i];
-          name = property.Assign.variable.Value.base.Literal.value;
-          PUT(name);
-          _results.push(Build(property.Assign.value));
+          _results.push(property.Assign ? (name = property.Assign.variable.Value.base.Literal.value, PUT(name), Build(property.Assign.value)) : (Build(property), PUT("NADA")));
         }
         return _results;
       });
@@ -506,12 +480,29 @@
         return op === '<' || op === '>' || op === '>=' || op === '<=' || op === '===' || op === '!==';
       };
       op = ast.operator;
-      if (op === '++' || op === '--') {
-        return AST.Assign(scope, {
-          context: op,
-          variable: ast.first,
-          value: ast.first
-        });
+      if (op === '++') {
+        if (ast.flip) {
+          PUT("INCR_POST", function() {
+            return Build(ast.first);
+          });
+        } else {
+          PUT("INCR_PRE", function() {
+            return Build(ast.first);
+          });
+        }
+        return;
+      }
+      if (op === '--') {
+        if (ast.flip) {
+          PUT("DECR_POST", function() {
+            return Build(ast.first);
+          });
+        } else {
+          PUT("DECR_PRE", function() {
+            return Build(ast.first);
+          });
+        }
+        return;
       }
       if (op === "?") {
         try {
@@ -593,45 +584,52 @@
         to_val: to_val
       };
     },
-    Switch: function(scope, ast) {
-      var case_ast, match_value, subject, _i, _len, _ref;
-      subject = Build(scope, ast.subject);
-      _ref = ast.cases;
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        case_ast = _ref[_i];
-        match_value = Build(scope, case_ast.cond);
-        if (subject === match_value) {
-          return Build(scope, case_ast.block);
-        }
-      }
-      if (ast.otherwise) {
-        return Build(scope, ast.otherwise);
-      }
-      return null;
+    Splat: function(ast) {
+      return PUT("SPLAT", function() {
+        return Build(ast.name);
+      });
     },
-    Throw: function(scope, ast) {
-      var e;
-      e = Build(scope, ast.expression);
-      throw {
-        __meta: e
-      };
-    },
-    Try: function(scope, ast) {
-      var catch_var;
-      try {
-        return Build(scope, ast.attempt);
-      } catch (e) {
-        if (e.__meta == null) {
-          throw e;
+    Switch: function(ast) {
+      return PUT("SWITCH", function() {
+        var case_ast, _i, _len, _ref;
+        Build(ast.subject);
+        _ref = ast.cases;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          case_ast = _ref[_i];
+          PUT("CASE", function() {
+            Build(case_ast.cond);
+            return Build(case_ast.block);
+          });
         }
-        catch_var = ast.error.Literal.value;
-        scope.set(catch_var, e.__meta);
-        return Build(scope, ast.recovery);
-      } finally {
+        if (ast.otherwise) {
+          return PUT("OTHERWISE", function() {
+            return Build(ast.otherwise);
+          });
+        }
+      });
+    },
+    Throw: function(ast) {
+      return PUT("THROW", function() {
+        return PUT(ast.expression);
+      });
+    },
+    Try: function(ast) {
+      return PUT("TRY", function() {
+        PUT("DO", function() {
+          return Build(ast.attempt);
+        });
+        PUT("CATCH", function() {
+          var catch_var;
+          catch_var = ast.error.Literal.value;
+          PUT(catch_var);
+          return Build(ast.recovery);
+        });
         if (ast.ensure) {
-          Build(scope, ast.ensure);
+          return PUT("FINALLY", function() {
+            return Build(ast.ensure);
+          });
         }
-      }
+      });
     },
     Value: function(ast) {
       var key, last_property, obj, prior, priors, properties, property, slice, _i, _len, _ref, _ref2;

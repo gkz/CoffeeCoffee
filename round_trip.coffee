@@ -122,6 +122,11 @@ Build =
     high = Eval block
     "[#{low}...#{high}]"
 
+  'RANGE_INCLUSIVE': (arg, block) ->
+    low = Eval block
+    high = Eval block
+    "[#{low}..#{high}]"
+
   'RETURN': (arg, block) ->
     val = Eval block
     "return #{val}"

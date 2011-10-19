@@ -114,56 +114,22 @@ AST =
       Build stmt
     
   Call: (ast) ->
-    stmt = if ast.isNew
-      "NEW"
-    else
-      "CALL"
-    PUT stmt, ->
-      Build ast.variable
-      PUT "ARGS", ->
-        for arg in ast.args
-          Build arg
-    return
-    
-    args = []
-    for arg in ast.args
-      if arg.Splat?
-        args = args.concat Build scope, arg.Splat.name
-      else
-        args.push Build scope, arg
-
     if ast.isSuper
-      this_var = scope.get "this"
-      this_var.__super__[CURRENT_OBJECT_METHOD_NAME].apply this_var, args
-      return
-
-    variable = ast.variable.Value
-    obj = Build scope, variable.base
-    properties = variable.properties
-
-    if ast.isNew
-      # may need to handle properties better
-      Debugger.info "new #{obj} with args: #{args}" 
-      val = newify obj, args
-      return val
-
-    if properties.length == 0
-      Debugger.info "call with args: #{args}"
-      val = obj args...
+      PUT "SUPER", ->
+        PUT "ARGS", ->
+          for arg in ast.args
+            Build arg
     else
-      [obj, key] = AST.deref_properties scope, obj, properties
-      if !obj[key]?
-        throw "method #{key} does not exist for obj #{obj}"
-      old_method_name = CURRENT_OBJECT_METHOD_NAME
-      CURRENT_OBJECT_METHOD_NAME = key
-      try
-        Debugger.info "call #{key} with args: #{args}"
-        val = obj[key].apply obj, args
-      finally
-        CURRENT_OBJECT_METHOD_NAME = old_method_name
-    Debugger.info "return #{val}"
-    val
-  
+      stmt = if ast.isNew
+        "NEW"
+      else
+        "CALL"
+      PUT stmt, ->
+        Build ast.variable
+        PUT "ARGS", ->
+          for arg in ast.args
+            Build arg
+      
   Class: (ast) ->
     class_name = ast.variable.Value.base.Literal.value
     PUT "CLASS", ->
@@ -246,6 +212,15 @@ AST =
 
   For: (ast) ->
     if ast.index
+      PUT "FOR_OF", ->
+        PUT "VARS", ->
+          PUT ast.index.Literal.value
+          PUT ast.name.Literal.value if ast.name
+        Build ast.source
+        PUT "DO", ->
+          Build ast.body
+      return
+        
       obj = Build scope, ast.source
       key_var = ast.index.Literal.value
       val_var = ast.name && AST.name ast
@@ -266,7 +241,8 @@ AST =
       PUT "FOR_IN", ->
         PUT ast.name.Literal.value
         Build ast.source
-        Build ast.body
+        PUT "DO", ->
+          Build ast.body
       return
 
       range = Build scope, ast.source
@@ -299,12 +275,14 @@ AST =
     else if ast.elseBody
       Build scope, ast.elseBody
       
-  In: (scope, ast) ->
-    object = Build scope, ast.object
-    array = Build scope, ast.array
-    val = object in array
-    val = !val if ast.negated
-    val
+  In: (ast) ->
+    name = if ast.negated
+      "NOT_IN"
+    else
+      "IN"
+    PUT name, ->
+      Build ast.object
+      Build ast.array
     
   Index: (scope, ast) ->
     return Build scope, ast.index
@@ -315,9 +293,9 @@ AST =
       if value == 'false' || value == 'true' || value == 'undefined' || value == 'undefined'
         return PUT "VALUE #{value}"
       if value == 'break'
-        throw __meta_break: true
+        return PUT "BREAK"
       if value == 'continue'
-        throw __meta_continue: true
+        return PUT "CONTINUE"
       c = value.charAt(0)
       if c == "'" || c == '"'
         return PUT "STRING #{value}"
@@ -334,10 +312,13 @@ AST =
   Obj: (ast) ->
     PUT "OBJ", ->
       for property in ast.properties
-        name = property.Assign.variable.Value.base.Literal.value
-        PUT name
-        Build property.Assign.value
-        # Build property
+        if property.Assign
+          name = property.Assign.variable.Value.base.Literal.value
+          PUT name
+          Build property.Assign.value
+        else
+          Build property
+          PUT "NADA"
     return
 
     obj = {}
@@ -370,11 +351,22 @@ AST =
     
     op = ast.operator
     
-    if op == '++' or op == '--'
-      return AST.Assign scope,
-        context: op
-        variable: ast.first
-        value: ast.first
+    if op == '++'
+      if ast.flip
+        PUT "INCR_POST", ->
+          Build ast.first
+      else
+        PUT "INCR_PRE", ->
+          Build ast.first
+      return
+    if op == '--'
+      if ast.flip
+        PUT "DECR_POST", ->
+          Build ast.first
+      else
+        PUT "DECR_PRE", ->
+          Build ast.first
+      return
     
     if op == "?"
       try
@@ -435,31 +427,36 @@ AST =
     from_val: from_val
     to_val: to_val
     
-  Switch: (scope, ast) ->
-    subject = Build scope, ast.subject
-    for case_ast in ast.cases
-      match_value = Build scope, case_ast.cond
-      if subject == match_value
-        return Build scope, case_ast.block
-    if ast.otherwise
-      return Build scope, ast.otherwise
-    null
+  Splat: (ast) ->
+    PUT "SPLAT", ->
+      Build ast.name
+
+  Switch: (ast) ->
+    PUT "SWITCH", ->
+      Build ast.subject
+      for case_ast in ast.cases
+        PUT "CASE", ->
+          Build case_ast.cond
+          Build case_ast.block
+      if ast.otherwise
+        PUT "OTHERWISE", ->
+          Build ast.otherwise
     
-  Throw: (scope, ast) ->
-    e = Build scope, ast.expression
-    throw __meta: e
+  Throw: (ast) ->
+    PUT "THROW", ->
+      PUT ast.expression
     
-  Try: (scope, ast) ->
-    try
-      Build scope, ast.attempt
-    catch e
-      throw e unless e.__meta?
-      catch_var = ast.error.Literal.value
-      scope.set catch_var, e.__meta
-      Build scope, ast.recovery
-    finally
+  Try: (ast) ->
+    PUT "TRY", ->
+      PUT "DO", ->
+        Build ast.attempt
+      PUT "CATCH", ->
+        catch_var = ast.error.Literal.value
+        PUT catch_var
+        Build ast.recovery
       if ast.ensure
-        Build scope, ast.ensure
+        PUT "FINALLY", ->
+          Build ast.ensure
       
   Value: (ast) ->
     if ast.properties.length == 0

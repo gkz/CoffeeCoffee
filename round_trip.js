@@ -144,6 +144,12 @@
       high = Eval(block);
       return "[" + low + "..." + high + "]";
     },
+    'RANGE_INCLUSIVE': function(arg, block) {
+      var high, low;
+      low = Eval(block);
+      high = Eval(block);
+      return "[" + low + ".." + high + "]";
+    },
     'RETURN': function(arg, block) {
       var val;
       val = Eval(block);
