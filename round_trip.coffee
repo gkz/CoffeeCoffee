@@ -59,13 +59,18 @@ Build =
   
   'ASSIGN': (arg, block) ->
     my_var = Eval block
+    op = arg
     value = Eval block
-    Join "#{my_var} =", value
+    Join "#{my_var} #{op}", value
 
   'CALL': (arg, block) ->
     my_var = Eval block
     args = Eval block
     "#{my_var}#{args}"
+
+  'CLASS': (arg, block) ->
+    prolog = "class #{Shift block}"
+    Indent prolog, Eval block
     
   'CODE': (arg, block) ->
     params = Eval block
@@ -102,6 +107,11 @@ Build =
     val = Eval block
     index = Eval block
     "#{val}[#{index}]"
+
+  'NEW': (arg, block) ->
+    my_var = Eval block
+    args = Eval block
+    "new #{my_var}#{args}"
 
   'NUMBER': (arg, block) ->
     arg
@@ -145,6 +155,11 @@ Build =
   'RETURN': (arg, block) ->
     val = Eval block
     "return #{val}"
+
+  'SLICE': (arg, block) ->
+    val = Eval block
+    index = Eval block
+    "#{val}#{index}"
 
   'STRING': (arg, block) ->
     arg

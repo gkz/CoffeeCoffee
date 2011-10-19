@@ -114,7 +114,11 @@ AST =
       Build stmt
     
   Call: (ast) ->
-    PUT "CALL", ->
+    stmt = if ast.isNew
+      "NEW"
+    else
+      "CALL"
+    PUT stmt, ->
       Build ast.variable
       PUT "ARGS", ->
         for arg in ast.args
@@ -160,26 +164,27 @@ AST =
     Debugger.info "return #{val}"
     val
   
-  Class: (scope, ast) ->
+  Class: (ast) ->
     class_name = ast.variable.Value.base.Literal.value
+    PUT "CLASS", ->
+      PUT class_name
 
-    expressions = ast.body.Block.expressions
-    if expressions.length == 0
-      class_code = null
-      block_ast = null
-    else if expressions.length == 1
-      class_code = null
-      block_ast = expressions[0]
-    else
-      [class_code, block_ast] = expressions
+      expressions = ast.body.Block.expressions
+      if expressions.length == 0
+        class_code = null
+        block_ast = null
+      else if expressions.length == 1
+        class_code = null
+        block_ast = expressions[0]
+      else
+        [class_code, block_ast] = expressions
         
-    if class_code
-      Build scope, class_code
-        
-    if block_ast
-      proto = Build scope, block_ast
-    else
-      proto = ->
+      # if class_code
+      #   Build class_code
+      PUT "DO", ->
+        if block_ast
+          Build block_ast
+    return
         
     if ast.parent
       parent_class = Build scope, ast.parent 
@@ -193,7 +198,14 @@ AST =
     PUT 'CODE', ->
       PUT 'PARAMS', ->
         for param in ast.params
-          PUT param.Param.name.Literal.value
+          param = param.Param
+          if param.name.Literal
+            name = param.name.Literal.value
+          else
+            name = "@#{param.name.Value.properties[0].Access.name.Literal.value}"
+          if param.splat
+            name += "..."
+          PUT name
       Build ast.body
     return
     f = (args...) ->

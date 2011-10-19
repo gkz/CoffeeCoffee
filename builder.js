@@ -151,8 +151,9 @@
       return _results;
     },
     Call: function(ast) {
-      var CURRENT_OBJECT_METHOD_NAME, arg, args, key, obj, old_method_name, properties, this_var, val, variable, _i, _len, _ref, _ref2;
-      PUT("CALL", function() {
+      var CURRENT_OBJECT_METHOD_NAME, arg, args, key, obj, old_method_name, properties, stmt, this_var, val, variable, _i, _len, _ref, _ref2;
+      stmt = ast.isNew ? "NEW" : "CALL";
+      PUT(stmt, function() {
         Build(ast.variable);
         return PUT("ARGS", function() {
           var arg, _i, _len, _ref, _results;
@@ -209,27 +210,29 @@
       Debugger.info("return " + val);
       return val;
     },
-    Class: function(scope, ast) {
-      var block_ast, class_code, class_name, expressions, klass, parent_class, proto;
+    Class: function(ast) {
+      var class_name, klass, parent_class;
       class_name = ast.variable.Value.base.Literal.value;
-      expressions = ast.body.Block.expressions;
-      if (expressions.length === 0) {
-        class_code = null;
-        block_ast = null;
-      } else if (expressions.length === 1) {
-        class_code = null;
-        block_ast = expressions[0];
-      } else {
-        class_code = expressions[0], block_ast = expressions[1];
-      }
-      if (class_code) {
-        Build(scope, class_code);
-      }
-      if (block_ast) {
-        proto = Build(scope, block_ast);
-      } else {
-        proto = function() {};
-      }
+      PUT("CLASS", function() {
+        var block_ast, class_code, expressions;
+        PUT(class_name);
+        expressions = ast.body.Block.expressions;
+        if (expressions.length === 0) {
+          class_code = null;
+          block_ast = null;
+        } else if (expressions.length === 1) {
+          class_code = null;
+          block_ast = expressions[0];
+        } else {
+          class_code = expressions[0], block_ast = expressions[1];
+        }
+        return PUT("DO", function() {
+          if (block_ast) {
+            return Build(block_ast);
+          }
+        });
+      });
+      return;
       if (ast.parent) {
         parent_class = Build(scope, ast.parent);
       } else {
@@ -245,12 +248,21 @@
       var f, obj;
       PUT('CODE', function() {
         PUT('PARAMS', function() {
-          var param, _i, _len, _ref, _results;
+          var name, param, _i, _len, _ref, _results;
           _ref = ast.params;
           _results = [];
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             param = _ref[_i];
-            _results.push(PUT(param.Param.name.Literal.value));
+            param = param.Param;
+            if (param.name.Literal) {
+              name = param.name.Literal.value;
+            } else {
+              name = "@" + param.name.Value.properties[0].Access.name.Literal.value;
+            }
+            if (param.splat) {
+              name += "...";
+            }
+            _results.push(PUT(name));
           }
           return _results;
         });

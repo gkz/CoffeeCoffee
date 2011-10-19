@@ -76,16 +76,22 @@
       return "[" + (Comma(elems)) + "]";
     },
     'ASSIGN': function(arg, block) {
-      var my_var, value;
+      var my_var, op, value;
       my_var = Eval(block);
+      op = arg;
       value = Eval(block);
-      return Join("" + my_var + " =", value);
+      return Join("" + my_var + " " + op, value);
     },
     'CALL': function(arg, block) {
       var args, my_var;
       my_var = Eval(block);
       args = Eval(block);
       return "" + my_var + args;
+    },
+    'CLASS': function(arg, block) {
+      var prolog;
+      prolog = "class " + (Shift(block));
+      return Indent(prolog, Eval(block));
     },
     'CODE': function(arg, block) {
       var params;
@@ -127,6 +133,12 @@
       val = Eval(block);
       index = Eval(block);
       return "" + val + "[" + index + "]";
+    },
+    'NEW': function(arg, block) {
+      var args, my_var;
+      my_var = Eval(block);
+      args = Eval(block);
+      return "new " + my_var + args;
     },
     'NUMBER': function(arg, block) {
       return arg;
@@ -183,6 +195,12 @@
       var val;
       val = Eval(block);
       return "return " + val;
+    },
+    'SLICE': function(arg, block) {
+      var index, val;
+      val = Eval(block);
+      index = Eval(block);
+      return "" + val + index;
     },
     'STRING': function(arg, block) {
       return arg;
