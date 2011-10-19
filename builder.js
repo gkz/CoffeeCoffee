@@ -501,7 +501,7 @@
       return obj;
     },
     Op: function(ast) {
-      var class_function, class_name, is_chainable, op, operand1;
+      var class_name, is_chainable, op, operand1;
       is_chainable = function(op) {
         return op === '<' || op === '>' || op === '>=' || op === '<=' || op === '===' || op === '!==';
       };
@@ -524,8 +524,10 @@
       }
       if (op === 'new') {
         class_name = ast.first.Value.base.Literal.value;
-        class_function = scope.get(class_name);
-        return newify(class_function, []);
+        PUT("NEW_BARE", function() {
+          return PUT(class_name);
+        });
+        return;
       }
       if (ast.second) {
         if (is_chainable(op) && the_key_of(ast.first) === "Op" && is_chainable(ast.first.Op.operator)) {

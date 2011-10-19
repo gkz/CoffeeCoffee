@@ -385,8 +385,9 @@ AST =
       
     if op == 'new'
       class_name = ast.first.Value.base.Literal.value
-      class_function = scope.get(class_name)
-      return newify class_function, []
+      PUT "NEW_BARE", ->
+        PUT class_name
+      return
     
     if ast.second
       if is_chainable(op) && the_key_of(ast.first) == "Op" && is_chainable(ast.first.Op.operator)

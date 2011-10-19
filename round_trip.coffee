@@ -78,6 +78,10 @@ Build =
     my_var = Eval block
     args = Eval block
     "new #{my_var}#{args}"
+    
+  'NEW_BARE': (arg, block) ->
+    my_var = Shift block
+    "new #{my_var}"    
 
   'NUMBER': (arg, block) ->
     arg

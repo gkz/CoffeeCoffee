@@ -88,6 +88,11 @@
       args = Eval(block);
       return "new " + my_var + args;
     },
+    'NEW_BARE': function(arg, block) {
+      var my_var;
+      my_var = Shift(block);
+      return "new " + my_var;
+    },
     'NUMBER': function(arg, block) {
       return arg;
     },
