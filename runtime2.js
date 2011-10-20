@@ -1,7 +1,17 @@
 (function() {
-  var Compile, Compiler, GetBlock, RunTime, Scope, binary_ops, data, fn, fs, handle_data, indenter, parser, stdin, unary_ops, update_variable_reference;
+  var Compile, Compiler, GetBlock, RunTime, Scope, Shift, binary_ops, data, fn, fs, handle_data, indenter, parser, stdin, unary_ops, update_variable_reference;
   var __slice = Array.prototype.slice;
   Compiler = {
+    'ACCESS': function(arg, block) {
+      var access, value_code;
+      value_code = Compile(block);
+      access = Shift(block);
+      return function(rt) {
+        return rt.call(value_code, function(val) {
+          return rt.value(val[access]);
+        });
+      };
+    },
     'ASSIGN': function(arg, block) {
       var name, subarg, subblock, value_code, var_name, _ref;
       _ref = GetBlock(block), name = _ref[0], subarg = _ref[1], subblock = _ref[2];
@@ -54,9 +64,37 @@
         return rt.value(val);
       };
     },
+    'KEY_VALUE': function(arg, block) {
+      var name, value_code;
+      name = Shift(block);
+      value_code = Compile(block);
+      return function(rt) {
+        var obj;
+        obj = rt.extra;
+        rt.call(value_code, function(val) {
+          return obj[name] = val;
+        });
+        return rt.value(null);
+      };
+    },
     'NUMBER': function(arg, block) {
       return function(rt) {
         return rt.value(parseFloat(arg));
+      };
+    },
+    'OBJ': function(arg, block) {
+      var keys;
+      keys = [];
+      while (block.len() > 0) {
+        keys.push(Compile(block));
+      }
+      return function(rt) {
+        var key, obj;
+        obj = {};
+        key = keys[0];
+        return rt.call_extra(key, obj, function(val) {
+          return rt.value(obj);
+        });
       };
     },
     'OP_BINARY': function(arg, block) {
@@ -127,20 +165,28 @@
       return console.log("unknown " + name);
     }
   };
+  Shift = function(block) {
+    return block.shift()[1];
+  };
   RunTime = function() {
     var scope, self;
     scope = Scope();
     scope.set("x", 42);
     return self = {
-      call: function(code, cb) {
+      call_extra: function(code, extra, cb) {
         return code({
           value: function(val) {
             return cb(val);
           },
           call: self.call,
+          call_extra: self.call_extra,
           scope: scope,
-          step: self.step
+          step: self.step,
+          extra: extra
         });
+      },
+      call: function(code, cb) {
+        return self.call_extra(code, null, cb);
       },
       step: function(f) {
         return setTimeout(f, 200);

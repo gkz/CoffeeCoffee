@@ -6,6 +6,13 @@
 #  coffee nodes_to_json.coffee test/cubes.coffee | node builder.js - | node round_trip.js - 
 
 Compiler =
+  'ACCESS': (arg, block) ->
+    value_code = Compile block
+    access = Shift block
+    (rt) ->
+      rt.call value_code, (val) ->
+        rt.value val[access]
+  
   'ASSIGN': (arg, block) ->
     [name, subarg, subblock] = GetBlock block
     var_name = subarg
@@ -43,9 +50,28 @@ Compiler =
       val = rt.scope.get(arg)
       rt.value val
       
+  'KEY_VALUE': (arg, block) ->
+    name = Shift block
+    value_code = Compile block
+    (rt) ->
+      obj = rt.extra
+      rt.call value_code, (val) ->
+        obj[name] = val
+      rt.value null
+    
   'NUMBER': (arg, block) ->
     (rt) ->
       rt.value parseFloat(arg)
+      
+  'OBJ': (arg, block) ->
+    keys = []
+    while block.len() > 0
+      keys.push Compile block
+    (rt) ->
+      obj = {}
+      key = keys[0]
+      rt.call_extra key, obj, (val) ->
+        rt.value obj
       
   'OP_BINARY': (arg, block) ->
     op = arg
@@ -97,17 +123,26 @@ Compile = (block) ->
   else
     console.log "unknown #{name}"
 
+Shift = (block) ->
+  block.shift()[1]
+
 RunTime = ->
   scope = Scope()
   scope.set("x", 42)
   self =
-    call: (code, cb) ->
+    call_extra: (code, extra, cb) ->
       code
         value: (val) ->
           cb(val)
         call: self.call
+        call_extra: self.call_extra
         scope: scope
         step: self.step
+        extra: extra
+        
+    call: (code, cb) ->
+      self.call_extra(code, null, cb)
+      
     step: (f) ->
       setTimeout f, 200
 
