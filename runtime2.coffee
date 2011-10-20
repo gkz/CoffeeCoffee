@@ -233,8 +233,11 @@ Compiler =
     f = (rt, cb) ->
       rt.call cond_code, (cond) ->
         if cond
-          rt.call block_code, ->
-            f(rt, cb)
+          rt.call block_code, (val) ->
+            if rt.control_flow == 'return'
+              cb val
+            else
+              f rt, cb
         else
           cb null
 

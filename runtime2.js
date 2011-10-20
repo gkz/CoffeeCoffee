@@ -318,8 +318,12 @@
       return f = function(rt, cb) {
         return rt.call(cond_code, function(cond) {
           if (cond) {
-            return rt.call(block_code, function() {
-              return f(rt, cb);
+            return rt.call(block_code, function(val) {
+              if (rt.control_flow === 'return') {
+                return cb(val);
+              } else {
+                return f(rt, cb);
+              }
             });
           } else {
             return cb(null);
