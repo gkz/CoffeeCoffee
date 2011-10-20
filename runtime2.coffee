@@ -304,6 +304,14 @@ Compiler =
   'PARENS': (arg, block) ->
     Compile block
 
+  'RANGE_INCLUSIVE': (arg, block) ->
+    low_code = Compile block
+    high_code = Compile block
+    (rt, cb) ->
+      rt.call low_code, (low) ->
+        rt.call high_code, (high) ->
+          cb [low..high]
+
   'RANGE_EXCLUSIVE': (arg, block) ->
     low_code = Compile block
     high_code = Compile block

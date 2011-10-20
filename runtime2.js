@@ -418,6 +418,23 @@
     'PARENS': function(arg, block) {
       return Compile(block);
     },
+    'RANGE_INCLUSIVE': function(arg, block) {
+      var high_code, low_code;
+      low_code = Compile(block);
+      high_code = Compile(block);
+      return function(rt, cb) {
+        return rt.call(low_code, function(low) {
+          return rt.call(high_code, function(high) {
+            var _i, _results;
+            return cb((function() {
+              _results = [];
+              for (var _i = low; low <= high ? _i <= high : _i >= high; low <= high ? _i++ : _i--){ _results.push(_i); }
+              return _results;
+            }).apply(this, arguments));
+          });
+        });
+      };
+    },
     'RANGE_EXCLUSIVE': function(arg, block) {
       var high_code, low_code;
       low_code = Compile(block);
