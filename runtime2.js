@@ -183,6 +183,29 @@
         return cb(val);
       };
     },
+    'FOR_IN': function(arg, block) {
+      var block_code, f, range_code, step_var;
+      step_var = Shift(block);
+      range_code = Compile(block);
+      block_code = Compile(block);
+      return f = function(rt, cb) {
+        return rt.call(range_code, function(range) {
+          var last, values;
+          values = [];
+          f = function(range_val, cb) {
+            rt.scope().set(step_var, range_val);
+            return rt.call(block_code, function(val) {
+              values.push(val);
+              return cb(true);
+            });
+          };
+          last = function() {
+            return cb(values);
+          };
+          return iterate_callbacks(f, last, range);
+        });
+      };
+    },
     'IF': function(arg, block) {
       var cond_code, else_code, if_code;
       cond_code = Compile(block);
@@ -266,13 +289,27 @@
       f = binary_ops[op];
       operand1 = Compile(block);
       operand2 = Compile(block);
-      return function(rt, cb) {
-        return rt.call(operand1, function(op1) {
-          return rt.call(operand2, function(op2) {
-            return cb(f(op1, op2));
+      if (op === '&&') {
+        return function(rt, cb) {
+          return rt.call(operand1, function(op1) {
+            if (op1) {
+              return rt.call(operand2, function(op2) {
+                return cb(op2);
+              });
+            } else {
+              return cb(false);
+            }
           });
-        });
-      };
+        };
+      } else {
+        return function(rt, cb) {
+          return rt.call(operand1, function(op1) {
+            return rt.call(operand2, function(op2) {
+              return cb(f(op1, op2));
+            });
+          });
+        };
+      }
     },
     'OP_UNARY': function(arg, block) {
       var f, op, operand1;
@@ -287,6 +324,23 @@
     },
     'PARENS': function(arg, block) {
       return Compile(block);
+    },
+    'RANGE_EXCLUSIVE': function(arg, block) {
+      var high_code, low_code;
+      low_code = Compile(block);
+      high_code = Compile(block);
+      return function(rt, cb) {
+        return rt.call(low_code, function(low) {
+          return rt.call(high_code, function(high) {
+            var _i, _results;
+            return cb((function() {
+              _results = [];
+              for (var _i = low; low <= high ? _i < high : _i > high; low <= high ? _i++ : _i--){ _results.push(_i); }
+              return _results;
+            }).apply(this, arguments));
+          });
+        });
+      };
     },
     'RETURN': function(arg, block) {
       var value_code;

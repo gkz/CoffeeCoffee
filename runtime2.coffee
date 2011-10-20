@@ -132,6 +132,22 @@ Compiler =
       val = rt.scope().get(arg)
       cb val
 
+  'FOR_IN': (arg, block) ->
+    step_var = Shift block
+    range_code = Compile block
+    block_code = Compile block
+    f = (rt, cb) ->
+      rt.call range_code, (range) ->
+        values = []
+        f = (range_val, cb) ->
+          rt.scope().set step_var, range_val
+          rt.call block_code, (val) ->
+            values.push val
+            cb true
+        last = ->
+          cb values
+        iterate_callbacks f, last, range
+        
   'IF': (arg, block) ->
     cond_code = Compile block
     if_code = Compile block
@@ -194,10 +210,19 @@ Compiler =
     operand1 = Compile block
     operand2 = Compile block
 
-    (rt, cb) ->
-      rt.call operand1, (op1) ->
-        rt.call operand2, (op2) ->
-          cb f op1, op2
+    if op == '&&'
+      (rt, cb) ->
+        rt.call operand1, (op1) ->
+          if op1
+            rt.call operand2, (op2) ->
+              cb op2
+          else
+            cb false
+    else
+      (rt, cb) ->
+        rt.call operand1, (op1) ->
+          rt.call operand2, (op2) ->
+            cb f op1, op2
 
   'OP_UNARY': (arg, block) ->
     op = arg
@@ -210,6 +235,14 @@ Compiler =
 
   'PARENS': (arg, block) ->
     Compile block
+
+  'RANGE_EXCLUSIVE': (arg, block) ->
+    low_code = Compile block
+    high_code = Compile block
+    (rt, cb) ->
+      rt.call low_code, (low) ->
+        rt.call high_code, (high) ->
+          cb [low...high]
 
   'RETURN': (arg, block) ->
     value_code = Compile block
