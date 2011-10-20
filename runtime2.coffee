@@ -57,17 +57,30 @@ Compiler =
       rt.call my_var, (val) ->
         rt.call args, (my_args) ->
           if val.__coffeecoffee__
-            val rt, cb, my_args...
+            val rt, cb, my_args
           else
             cb val my_args...
 
   'CODE': (arg, block) ->
     # Note that CS functions can only be called from
     # CS now.
-    params = Compile block
+    [name, subarg, params_block] = GetBlock block
+    params = []
+    while params_block.len() > 0
+      [ignore, ignore, param_block] = GetBlock params_block
+      params.push Shift param_block
+    
+    set_parms = (scope, my_args) ->
+      i = 0
+      for param in params
+        scope.set param, my_args[i]
+        i += 1
+    
     body = Compile block
     (rt, cb) ->
-      f = (rt, cb, my_args...) ->
+      f = (rt, cb, my_args) ->
+        scope = rt.scope()
+        set_parms(scope, my_args)
         rt.call body, (val) ->
           cb val
       f.__coffeecoffee__ = true
@@ -146,9 +159,6 @@ Compiler =
       rt.call operand1, (op1) ->
         cb f op1
   
-  'PARAMS': (args, block) ->
-    null
-
   'STRING': (arg, block) ->
     value = arg
     if value.charAt(0) == '"'

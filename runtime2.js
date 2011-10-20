@@ -74,7 +74,7 @@
         return rt.call(my_var, function(val) {
           return rt.call(args, function(my_args) {
             if (val.__coffeecoffee__) {
-              return val.apply(null, [rt, cb].concat(__slice.call(my_args)));
+              return val(rt, cb, my_args);
             } else {
               return cb(val.apply(null, my_args));
             }
@@ -83,14 +83,31 @@
       };
     },
     'CODE': function(arg, block) {
-      var body, params;
-      params = Compile(block);
+      var body, ignore, name, param_block, params, params_block, set_parms, subarg, _ref, _ref2;
+      _ref = GetBlock(block), name = _ref[0], subarg = _ref[1], params_block = _ref[2];
+      params = [];
+      while (params_block.len() > 0) {
+        _ref2 = GetBlock(params_block), ignore = _ref2[0], ignore = _ref2[1], param_block = _ref2[2];
+        params.push(Shift(param_block));
+      }
+      set_parms = function(scope, my_args) {
+        var i, param, _i, _len, _results;
+        i = 0;
+        _results = [];
+        for (_i = 0, _len = params.length; _i < _len; _i++) {
+          param = params[_i];
+          scope.set(param, my_args[i]);
+          _results.push(i += 1);
+        }
+        return _results;
+      };
       body = Compile(block);
       return function(rt, cb) {
         var f;
-        f = function() {
-          var my_args;
-          rt = arguments[0], cb = arguments[1], my_args = 3 <= arguments.length ? __slice.call(arguments, 2) : [];
+        f = function(rt, cb, my_args) {
+          var scope;
+          scope = rt.scope();
+          set_parms(scope, my_args);
           return rt.call(body, function(val) {
             return cb(val);
           });
@@ -198,9 +215,6 @@
           return cb(f(op1));
         });
       };
-    },
-    'PARAMS': function(args, block) {
-      return null;
     },
     'STRING': function(arg, block) {
       var s, value;
