@@ -166,7 +166,9 @@
           }
           return _results;
         });
-        return Build(ast.body);
+        return PUT("DO", function() {
+          return Build(ast.body);
+        });
       });
     },
     Existence: function(ast) {

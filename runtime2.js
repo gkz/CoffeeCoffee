@@ -73,9 +73,30 @@
       return function(rt) {
         return rt.call(my_var, function(val) {
           return rt.call(args, function(my_args) {
-            return rt.value(val.apply(null, my_args));
+            if (val.__coffeecoffee__) {
+              return val.apply(null, [rt].concat(__slice.call(my_args)));
+            } else {
+              return rt.value(val.apply(null, my_args));
+            }
           });
         });
+      };
+    },
+    'CODE': function(arg, block) {
+      var body, params;
+      params = Compile(block);
+      body = Compile(block);
+      return function(rt) {
+        var f;
+        f = function() {
+          var my_args;
+          rt = arguments[0], my_args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
+          return rt.call(body, function(val) {
+            return rt.value(val);
+          });
+        };
+        f.__coffeecoffee__ = true;
+        return rt.value(f);
       };
     },
     'COND': function(arg, block) {
@@ -129,8 +150,10 @@
       };
     },
     'NUMBER': function(arg, block) {
+      var n;
+      n = parseFloat(arg);
       return function(rt) {
-        return rt.value(parseFloat(arg));
+        return rt.value(n);
       };
     },
     'OBJ': function(arg, block) {
@@ -178,16 +201,20 @@
         });
       };
     },
+    'PARAMS': function(args, block) {
+      return null;
+    },
     'STRING': function(arg, block) {
-      var value;
+      var s, value;
       value = arg;
+      if (value.charAt(0) === '"') {
+        s = JSON.parse(value);
+      }
+      if (value.charAt(0) === "'") {
+        s = JSON.parse('"' + value.substring(1, value.length - 1) + '"');
+      }
       return function(rt) {
-        if (value.charAt(0) === '"') {
-          rt.value(JSON.parse(value));
-        }
-        if (value.charAt(0) === "'") {
-          return rt.value(JSON.parse('"' + value.substring(1, value.length - 1) + '"'));
-        }
+        return rt.value(s);
       };
     },
     'WHILE': function(arg, block) {
@@ -219,7 +246,7 @@
     return [name, arg, block];
   };
   Compile = function(block) {
-    var arg, args, line, name, prefix, _ref;
+    var arg, args, line, name, obj, prefix, _ref;
     _ref = indenter.small_block(block), prefix = _ref[0], line = _ref[1], block = _ref[2];
     if (line.length === 0) {
       return null;
@@ -228,7 +255,7 @@
     name = args[0];
     arg = args.slice(1, args.length).join(' ');
     if (Compiler[name]) {
-      return Compiler[name](arg, block);
+      return obj = Compiler[name](arg, block);
     } else {
       return console.log("unknown " + name);
     }

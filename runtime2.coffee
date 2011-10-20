@@ -56,7 +56,22 @@ Compiler =
     (rt) ->
       rt.call my_var, (val) ->
         rt.call args, (my_args) ->
-          rt.value val my_args...
+          if val.__coffeecoffee__
+            val rt, my_args...
+          else
+            rt.value val my_args...
+
+  'CODE': (arg, block) ->
+    # Note that CS functions can only be called from
+    # CS now.
+    params = Compile block
+    body = Compile block
+    (rt) ->
+      f = (rt, my_args...) ->
+        rt.call body, (val) ->
+          rt.value val
+      f.__coffeecoffee__ = true
+      rt.value f
     
   'COND': (arg, block) ->
     f = Compile block
@@ -93,9 +108,10 @@ Compiler =
       rt.value null
     
   'NUMBER': (arg, block) ->
+    n = parseFloat(arg)
     (rt) ->
-      rt.value parseFloat(arg)
-      
+      rt.value n
+
   'OBJ': (arg, block) ->
     keys = []
     while block.len() > 0
@@ -130,14 +146,18 @@ Compiler =
     (rt) ->
       rt.call operand1, (op1) ->
         rt.value f op1
+  
+  'PARAMS': (args, block) ->
+    null
 
   'STRING': (arg, block) ->
     value = arg
+    if value.charAt(0) == '"'
+      s = JSON.parse value
+    if value.charAt(0) == "'"
+      s = JSON.parse '"' + value.substring(1, value.length-1) + '"'
     (rt) ->
-      if value.charAt(0) == '"'
-        rt.value JSON.parse value
-      if value.charAt(0) == "'"
-        rt.value JSON.parse '"' + value.substring(1, value.length-1) + '"'
+      rt.value s
         
   'WHILE': (arg, block) ->
     cond_code = Compile block
@@ -165,7 +185,7 @@ Compile = (block) ->
   name = args[0]
   arg = args[1...args.length].join ' ' # gross, need regex
   if Compiler[name]
-    Compiler[name](arg, block)
+    obj = Compiler[name](arg, block)
   else
     console.log "unknown #{name}"
 

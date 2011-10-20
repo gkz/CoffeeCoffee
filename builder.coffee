@@ -115,7 +115,8 @@ AST =
             PUT name
             if param.value
               Build param.value
-      Build ast.body
+      PUT "DO", ->
+        Build ast.body
 
   Existence: (ast) ->
     PUT "EXISTENCE", ->
