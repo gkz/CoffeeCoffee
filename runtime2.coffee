@@ -13,6 +13,7 @@ Compiler =
     (rt) ->
       rt.call value_code, (val) ->
         rt.scope.set var_name, val
+        rt.value null
 
   'EVAL': (arg, block) ->
     (rt) ->
@@ -69,17 +70,21 @@ RunTime = ->
     call: (code, cb) ->
       code
         value: (val) ->
-          cb(val)
+          f = -> cb(val)
+          setTimeout(f, 200)
         call: self.call
         scope: scope
 
 parser = (indented_lines) ->
   runtime = RunTime()
-  while indented_lines.len() > 0
-    code = Compile(indented_lines)
-    if code
-      runtime.call code, (val) ->
-        console.log val
+  f = ->
+    if indented_lines.len() > 0
+      code = Compile(indented_lines)
+      if code
+        runtime.call code, (val) ->
+          console.log val
+          f()
+  f()
 
 handle_data = (s) ->
   prefix_line_array = indenter.big_block(s)

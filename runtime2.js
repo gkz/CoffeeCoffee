@@ -9,7 +9,8 @@
       value_code = Compile(block);
       return function(rt) {
         return rt.call(value_code, function(val) {
-          return rt.scope.set(var_name, val);
+          rt.scope.set(var_name, val);
+          return rt.value(null);
         });
       };
     },
@@ -85,7 +86,11 @@
       call: function(code, cb) {
         return code({
           value: function(val) {
-            return cb(val);
+            var f;
+            f = function() {
+              return cb(val);
+            };
+            return setTimeout(f, 200);
           },
           call: self.call,
           scope: scope
@@ -94,16 +99,21 @@
     };
   };
   parser = function(indented_lines) {
-    var code, runtime, _results;
+    var f, runtime;
     runtime = RunTime();
-    _results = [];
-    while (indented_lines.len() > 0) {
-      code = Compile(indented_lines);
-      _results.push(code ? runtime.call(code, function(val) {
-        return console.log(val);
-      }) : void 0);
-    }
-    return _results;
+    f = function() {
+      var code;
+      if (indented_lines.len() > 0) {
+        code = Compile(indented_lines);
+        if (code) {
+          return runtime.call(code, function(val) {
+            console.log(val);
+            return f();
+          });
+        }
+      }
+    };
+    return f();
   };
   handle_data = function(s) {
     var prefix_line_array;
