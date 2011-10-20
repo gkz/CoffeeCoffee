@@ -85,15 +85,29 @@ Compiler =
           cb null
 
   'CALL': (arg, block) ->
-    my_var = Compile block
-    args = Compile block
-    (rt, cb) ->
-      rt.call my_var, (val) ->
-        rt.call args, (my_args) ->
-          if val.__coffeecoffee__
-            val rt, cb, my_args
-          else
-            cb val my_args...
+    [name, subarg, subblock] = GetBlock block
+    if name == 'ACCESS'
+      my_obj = Compile subblock
+      accessor = Shift subblock
+      args = Compile block
+      (rt, cb) ->
+        rt.call my_obj, (obj) ->
+          rt.call args, (my_args) ->
+            f = obj[accessor]
+            if f.__coffeecoffee__
+              f.apply obj, rt, cb, my_args
+            else
+              cb f.call obj, my_args...
+    else
+      my_var = Compiler[name](subarg, subblock)
+      args = Compile block
+      (rt, cb) ->
+        rt.call my_var, (f) ->
+          rt.call args, (my_args) ->
+            if f.__coffeecoffee__
+              f rt, cb, my_args
+            else
+              cb f my_args...
 
   'CODE': (arg, block) ->
     # Note that CS functions can only be called from

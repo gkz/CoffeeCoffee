@@ -110,20 +110,40 @@
       };
     },
     'CALL': function(arg, block) {
-      var args, my_var;
-      my_var = Compile(block);
-      args = Compile(block);
-      return function(rt, cb) {
-        return rt.call(my_var, function(val) {
-          return rt.call(args, function(my_args) {
-            if (val.__coffeecoffee__) {
-              return val(rt, cb, my_args);
-            } else {
-              return cb(val.apply(null, my_args));
-            }
+      var accessor, args, my_obj, my_var, name, subarg, subblock, _ref;
+      _ref = GetBlock(block), name = _ref[0], subarg = _ref[1], subblock = _ref[2];
+      if (name === 'ACCESS') {
+        my_obj = Compile(subblock);
+        accessor = Shift(subblock);
+        args = Compile(block);
+        return function(rt, cb) {
+          return rt.call(my_obj, function(obj) {
+            return rt.call(args, function(my_args) {
+              var f;
+              f = obj[accessor];
+              if (f.__coffeecoffee__) {
+                return f.apply(obj, rt, cb, my_args);
+              } else {
+                return cb(f.call.apply(f, [obj].concat(__slice.call(my_args))));
+              }
+            });
           });
-        });
-      };
+        };
+      } else {
+        my_var = Compiler[name](subarg, subblock);
+        args = Compile(block);
+        return function(rt, cb) {
+          return rt.call(my_var, function(f) {
+            return rt.call(args, function(my_args) {
+              if (f.__coffeecoffee__) {
+                return f(rt, cb, my_args);
+              } else {
+                return cb(f.apply(null, my_args));
+              }
+            });
+          });
+        };
+      }
     },
     'CODE': function(arg, block) {
       var body, ignore, name, param_block, params, params_block, set_parms, subarg, _ref, _ref2;
