@@ -94,7 +94,7 @@
         });
       },
       step: function(f) {
-        return setTimeout(f, 1000);
+        return setTimeout(f, 200);
       }
     };
   };

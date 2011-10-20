@@ -75,7 +75,7 @@ RunTime = ->
         scope: scope
         step: self.step
     step: (f) ->
-      setTimeout f, 1000
+      setTimeout f, 200
 
 parser = (indented_lines) ->
   runtime = RunTime()
