@@ -12,7 +12,21 @@ Compiler =
     (rt) ->
       rt.call value_code, (val) ->
         rt.value val[access]
-  
+
+  'ARGS': (arg, block) ->
+    arg_codes = []
+    while block.len() > 0
+      arg_codes.push Compile block
+    (rt) ->
+      args = []
+      f = (arg_code, cb) ->
+        rt.call arg_code, (my_arg) ->
+          args.push my_arg
+          cb(true)
+      last = ->
+        rt.value args
+      iterate_callbacks f, last, arg_codes
+    
   'ASSIGN': (arg, block) ->
     [name, subarg, subblock] = GetBlock block
     var_name = subarg
@@ -22,6 +36,14 @@ Compiler =
         rt.scope.set var_name, val, arg
         rt.value null
 
+  'CALL': (arg, block) ->
+    my_var = Compile block
+    args = Compile block
+    (rt) ->
+      rt.call my_var, (val) ->
+        rt.call args, (my_args) ->
+          rt.value val my_args...
+    
   'COND': (arg, block) ->
     f = Compile block
     (rt) ->
@@ -130,7 +152,6 @@ Shift = (block) ->
 
 RunTime = ->
   scope = Scope()
-  scope.set("x", 42)
   self =
     call_extra: (code, extra, cb) ->
       code

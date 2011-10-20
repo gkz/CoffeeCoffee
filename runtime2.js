@@ -12,6 +12,27 @@
         });
       };
     },
+    'ARGS': function(arg, block) {
+      var arg_codes;
+      arg_codes = [];
+      while (block.len() > 0) {
+        arg_codes.push(Compile(block));
+      }
+      return function(rt) {
+        var args, f, last;
+        args = [];
+        f = function(arg_code, cb) {
+          return rt.call(arg_code, function(my_arg) {
+            args.push(my_arg);
+            return cb(true);
+          });
+        };
+        last = function() {
+          return rt.value(args);
+        };
+        return iterate_callbacks(f, last, arg_codes);
+      };
+    },
     'ASSIGN': function(arg, block) {
       var name, subarg, subblock, value_code, var_name, _ref;
       _ref = GetBlock(block), name = _ref[0], subarg = _ref[1], subblock = _ref[2];
@@ -21,6 +42,18 @@
         return rt.call(value_code, function(val) {
           rt.scope.set(var_name, val, arg);
           return rt.value(null);
+        });
+      };
+    },
+    'CALL': function(arg, block) {
+      var args, my_var;
+      my_var = Compile(block);
+      args = Compile(block);
+      return function(rt) {
+        return rt.call(my_var, function(val) {
+          return rt.call(args, function(my_args) {
+            return rt.value(val.apply(null, my_args));
+          });
         });
       };
     },
@@ -173,7 +206,6 @@
   RunTime = function() {
     var scope, self;
     scope = Scope();
-    scope.set("x", 42);
     return self = {
       call_extra: function(code, extra, cb) {
         return code({
