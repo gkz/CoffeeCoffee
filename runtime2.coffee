@@ -291,6 +291,21 @@ Compiler =
         rt.control_flow = 'return'
         cb val
 
+  'SLICE': (arg, block) ->
+    value_code = Compile block
+    [name, arg, subblock] = GetBlock block
+    if name == 'RANGE_EXCLUSIVE'
+      slice = (x, low, high) -> x[low...high]
+    else
+      slice = (x, low, high) -> x[low..high]
+    low_code = Compile subblock
+    high_code = Compile subblock
+    (rt, cb) ->
+      rt.call value_code, (value) ->
+        rt.call low_code, (low) ->
+          rt.call high_code, (high) ->
+            cb slice value, low, high
+        
   'STRING': (arg, block) ->
     value = arg
     if value.charAt(0) == '"'

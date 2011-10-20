@@ -401,6 +401,31 @@
         });
       };
     },
+    'SLICE': function(arg, block) {
+      var high_code, low_code, name, slice, subblock, value_code, _ref;
+      value_code = Compile(block);
+      _ref = GetBlock(block), name = _ref[0], arg = _ref[1], subblock = _ref[2];
+      if (name === 'RANGE_EXCLUSIVE') {
+        slice = function(x, low, high) {
+          return x.slice(low, high);
+        };
+      } else {
+        slice = function(x, low, high) {
+          return x.slice(low, (high + 1) || 9e9);
+        };
+      }
+      low_code = Compile(subblock);
+      high_code = Compile(subblock);
+      return function(rt, cb) {
+        return rt.call(value_code, function(value) {
+          return rt.call(low_code, function(low) {
+            return rt.call(high_code, function(high) {
+              return cb(slice(value, low, high));
+            });
+          });
+        });
+      };
+    },
     'STRING': function(arg, block) {
       var s, value;
       value = arg;
