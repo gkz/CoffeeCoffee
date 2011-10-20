@@ -6,6 +6,19 @@
 #  coffee nodes_to_json.coffee test/cubes.coffee | node builder.js - | node round_trip.js - 
 
 Compiler =
+  'ASSIGN': (arg, block) ->
+    [name, subarg, subblock] = GetBlock block
+    var_name = subarg
+    value_code = Compile block
+    (rt) ->
+      rt.call value_code, (val) ->
+        rt.scope.set var_name, val
+
+  'EVAL': (arg, block) ->
+    (rt) ->
+      val = rt.scope.get(arg)
+      rt.value val
+      
   'NUMBER': (arg, block) ->
     (rt) ->
       rt.value parseFloat(arg)
@@ -30,6 +43,14 @@ Compiler =
       rt.call operand1, (op1) ->
         rt.value f op1
 
+GetBlock = (block) ->
+  [prefix, line, block] = indenter.small_block(block)
+  return null if line.length == 0
+  args = line.split(' ')
+  name = args[0]
+  arg = args[1...args.length].join ' ' # gross, need regex
+  [name, arg, block]
+
 Compile = (block) ->
   [prefix, line, block] = indenter.small_block(block)
   return null if line.length == 0
@@ -42,12 +63,15 @@ Compile = (block) ->
     console.log "unknown #{name}"
 
 RunTime = ->
+  scope = Scope()
+  scope.set("x", 42)
   self =
     call: (code, cb) ->
       code
         value: (val) ->
           cb(val)
         call: self.call
+        scope: scope
 
 parser = (indented_lines) ->
   runtime = RunTime()
@@ -91,6 +115,88 @@ unary_ops = {
   '~': (op) -> ~op
   'typeof': (op) -> typeof op
 }
+
+# Scope: returns an object to manage variable assignment
+#
+# Scope essentially just wraps a hash and parent scope for now.  It's mostly used by Assign.
+# Scoping is still very primitive, e.g. it doesn't have full closures.  It uses
+# its parent scope for lookups, but it's not rigorous about detecting hoisted
+# variables.  It should work for most simple cases, though.
+Scope = (params, parent_scope, this_value, args) ->
+  vars = {}
+
+  set_local_value = (key, value) ->
+    # Vars are wrapped inside a hash, as a cheap trick to avoid ambiguity
+    # w/r/t undefined values.  This prevents us from trying to go to the parent
+    # scope when the variable has been assigned in our own scope.
+    vars[key] = {obj: value}
+
+  for key, value of params
+    set_local_value(key, value)
+  set_local_value("this", this_value)
+  set_local_value("arguments", args)
+
+  self =
+    # try to find the wrapped variable at the correct closure scope...still a work
+    # in progress
+    get_closure_wrapper: (var_name) ->
+      val = vars[var_name]
+      return val if val?
+      return parent_scope.get_closure_wrapper var_name if parent_scope
+      return
+
+    set: (var_name, value, context) ->
+      context ||= "=" # default, could also be +=, etc.
+
+      closure_wrapper = self.get_closure_wrapper var_name
+
+      if closure_wrapper
+        # we have a previous reference
+        assigned_val = update_variable_reference(closure_wrapper, "obj", value, context)
+        assigned_val
+      else if context == "="
+        # first reference to local variable
+        set_local_value(var_name, value)
+        value
+      else
+        # cannot find var, so += and friends won't work
+        throw "Var #{var_name} has not been set"
+
+
+    get: (var_name) ->
+      if var_name == 'require'
+        return (args...) -> require args...
+
+      closure_wrapper = self.get_closure_wrapper(var_name)
+      if closure_wrapper
+        value = closure_wrapper.obj
+        return value
+
+      # builtins
+      if root?
+        val = root[var_name]
+      else
+        val = window[var_name]
+      internal_throw "reference", "ReferenceError: #{var_name} is not defined" unless val?
+      val
+      
+update_variable_reference = (hash, key, value, context) ->
+  context ||= '='
+  if key.from_val? && key.to_val?
+    throw "slice assignment not allowed" if context != '='
+    [].splice.apply(hash, [key.from_val, key.to_val - key.from_val].concat(value))
+    return value
+  commands = {
+    '=':   -> hash[key] = value
+    '+=':  -> hash[key] += value
+    '*=':  -> hash[key] *= value
+    '-=':  -> hash[key] -= value
+    '||=': -> hash[key] ||= value
+    '++':  -> ++hash[key]
+    '--':  -> --hash[key]
+  }
+  throw "unknown context #{context}" unless commands[context]
+  commands[context]()
 
 if window?
   window.transcompile = transcompile
