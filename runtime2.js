@@ -33,6 +33,27 @@
         return iterate_callbacks(f, last, arg_codes);
       };
     },
+    'ARR': function(arg, block) {
+      var arr_exprs;
+      arr_exprs = [];
+      while (block.len() > 0) {
+        arr_exprs.push(Compile(block));
+      }
+      return function(rt) {
+        var arr, f, last;
+        arr = [];
+        f = function(elem_expr, cb) {
+          return rt.call(elem_expr, function(val) {
+            arr.push(val);
+            return cb(true);
+          });
+        };
+        last = function() {
+          return rt.value(arr);
+        };
+        return iterate_callbacks(f, last, arr_exprs);
+      };
+    },
     'ASSIGN': function(arg, block) {
       var name, subarg, subblock, value_code, var_name, _ref;
       _ref = GetBlock(block), name = _ref[0], subarg = _ref[1], subblock = _ref[2];
@@ -157,6 +178,18 @@
         });
       };
     },
+    'STRING': function(arg, block) {
+      var value;
+      value = arg;
+      return function(rt) {
+        if (value.charAt(0) === '"') {
+          rt.value(JSON.parse(value));
+        }
+        if (value.charAt(0) === "'") {
+          return rt.value(JSON.parse('"' + value.substring(1, value.length - 1) + '"'));
+        }
+      };
+    },
     'WHILE': function(arg, block) {
       var block_code, cond_code, f;
       cond_code = Compile(block);
@@ -243,7 +276,6 @@
     }
     f = function(stmt, cb) {
       return runtime.call(stmt, function(val) {
-        console.log(val);
         return runtime.step(function() {
           return cb(true);
         });

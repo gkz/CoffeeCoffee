@@ -27,6 +27,20 @@ Compiler =
         rt.value args
       iterate_callbacks f, last, arg_codes
     
+  'ARR': (arg, block) ->
+    arr_exprs = []
+    while block.len() > 0
+      arr_exprs.push Compile block
+    (rt) ->
+      arr = []
+      f = (elem_expr, cb) ->
+        rt.call elem_expr, (val) ->
+          arr.push val
+          cb(true)
+      last = ->
+        rt.value arr
+      iterate_callbacks f, last, arr_exprs
+    
   'ASSIGN': (arg, block) ->
     [name, subarg, subblock] = GetBlock block
     var_name = subarg
@@ -116,6 +130,14 @@ Compiler =
     (rt) ->
       rt.call operand1, (op1) ->
         rt.value f op1
+
+  'STRING': (arg, block) ->
+    value = arg
+    (rt) ->
+      if value.charAt(0) == '"'
+        rt.value JSON.parse value
+      if value.charAt(0) == "'"
+        rt.value JSON.parse '"' + value.substring(1, value.length-1) + '"'
         
   'WHILE': (arg, block) ->
     cond_code = Compile block
@@ -180,7 +202,7 @@ parser = (indented_lines) ->
   
   f = (stmt, cb) ->
     runtime.call stmt, (val) ->
-      console.log val
+      # console.log val
       runtime.step ->
         cb(true)
   last = ->
