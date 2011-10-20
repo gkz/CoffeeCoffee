@@ -1,5 +1,5 @@
 (function() {
-  var Compile, Compiler, GetBlock, RunTime, Scope, Shift, binary_ops, data, fn, fs, handle_data, indenter, iterate_callbacks, parser, stdin, unary_ops, update_variable_reference;
+  var Compile, Compiler, GetBlock, RunTime, Scope, Shift, binary_ops, build_class, data, fn, fs, handle_data, indenter, iterate_callbacks, newify, parser, stdin, unary_ops, update_variable_reference;
   var __slice = Array.prototype.slice;
   Compiler = {
     'ACCESS': function(arg, block) {
@@ -144,6 +144,38 @@
           });
         };
       }
+    },
+    'CLASS': function(arg, block) {
+      var class_name, code, methods, name, subarg, subblock, _ref;
+      class_name = Shift(block);
+      GetBlock(block);
+      _ref = GetBlock(block), name = _ref[0], subarg = _ref[1], subblock = _ref[2];
+      methods = [];
+      while (subblock.len() > 0) {
+        name = Shift(subblock);
+        code = Compile(subblock);
+        methods.push({
+          name: name,
+          code: code
+        });
+      }
+      return function(rt, cb) {
+        var f, last, proto;
+        proto = {};
+        f = function(method, cb) {
+          return rt.call(method.code, function(f) {
+            proto[method.name] = f;
+            return cb(true);
+          });
+        };
+        last = function() {
+          var klass;
+          klass = build_class(proto);
+          rt.scope().set(class_name, klass);
+          return cb(true);
+        };
+        return iterate_callbacks(f, last, methods);
+      };
     },
     'CODE': function(arg, block) {
       var body, ignore, name, param_block, params, params_block, set_parms, subarg, _ref, _ref2;
@@ -303,6 +335,18 @@
           return obj[name] = val;
         });
         return cb(null);
+      };
+    },
+    'NEW': function(arg, block) {
+      var args, my_var;
+      my_var = Compile(block);
+      args = Compile(block);
+      return function(rt, cb) {
+        return rt.call(my_var, function(f) {
+          return rt.call(args, function(my_args) {
+            return newify(f, rt, cb, my_args);
+          });
+        });
       };
     },
     'NUMBER': function(arg, block) {
@@ -496,7 +540,7 @@
     if (Compiler[name]) {
       return obj = Compiler[name](arg, block);
     } else {
-      return console.log("unknown " + name);
+      return console.log("unknown compile target: " + name);
     }
   };
   Shift = function(block) {
@@ -758,6 +802,58 @@
       throw "unknown context " + context;
     }
     return commands[context]();
+  };
+  build_class = function(proto, superclass) {
+    var X, extendify, key;
+    extendify = function(child, parent) {
+      var ctor, key;
+      ctor = function() {
+        this.constructor = child;
+        return null;
+      };
+      for (key in parent) {
+        if (Object.prototype.hasOwnProperty.call(parent, key)) {
+          child[key] = parent[key];
+        }
+      }
+      ctor.prototype = parent.prototype;
+      child.prototype = new ctor;
+      child.__super__ = parent.prototype;
+      return child;
+    };
+    X = function() {
+      this.__super__ = X.__super__;
+      if (Object.prototype.hasOwnProperty.call(proto, "constructor")) {
+        return proto.constructor.apply(this, arguments);
+      } else if (superclass) {
+        return X.__super__.constructor.apply(this, arguments);
+      } else {
+        return;
+      }
+    };
+    if (superclass) {
+      extendify(X, superclass);
+    }
+    for (key in proto) {
+      X.prototype[key] = proto[key];
+    }
+    return X;
+  };
+  newify = function(func, rt, cb, args) {
+    var callback, child, ctor;
+    ctor = function() {};
+    ctor.prototype = func.prototype;
+    child = new ctor;
+    callback = function(result) {
+      console.log("in callback", result);
+      if (typeof result === "object") {
+        return cb(result);
+      } else {
+        return cb(child);
+      }
+    };
+    console.log("here in newify");
+    return func.call.apply(func, [child, rt, callback].concat(__slice.call(args)));
   };
   if (typeof window !== "undefined" && window !== null) {
     window.transcompile = transcompile;

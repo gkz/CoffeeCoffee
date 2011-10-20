@@ -1,9 +1,6 @@
-# Create CS code from our intermediate language.  This code is mostly used to validate
-# that the transformation to the intermediate language is not lossy.
-
-
-# Example usage:
-#  coffee nodes_to_json.coffee test/cubes.coffee | node builder.js - | node round_trip.js - 
+# This is a second cut at a CS runtime.  It's not running CS directly, but it's running an intermediate language
+# natively, rather than simply transcompiling to JS.  Everything is callback-oriented, which allows the runtime
+# to set breakpoints.
 
 Compiler =
   'ACCESS': (arg, block) ->
@@ -109,6 +106,29 @@ Compiler =
             else
               cb f my_args...
 
+  'CLASS': (arg, block) ->
+    class_name = Shift block
+    GetBlock block # parents
+    [name, subarg, subblock] = GetBlock block
+    methods = []
+    while subblock.len() > 0
+      name = Shift subblock
+      code = Compile subblock
+      methods.push 
+        name: name
+        code: code
+    (rt, cb) ->
+      proto = {}
+      f = (method, cb) ->
+        rt.call method.code, (f) ->
+          proto[method.name] = f 
+          cb true
+      last = ->
+        klass = build_class proto
+        rt.scope().set class_name, klass
+        cb true
+      iterate_callbacks f, last, methods
+    
   'CODE': (arg, block) ->
     # Note that CS functions can only be called from
     # CS now.
@@ -223,6 +243,14 @@ Compiler =
       rt.call value_code, (val) ->
         obj[name] = val
       cb null
+    
+  'NEW': (arg, block) ->
+    my_var = Compile block
+    args = Compile block
+    (rt, cb) ->
+      rt.call my_var, (f) ->
+        rt.call args, (my_args) ->
+          newify f, rt, cb, my_args
     
   'NUMBER': (arg, block) ->
     n = parseFloat(arg)
@@ -356,7 +384,7 @@ Compile = (block) ->
   if Compiler[name]
     obj = Compiler[name](arg, block)
   else
-    console.log "unknown #{name}"
+    console.log "unknown compile target: #{name}"
 
 Shift = (block) ->
   block.shift()[1]
@@ -529,6 +557,48 @@ update_variable_reference = (hash, key, value, context) ->
   }
   throw "unknown context #{context}" unless commands[context]
   commands[context]()
+
+build_class = (proto, superclass)->
+  # The class mechanism is mostly handled through JS, rather than
+  # simulated, but we need to do this to play nice with JS libraries.
+  extendify = (child, parent) ->
+    ctor = ->
+      this.constructor = child
+      null # super important
+    for key of parent
+      if Object::hasOwnProperty.call(parent, key)
+        child[key] = parent[key]
+    ctor.prototype = parent.prototype
+    child.prototype = new ctor
+    child.__super__ = parent.prototype
+    child
+
+  X = ->
+    this.__super__ = X.__super__
+    if Object::hasOwnProperty.call(proto, "constructor")
+      proto.constructor.apply this, arguments
+    else if superclass
+      X.__super__.constructor.apply this, arguments
+    else
+      undefined
+  if superclass
+    extendify(X, superclass)
+  for key of proto
+    X.prototype[key] = proto[key]
+  X
+
+newify = (func, rt, cb, args) ->
+  ctor = ->
+  ctor.prototype = func.prototype
+  child = new ctor
+  callback = (result) ->
+    console.log "in callback", result
+    if typeof result is "object"
+      cb result
+    else
+      cb child
+  console.log "here in newify"
+  func.call child, rt, callback, args...
 
 if window?
   window.transcompile = transcompile
