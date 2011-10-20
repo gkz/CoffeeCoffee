@@ -12,7 +12,7 @@ Compiler =
     value_code = Compile block
     (rt) ->
       rt.call value_code, (val) ->
-        rt.scope.set var_name, val
+        rt.scope.set var_name, val, arg
         rt.value null
 
   'EVAL': (arg, block) ->
@@ -70,10 +70,12 @@ RunTime = ->
     call: (code, cb) ->
       code
         value: (val) ->
-          f = -> cb(val)
-          setTimeout(f, 200)
+          cb(val)
         call: self.call
         scope: scope
+        step: self.step
+    step: (f) ->
+      setTimeout f, 1000
 
 parser = (indented_lines) ->
   runtime = RunTime()
@@ -83,7 +85,7 @@ parser = (indented_lines) ->
       if code
         runtime.call code, (val) ->
           console.log val
-          f()
+          runtime.step f
   f()
 
 handle_data = (s) ->

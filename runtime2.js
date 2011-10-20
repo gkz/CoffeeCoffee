@@ -9,7 +9,7 @@
       value_code = Compile(block);
       return function(rt) {
         return rt.call(value_code, function(val) {
-          rt.scope.set(var_name, val);
+          rt.scope.set(var_name, val, arg);
           return rt.value(null);
         });
       };
@@ -86,15 +86,15 @@
       call: function(code, cb) {
         return code({
           value: function(val) {
-            var f;
-            f = function() {
-              return cb(val);
-            };
-            return setTimeout(f, 200);
+            return cb(val);
           },
           call: self.call,
-          scope: scope
+          scope: scope,
+          step: self.step
         });
+      },
+      step: function(f) {
+        return setTimeout(f, 1000);
       }
     };
   };
@@ -108,7 +108,7 @@
         if (code) {
           return runtime.call(code, function(val) {
             console.log(val);
-            return f();
+            return runtime.step(f);
           });
         }
       }
