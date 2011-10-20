@@ -33,12 +33,6 @@ INDENT = -> TAB += '  '
 DEDENT = -> TAB = TAB[0...TAB.length - 2]
 
 AST =
-  name: (ast) ->
-    return ast.name.Literal.value
-
-  Access: (scope, ast) ->
-    AST.name ast
-    
   Arr: (ast) ->
     PUT "ARR", ->
       for object in ast.objects
@@ -300,8 +294,17 @@ AST =
           base: ast.base
           properties: priors
       if last_property.Access?
-        PUT "ACCESS", ->
-          prior()
+        name = if last_property.Access.soak
+          "ACCESS_SOAK"
+        else
+          "ACCESS"
+          
+        PUT name, ->
+          if last_property.Access.proto
+            PUT "PROTO", ->
+              prior()
+          else
+            prior()
           PUT last_property.Access.name.Literal.value
       else if last_property.Index?
         PUT "INDEX", ->

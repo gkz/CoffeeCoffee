@@ -40,12 +40,6 @@
     return TAB = TAB.slice(0, TAB.length - 2);
   };
   AST = {
-    name: function(ast) {
-      return ast.name.Literal.value;
-    },
-    Access: function(scope, ast) {
-      return AST.name(ast);
-    },
     Arr: function(ast) {
       return PUT("ARR", function() {
         var object, _i, _len, _ref, _results;
@@ -404,7 +398,7 @@
       });
     },
     Value: function(ast) {
-      var last_property, prior, priors, properties;
+      var last_property, name, prior, priors, properties;
       if (ast.properties.length === 0) {
         return Build(ast.base);
       } else {
@@ -418,8 +412,15 @@
           });
         };
         if (last_property.Access != null) {
-          PUT("ACCESS", function() {
-            prior();
+          name = last_property.Access.soak ? "ACCESS_SOAK" : "ACCESS";
+          PUT(name, function() {
+            if (last_property.Access.proto) {
+              PUT("PROTO", function() {
+                return prior();
+              });
+            } else {
+              prior();
+            }
             return PUT(last_property.Access.name.Literal.value);
           });
         } else if (last_property.Index != null) {

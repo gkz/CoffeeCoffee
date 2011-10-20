@@ -7,6 +7,12 @@
       access = Shift(block);
       return "" + val + "." + access;
     },
+    'ACCESS_SOAK': function(arg, block) {
+      var access, val;
+      val = Eval(block);
+      access = Shift(block);
+      return "" + val + "?." + access;
+    },
     'ARGS': function(arg, block) {
       var my_args;
       my_args = [];
@@ -204,6 +210,11 @@
       } else {
         return null;
       }
+    },
+    'PROTO': function(arg, block) {
+      var val;
+      val = Eval(block);
+      return "" + val + ".prototype";
     },
     'RANGE_EXCLUSIVE': function(arg, block) {
       var high, low;

@@ -11,6 +11,11 @@ Build =
     access = Shift block
     "#{val}.#{access}"
 
+  'ACCESS_SOAK': (arg, block) ->
+    val = Eval block
+    access = Shift block
+    "#{val}?.#{access}"
+
   'ARGS': (arg, block) ->
     my_args = []
     while block.len() > 0
@@ -176,6 +181,10 @@ Build =
       Eval block
     else
       null
+    
+  'PROTO': (arg, block) ->
+    val = Eval block
+    "#{val}.prototype"
     
   'RANGE_EXCLUSIVE': (arg, block) ->
     low = Eval block
