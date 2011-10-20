@@ -95,7 +95,7 @@ Compiler =
           rt.call args, (my_args) ->
             f = obj[accessor]
             if f.__coffeecoffee__
-              f.apply obj, rt, cb, my_args
+              f.call obj, rt, cb, my_args
             else
               cb f.call obj, my_args...
     else
@@ -157,7 +157,16 @@ Compiler =
       last = ->
         cb val
       iterate_callbacks(f, last, stmts)
-    
+   
+  'EXISTENCE': (arg, block) ->
+    val_code = Compile block
+    (rt, cb) ->
+      # not super robust
+      rt.scope().relax(true)
+      rt.call val_code, (val) ->
+        rt.scope().relax(false)
+        cb val
+     
   'EVAL': (arg, block) ->
     (rt, cb) ->
       val = rt.scope().get(arg)
@@ -290,7 +299,17 @@ Compiler =
       s = JSON.parse '"' + value.substring(1, value.length-1) + '"'
     (rt, cb) ->
       cb s
-        
+  
+  'VALUE': (arg, block) ->
+    map =
+      true: true
+      false: false
+      null: null
+      undefined: undefined
+    val = map[arg]
+    (rt, cb) ->
+      cb val
+    
   'WHILE': (arg, block) ->
     cond_code = Compile block
     block_code = Compile block
@@ -429,6 +448,8 @@ Scope = (params, parent_scope, this_value, args) ->
   set_local_value("this", this_value)
   set_local_value("arguments", args)
 
+  forgiving = false
+
   self =
     # try to find the wrapped variable at the correct closure scope...still a work
     # in progress
@@ -437,6 +458,9 @@ Scope = (params, parent_scope, this_value, args) ->
       return val if val?
       return parent_scope.get_closure_wrapper var_name if parent_scope
       return
+      
+    relax: (latitude) ->
+      forgiving = latitude
 
     set: (var_name, value, context) ->
       context ||= "=" # default, could also be +=, etc.
@@ -470,7 +494,7 @@ Scope = (params, parent_scope, this_value, args) ->
         val = root[var_name]
       else
         val = window[var_name]
-      internal_throw "reference", "ReferenceError: #{var_name} is not defined" unless val?
+      internal_throw "reference", "ReferenceError: #{var_name} is not defined" unless val? || forgiving
       val
       
 update_variable_reference = (hash, key, value, context) ->

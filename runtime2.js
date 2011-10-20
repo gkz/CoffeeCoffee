@@ -122,7 +122,7 @@
               var f;
               f = obj[accessor];
               if (f.__coffeecoffee__) {
-                return f.apply(obj, rt, cb, my_args);
+                return f.call(obj, rt, cb, my_args);
               } else {
                 return cb(f.call.apply(f, [obj].concat(__slice.call(my_args))));
               }
@@ -212,6 +212,17 @@
           return cb(val);
         };
         return iterate_callbacks(f, last, stmts);
+      };
+    },
+    'EXISTENCE': function(arg, block) {
+      var val_code;
+      val_code = Compile(block);
+      return function(rt, cb) {
+        rt.scope().relax(true);
+        return rt.call(val_code, function(val) {
+          rt.scope().relax(false);
+          return cb(val);
+        });
       };
     },
     'EVAL': function(arg, block) {
@@ -401,6 +412,19 @@
       }
       return function(rt, cb) {
         return cb(s);
+      };
+    },
+    'VALUE': function(arg, block) {
+      var map, val;
+      map = {
+        "true": true,
+        "false": false,
+        "null": null,
+        undefined: void 0
+      };
+      val = map[arg];
+      return function(rt, cb) {
+        return cb(val);
       };
     },
     'WHILE': function(arg, block) {
@@ -604,7 +628,7 @@
     }
   };
   Scope = function(params, parent_scope, this_value, args) {
-    var key, self, set_local_value, value, vars;
+    var forgiving, key, self, set_local_value, value, vars;
     vars = {};
     set_local_value = function(key, value) {
       return vars[key] = {
@@ -617,6 +641,7 @@
     }
     set_local_value("this", this_value);
     set_local_value("arguments", args);
+    forgiving = false;
     return self = {
       get_closure_wrapper: function(var_name) {
         var val;
@@ -627,6 +652,9 @@
         if (parent_scope) {
           return parent_scope.get_closure_wrapper(var_name);
         }
+      },
+      relax: function(latitude) {
+        return forgiving = latitude;
       },
       set: function(var_name, value, context) {
         var assigned_val, closure_wrapper;
@@ -661,7 +689,7 @@
         } else {
           val = window[var_name];
         }
-        if (val == null) {
+        if (!((val != null) || forgiving)) {
           internal_throw("reference", "ReferenceError: " + var_name + " is not defined");
         }
         return val;
