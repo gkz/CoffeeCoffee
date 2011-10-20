@@ -15,6 +15,29 @@ Compiler =
         rt.scope.set var_name, val, arg
         rt.value null
 
+  'COND': (arg, block) ->
+    f = Compile block
+    (rt) ->
+      rt.call f, (val) ->
+        rt.value val
+
+  'DO': (arg, block) ->
+    stmts = []
+    while block.len() > 0
+      stmts.push Compile(block)
+    (rt) ->
+      i = 0
+      val = null
+      f = -> 
+        if i < stmts.length
+          rt.call stmts[i], (value) ->
+            val = value
+            i += 1
+            f()
+        else
+          rt.value val
+      f()
+    
   'EVAL': (arg, block) ->
     (rt) ->
       val = rt.scope.get(arg)
@@ -43,6 +66,17 @@ Compiler =
     (rt) ->
       rt.call operand1, (op1) ->
         rt.value f op1
+        
+  'WHILE': (arg, block) ->
+    cond_code = Compile block
+    block_code = Compile block
+    f = (rt) ->
+      rt.call cond_code, (cond) ->
+        if cond
+          rt.call block_code, ->
+            f(rt)
+        else
+          rt.value null
 
 GetBlock = (block) ->
   [prefix, line, block] = indenter.small_block(block)

@@ -14,6 +14,39 @@
         });
       };
     },
+    'COND': function(arg, block) {
+      var f;
+      f = Compile(block);
+      return function(rt) {
+        return rt.call(f, function(val) {
+          return rt.value(val);
+        });
+      };
+    },
+    'DO': function(arg, block) {
+      var stmts;
+      stmts = [];
+      while (block.len() > 0) {
+        stmts.push(Compile(block));
+      }
+      return function(rt) {
+        var f, i, val;
+        i = 0;
+        val = null;
+        f = function() {
+          if (i < stmts.length) {
+            return rt.call(stmts[i], function(value) {
+              val = value;
+              i += 1;
+              return f();
+            });
+          } else {
+            return rt.value(val);
+          }
+        };
+        return f();
+      };
+    },
     'EVAL': function(arg, block) {
       return function(rt) {
         var val;
@@ -48,6 +81,22 @@
       return function(rt) {
         return rt.call(operand1, function(op1) {
           return rt.value(f(op1));
+        });
+      };
+    },
+    'WHILE': function(arg, block) {
+      var block_code, cond_code, f;
+      cond_code = Compile(block);
+      block_code = Compile(block);
+      return f = function(rt) {
+        return rt.call(cond_code, function(cond) {
+          if (cond) {
+            return rt.call(block_code, function() {
+              return f(rt);
+            });
+          } else {
+            return rt.value(null);
+          }
         });
       };
     }
