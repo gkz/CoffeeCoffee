@@ -89,9 +89,27 @@
         keys.push(Compile(block));
       }
       return function(rt) {
-        var key, obj;
+        var f, i, last, next, obj;
         obj = {};
-        key = keys[0];
+        f = function(key, cb) {
+          return rt.call_extra(key, obj, function(val) {
+            return cb();
+          });
+        };
+        last = function() {
+          return rt.value(obj);
+        };
+        i = 0;
+        next = function(i) {
+          if (i < keys.length) {
+            return f(keys[i], function() {
+              return next(i + 1);
+            });
+          } else {
+            return last();
+          }
+        };
+        next(0);
         return rt.call_extra(key, obj, function(val) {
           return rt.value(obj);
         });

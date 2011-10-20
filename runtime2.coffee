@@ -69,7 +69,21 @@ Compiler =
       keys.push Compile block
     (rt) ->
       obj = {}
-      key = keys[0]
+      
+      f = (key, cb) ->
+        rt.call_extra key, obj, (val) ->
+          cb()
+      last = ->
+        rt.value obj
+
+      i = 0
+      next = (i) ->
+        if i < keys.length
+          f keys[i], -> next(i+1)
+        else
+          last()
+      next(0)
+      
       rt.call_extra key, obj, (val) ->
         rt.value obj
       
