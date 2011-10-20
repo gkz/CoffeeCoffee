@@ -1,5 +1,5 @@
 (function() {
-  var Compile, Compiler, GetBlock, RunTime, Scope, Shift, binary_ops, data, fn, fs, handle_data, indenter, parser, stdin, unary_ops, update_variable_reference;
+  var Compile, Compiler, GetBlock, RunTime, Scope, Shift, binary_ops, data, fn, fs, handle_data, indenter, iterate_callbacks, parser, stdin, unary_ops, update_variable_reference;
   var __slice = Array.prototype.slice;
   Compiler = {
     'ACCESS': function(arg, block) {
@@ -89,30 +89,17 @@
         keys.push(Compile(block));
       }
       return function(rt) {
-        var f, i, last, next, obj;
+        var f, last, obj;
         obj = {};
         f = function(key, cb) {
           return rt.call_extra(key, obj, function(val) {
-            return cb();
+            return cb(true);
           });
         };
         last = function() {
           return rt.value(obj);
         };
-        i = 0;
-        next = function(i) {
-          if (i < keys.length) {
-            return f(keys[i], function() {
-              return next(i + 1);
-            });
-          } else {
-            return last();
-          }
-        };
-        next(0);
-        return rt.call_extra(key, obj, function(val) {
-          return rt.value(obj);
-        });
+        return iterate_callbacks(f, last, keys);
       };
     },
     'OP_BINARY': function(arg, block) {
@@ -194,7 +181,11 @@
       call_extra: function(code, extra, cb) {
         return code({
           value: function(val) {
-            return cb(val);
+            var f;
+            f = function() {
+              return cb(val);
+            };
+            return setTimeout(f, 0);
           },
           call: self.call,
           call_extra: self.call_extra,
@@ -232,6 +223,21 @@
     var prefix_line_array;
     prefix_line_array = indenter.big_block(s);
     return parser(prefix_line_array);
+  };
+  iterate_callbacks = function(f, last, arr) {
+    var next;
+    next = function(i) {
+      if (i < arr.length) {
+        return f(arr[i], function(ok) {
+          if (ok) {
+            return next(i + 1);
+          }
+        });
+      } else {
+        return last();
+      }
+    };
+    return next(0);
   };
   binary_ops = {
     '*': function(op1, op2) {

@@ -72,20 +72,11 @@ Compiler =
       
       f = (key, cb) ->
         rt.call_extra key, obj, (val) ->
-          cb()
+          cb(true)
       last = ->
         rt.value obj
 
-      i = 0
-      next = (i) ->
-        if i < keys.length
-          f keys[i], -> next(i+1)
-        else
-          last()
-      next(0)
-      
-      rt.call_extra key, obj, (val) ->
-        rt.value obj
+      iterate_callbacks(f, last, keys)
       
   'OP_BINARY': (arg, block) ->
     op = arg
@@ -147,7 +138,9 @@ RunTime = ->
     call_extra: (code, extra, cb) ->
       code
         value: (val) ->
-          cb(val)
+          f = -> cb(val)
+          setTimeout(f, 0)
+          # cb(val)
         call: self.call
         call_extra: self.call_extra
         scope: scope
@@ -175,6 +168,16 @@ handle_data = (s) ->
   prefix_line_array = indenter.big_block(s)
   parser(prefix_line_array)  
 
+
+iterate_callbacks = (f, last, arr) ->
+  next = (i) ->
+    if i < arr.length
+      f arr[i], (ok) -> 
+        next(i+1) if ok
+    else
+      last()
+  next(0)
+  
 binary_ops = {
   '*':   (op1, op2) -> op1 * op2
   '/':   (op1, op2) -> op1 / op2
