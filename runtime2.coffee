@@ -147,6 +147,14 @@ Compiler =
               cb val
           else
             cb null
+
+  'INDEX': (arg, block) ->
+    value_code = Compile block
+    index_code = Compile block
+    (rt, cb) ->
+      rt.call value_code, (val) ->
+        rt.call index_code, (index) ->
+          cb val[index]
       
   'KEY_VALUE': (arg, block) ->
     name = Shift block
@@ -195,7 +203,10 @@ Compiler =
     (rt, cb) ->
       rt.call operand1, (op1) ->
         cb f op1
-  
+
+  'PARENS': (arg, block) ->
+    Compile block
+
   'STRING': (arg, block) ->
     value = arg
     if value.charAt(0) == '"'

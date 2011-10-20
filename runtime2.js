@@ -205,6 +205,18 @@
         });
       };
     },
+    'INDEX': function(arg, block) {
+      var index_code, value_code;
+      value_code = Compile(block);
+      index_code = Compile(block);
+      return function(rt, cb) {
+        return rt.call(value_code, function(val) {
+          return rt.call(index_code, function(index) {
+            return cb(val[index]);
+          });
+        });
+      };
+    },
     'KEY_VALUE': function(arg, block) {
       var name, value_code;
       name = Shift(block);
@@ -267,6 +279,9 @@
           return cb(f(op1));
         });
       };
+    },
+    'PARENS': function(arg, block) {
+      return Compile(block);
     },
     'STRING': function(arg, block) {
       var s, value;
