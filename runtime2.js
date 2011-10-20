@@ -6,9 +6,9 @@
       var access, value_code;
       value_code = Compile(block);
       access = Shift(block);
-      return function(rt) {
+      return function(rt, cb) {
         return rt.call(value_code, function(val) {
-          return rt.value(val[access]);
+          return cb(val[access]);
         });
       };
     },
@@ -18,7 +18,7 @@
       while (block.len() > 0) {
         arg_codes.push(Compile(block));
       }
-      return function(rt) {
+      return function(rt, cb) {
         var args, f, last;
         args = [];
         f = function(arg_code, cb) {
@@ -28,7 +28,7 @@
           });
         };
         last = function() {
-          return rt.value(args);
+          return cb(args);
         };
         return iterate_callbacks(f, last, arg_codes);
       };
@@ -39,7 +39,7 @@
       while (block.len() > 0) {
         arr_exprs.push(Compile(block));
       }
-      return function(rt) {
+      return function(rt, cb) {
         var arr, f, last;
         arr = [];
         f = function(elem_expr, cb) {
@@ -49,7 +49,7 @@
           });
         };
         last = function() {
-          return rt.value(arr);
+          return cb(arr);
         };
         return iterate_callbacks(f, last, arr_exprs);
       };
@@ -59,10 +59,10 @@
       _ref = GetBlock(block), name = _ref[0], subarg = _ref[1], subblock = _ref[2];
       var_name = subarg;
       value_code = Compile(block);
-      return function(rt) {
+      return function(rt, cb) {
         return rt.call(value_code, function(val) {
-          rt.scope.set(var_name, val, arg);
-          return rt.value(null);
+          rt.scope().set(var_name, val, arg);
+          return cb(null);
         });
       };
     },
@@ -70,13 +70,13 @@
       var args, my_var;
       my_var = Compile(block);
       args = Compile(block);
-      return function(rt) {
+      return function(rt, cb) {
         return rt.call(my_var, function(val) {
           return rt.call(args, function(my_args) {
             if (val.__coffeecoffee__) {
-              return val.apply(null, [rt].concat(__slice.call(my_args)));
+              return val.apply(null, [rt, cb].concat(__slice.call(my_args)));
             } else {
-              return rt.value(val.apply(null, my_args));
+              return cb(val.apply(null, my_args));
             }
           });
         });
@@ -86,25 +86,25 @@
       var body, params;
       params = Compile(block);
       body = Compile(block);
-      return function(rt) {
+      return function(rt, cb) {
         var f;
         f = function() {
           var my_args;
-          rt = arguments[0], my_args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
+          rt = arguments[0], cb = arguments[1], my_args = 3 <= arguments.length ? __slice.call(arguments, 2) : [];
           return rt.call(body, function(val) {
-            return rt.value(val);
+            return cb(val);
           });
         };
         f.__coffeecoffee__ = true;
-        return rt.value(f);
+        return cb(f);
       };
     },
     'COND': function(arg, block) {
       var f;
       f = Compile(block);
-      return function(rt) {
+      return function(rt, cb) {
         return rt.call(f, function(val) {
-          return rt.value(val);
+          return cb(val);
         });
       };
     },
@@ -114,7 +114,7 @@
       while (block.len() > 0) {
         stmts.push(Compile(block));
       }
-      return function(rt) {
+      return function(rt, cb) {
         var f, last, val;
         val = null;
         f = function(stmt, cb) {
@@ -124,36 +124,34 @@
           });
         };
         last = function() {
-          return rt.value(val);
+          return cb(val);
         };
         return iterate_callbacks(f, last, stmts);
       };
     },
     'EVAL': function(arg, block) {
-      return function(rt) {
+      return function(rt, cb) {
         var val;
-        val = rt.scope.get(arg);
-        return rt.value(val);
+        val = rt.scope().get(arg);
+        return cb(val);
       };
     },
     'KEY_VALUE': function(arg, block) {
       var name, value_code;
       name = Shift(block);
       value_code = Compile(block);
-      return function(rt) {
-        var obj;
-        obj = rt.extra;
+      return function(rt, obj, cb) {
         rt.call(value_code, function(val) {
           return obj[name] = val;
         });
-        return rt.value(null);
+        return cb(null);
       };
     },
     'NUMBER': function(arg, block) {
       var n;
       n = parseFloat(arg);
-      return function(rt) {
-        return rt.value(n);
+      return function(rt, cb) {
+        return cb(n);
       };
     },
     'OBJ': function(arg, block) {
@@ -162,7 +160,7 @@
       while (block.len() > 0) {
         keys.push(Compile(block));
       }
-      return function(rt) {
+      return function(rt, cb) {
         var f, last, obj;
         obj = {};
         f = function(key, cb) {
@@ -171,7 +169,7 @@
           });
         };
         last = function() {
-          return rt.value(obj);
+          return cb(obj);
         };
         return iterate_callbacks(f, last, keys);
       };
@@ -182,10 +180,10 @@
       f = binary_ops[op];
       operand1 = Compile(block);
       operand2 = Compile(block);
-      return function(rt) {
+      return function(rt, cb) {
         return rt.call(operand1, function(op1) {
           return rt.call(operand2, function(op2) {
-            return rt.value(f(op1, op2));
+            return cb(f(op1, op2));
           });
         });
       };
@@ -195,9 +193,9 @@
       op = arg;
       f = unary_ops[op];
       operand1 = Compile(block);
-      return function(rt) {
+      return function(rt, cb) {
         return rt.call(operand1, function(op1) {
-          return rt.value(f(op1));
+          return cb(f(op1));
         });
       };
     },
@@ -213,22 +211,22 @@
       if (value.charAt(0) === "'") {
         s = JSON.parse('"' + value.substring(1, value.length - 1) + '"');
       }
-      return function(rt) {
-        return rt.value(s);
+      return function(rt, cb) {
+        return cb(s);
       };
     },
     'WHILE': function(arg, block) {
       var block_code, cond_code, f;
       cond_code = Compile(block);
       block_code = Compile(block);
-      return f = function(rt) {
+      return f = function(rt, cb) {
         return rt.call(cond_code, function(cond) {
           if (cond) {
             return rt.call(block_code, function() {
-              return f(rt);
+              return f(rt, cb);
             });
           } else {
-            return rt.value(null);
+            return cb(null);
           }
         });
       };
@@ -268,23 +266,25 @@
     scope = Scope();
     return self = {
       call_extra: function(code, extra, cb) {
-        return code({
-          value: function(val) {
-            var f;
-            f = function() {
-              return cb(val);
-            };
-            return setTimeout(f, 0);
-          },
-          call: self.call,
-          call_extra: self.call_extra,
-          scope: scope,
-          step: self.step,
-          extra: extra
+        return code(self, extra, function(val) {
+          var f;
+          f = function() {
+            return cb(val);
+          };
+          return setTimeout(f, 0);
         });
       },
+      scope: function() {
+        return scope;
+      },
       call: function(code, cb) {
-        return self.call_extra(code, null, cb);
+        return code(self, function(val) {
+          var f;
+          f = function() {
+            return cb(val);
+          };
+          return setTimeout(f, 0);
+        });
       },
       step: function(f) {
         return setTimeout(f, 200);

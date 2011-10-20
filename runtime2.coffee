@@ -9,121 +9,120 @@ Compiler =
   'ACCESS': (arg, block) ->
     value_code = Compile block
     access = Shift block
-    (rt) ->
+    (rt, cb) ->
       rt.call value_code, (val) ->
-        rt.value val[access]
+        cb val[access]
 
   'ARGS': (arg, block) ->
     arg_codes = []
     while block.len() > 0
       arg_codes.push Compile block
-    (rt) ->
+    (rt, cb) ->
       args = []
       f = (arg_code, cb) ->
         rt.call arg_code, (my_arg) ->
           args.push my_arg
           cb(true)
       last = ->
-        rt.value args
+        cb args
       iterate_callbacks f, last, arg_codes
     
   'ARR': (arg, block) ->
     arr_exprs = []
     while block.len() > 0
       arr_exprs.push Compile block
-    (rt) ->
+    (rt, cb) ->
       arr = []
       f = (elem_expr, cb) ->
         rt.call elem_expr, (val) ->
           arr.push val
           cb(true)
       last = ->
-        rt.value arr
+        cb arr
       iterate_callbacks f, last, arr_exprs
     
   'ASSIGN': (arg, block) ->
     [name, subarg, subblock] = GetBlock block
     var_name = subarg
     value_code = Compile block
-    (rt) ->
+    (rt, cb) ->
       rt.call value_code, (val) ->
-        rt.scope.set var_name, val, arg
-        rt.value null
+        rt.scope().set var_name, val, arg
+        cb null
 
   'CALL': (arg, block) ->
     my_var = Compile block
     args = Compile block
-    (rt) ->
+    (rt, cb) ->
       rt.call my_var, (val) ->
         rt.call args, (my_args) ->
           if val.__coffeecoffee__
-            val rt, my_args...
+            val rt, cb, my_args...
           else
-            rt.value val my_args...
+            cb val my_args...
 
   'CODE': (arg, block) ->
     # Note that CS functions can only be called from
     # CS now.
     params = Compile block
     body = Compile block
-    (rt) ->
-      f = (rt, my_args...) ->
+    (rt, cb) ->
+      f = (rt, cb, my_args...) ->
         rt.call body, (val) ->
-          rt.value val
+          cb val
       f.__coffeecoffee__ = true
-      rt.value f
+      cb f
     
   'COND': (arg, block) ->
     f = Compile block
-    (rt) ->
+    (rt, cb) ->
       rt.call f, (val) ->
-        rt.value val
+        cb val
 
   'DO': (arg, block) ->
     stmts = []
     while block.len() > 0
       stmts.push Compile(block)
-    (rt) ->
+    (rt, cb) ->
       val = null
       f = (stmt, cb) ->
         rt.call stmt, (value) ->
           val = value
           cb(true)
       last = ->
-        rt.value val
+        cb val
       iterate_callbacks(f, last, stmts)
     
   'EVAL': (arg, block) ->
-    (rt) ->
-      val = rt.scope.get(arg)
-      rt.value val
+    (rt, cb) ->
+      val = rt.scope().get(arg)
+      cb val
       
   'KEY_VALUE': (arg, block) ->
     name = Shift block
     value_code = Compile block
-    (rt) ->
-      obj = rt.extra
+    (rt, obj, cb) ->
       rt.call value_code, (val) ->
         obj[name] = val
-      rt.value null
+      cb null
     
   'NUMBER': (arg, block) ->
     n = parseFloat(arg)
-    (rt) ->
-      rt.value n
+    (rt, cb) ->
+      cb n
 
   'OBJ': (arg, block) ->
     keys = []
     while block.len() > 0
       keys.push Compile block
-    (rt) ->
+    (rt, cb) ->
       obj = {}
       
       f = (key, cb) ->
         rt.call_extra key, obj, (val) ->
           cb(true)
       last = ->
-        rt.value obj
+        cb obj
 
       iterate_callbacks(f, last, keys)
       
@@ -133,19 +132,19 @@ Compiler =
     operand1 = Compile block
     operand2 = Compile block
 
-    (rt) ->
+    (rt, cb) ->
       rt.call operand1, (op1) ->
         rt.call operand2, (op2) ->
-          rt.value f op1, op2
+          cb f op1, op2
 
   'OP_UNARY': (arg, block) ->
     op = arg
     f = unary_ops[op]
     operand1 = Compile block
 
-    (rt) ->
+    (rt, cb) ->
       rt.call operand1, (op1) ->
-        rt.value f op1
+        cb f op1
   
   'PARAMS': (args, block) ->
     null
@@ -156,19 +155,19 @@ Compiler =
       s = JSON.parse value
     if value.charAt(0) == "'"
       s = JSON.parse '"' + value.substring(1, value.length-1) + '"'
-    (rt) ->
-      rt.value s
+    (rt, cb) ->
+      cb s
         
   'WHILE': (arg, block) ->
     cond_code = Compile block
     block_code = Compile block
-    f = (rt) ->
+    f = (rt, cb) ->
       rt.call cond_code, (cond) ->
         if cond
           rt.call block_code, ->
-            f(rt)
+            f(rt, cb)
         else
-          rt.value null
+          cb null
 
 GetBlock = (block) ->
   [prefix, line, block] = indenter.small_block(block)
@@ -196,19 +195,16 @@ RunTime = ->
   scope = Scope()
   self =
     call_extra: (code, extra, cb) ->
-      code
-        value: (val) ->
-          f = -> cb(val)
-          setTimeout(f, 0)
-          # cb(val)
-        call: self.call
-        call_extra: self.call_extra
-        scope: scope
-        step: self.step
-        extra: extra
-        
+      code self, extra, (val) ->
+        f = -> cb(val)
+        setTimeout(f, 0)
+
+    scope: -> scope
+    
     call: (code, cb) ->
-      self.call_extra(code, null, cb)
+      code self, (val) ->
+        f = -> cb(val)
+        setTimeout(f, 0)
       
     step: (f) ->
       setTimeout f, 200
