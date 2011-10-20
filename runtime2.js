@@ -178,6 +178,33 @@
         return cb(val);
       };
     },
+    'IF': function(arg, block) {
+      var cond_code, else_code, if_code;
+      cond_code = Compile(block);
+      if_code = Compile(block);
+      if (block.len() > 0) {
+        else_code = Compile(block);
+      } else {
+        else_code = null;
+      }
+      return function(rt, cb) {
+        return rt.call(cond_code, function(cond) {
+          if (cond) {
+            return rt.call(if_code, function(val) {
+              return cb(val);
+            });
+          } else {
+            if (else_code) {
+              return rt.call(else_code, function(val) {
+                return cb(val);
+              });
+            } else {
+              return cb(null);
+            }
+          }
+        });
+      };
+    },
     'KEY_VALUE': function(arg, block) {
       var name, value_code;
       name = Shift(block);

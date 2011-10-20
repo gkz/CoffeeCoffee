@@ -127,6 +127,26 @@ Compiler =
     (rt, cb) ->
       val = rt.scope().get(arg)
       cb val
+
+  'IF': (arg, block) ->
+    cond_code = Compile block
+    if_code = Compile block
+    if block.len() > 0
+      else_code = Compile block
+    else
+      else_code = null
+    
+    (rt, cb) ->
+      rt.call cond_code, (cond) ->
+        if cond
+          rt.call if_code, (val) ->
+            cb val
+        else
+          if else_code
+            rt.call else_code, (val) ->
+              cb val
+          else
+            cb null
       
   'KEY_VALUE': (arg, block) ->
     name = Shift block
