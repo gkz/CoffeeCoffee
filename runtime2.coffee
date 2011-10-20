@@ -33,17 +33,14 @@ Compiler =
     while block.len() > 0
       stmts.push Compile(block)
     (rt) ->
-      i = 0
       val = null
-      f = -> 
-        if i < stmts.length
-          rt.call stmts[i], (value) ->
-            val = value
-            i += 1
-            f()
-        else
-          rt.value val
-      f()
+      f = (stmt, cb) ->
+        rt.call stmt, (value) ->
+          val = value
+          cb(true)
+      last = ->
+        rt.value val
+      iterate_callbacks(f, last, stmts)
     
   'EVAL': (arg, block) ->
     (rt) ->
@@ -155,14 +152,19 @@ RunTime = ->
 
 parser = (indented_lines) ->
   runtime = RunTime()
-  f = ->
-    if indented_lines.len() > 0
-      code = Compile(indented_lines)
-      if code
-        runtime.call code, (val) ->
-          console.log val
-          runtime.step f
-  f()
+  stmts = []
+  while indented_lines.len() > 0
+    code = Compile indented_lines
+    stmts.push code if code
+  
+  f = (stmt, cb) ->
+    runtime.call stmt, (val) ->
+      console.log val
+      runtime.step ->
+        cb(true)
+  last = ->
+    console.log "EXITING PROGRAM!"
+  iterate_callbacks f, last, stmts
 
 handle_data = (s) ->
   prefix_line_array = indenter.big_block(s)

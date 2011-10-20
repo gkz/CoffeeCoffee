@@ -40,21 +40,18 @@
         stmts.push(Compile(block));
       }
       return function(rt) {
-        var f, i, val;
-        i = 0;
+        var f, last, val;
         val = null;
-        f = function() {
-          if (i < stmts.length) {
-            return rt.call(stmts[i], function(value) {
-              val = value;
-              i += 1;
-              return f();
-            });
-          } else {
-            return rt.value(val);
-          }
+        f = function(stmt, cb) {
+          return rt.call(stmt, function(value) {
+            val = value;
+            return cb(true);
+          });
         };
-        return f();
+        last = function() {
+          return rt.value(val);
+        };
+        return iterate_callbacks(f, last, stmts);
       };
     },
     'EVAL': function(arg, block) {
@@ -203,21 +200,27 @@
     };
   };
   parser = function(indented_lines) {
-    var f, runtime;
+    var code, f, last, runtime, stmts;
     runtime = RunTime();
-    f = function() {
-      var code;
-      if (indented_lines.len() > 0) {
-        code = Compile(indented_lines);
-        if (code) {
-          return runtime.call(code, function(val) {
-            console.log(val);
-            return runtime.step(f);
-          });
-        }
+    stmts = [];
+    while (indented_lines.len() > 0) {
+      code = Compile(indented_lines);
+      if (code) {
+        stmts.push(code);
       }
+    }
+    f = function(stmt, cb) {
+      return runtime.call(stmt, function(val) {
+        console.log(val);
+        return runtime.step(function() {
+          return cb(true);
+        });
+      });
     };
-    return f();
+    last = function() {
+      return console.log("EXITING PROGRAM!");
+    };
+    return iterate_callbacks(f, last, stmts);
   };
   handle_data = function(s) {
     var prefix_line_array;
