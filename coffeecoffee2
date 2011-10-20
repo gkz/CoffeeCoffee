@@ -1,0 +1,5 @@
+#!/bin/sh
+filename=$1
+shift
+echo "--------- $filename"
+node nodes_to_json.js "$filename" | node builder.js - | node runtime2.js - $@
