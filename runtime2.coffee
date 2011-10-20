@@ -99,6 +99,7 @@ Compiler =
         scope = rt.scope()
         set_parms(scope, my_args)
         rt.call body, (val) ->
+          rt.control_flow = null
           cb val
       f.__coffeecoffee__ = true
       cb f
@@ -118,7 +119,10 @@ Compiler =
       f = (stmt, cb) ->
         rt.call stmt, (value) ->
           val = value
-          cb(true)
+          if rt.control_flow
+            cb(false)
+          else
+            cb(true)
       last = ->
         cb val
       iterate_callbacks(f, last, stmts)
@@ -207,6 +211,13 @@ Compiler =
   'PARENS': (arg, block) ->
     Compile block
 
+  'RETURN': (arg, block) ->
+    value_code = Compile block
+    (rt, cb) ->
+      rt.call value_code, (val) ->
+        rt.control_flow = 'return'
+        cb val
+
   'STRING': (arg, block) ->
     value = arg
     if value.charAt(0) == '"'
@@ -291,8 +302,11 @@ handle_data = (s) ->
 iterate_callbacks = (f, last, arr) ->
   next = (i) ->
     if i < arr.length
-      f arr[i], (ok) -> 
-        next(i+1) if ok
+      f arr[i], (ok) ->
+        if ok
+          next(i+1)
+        else
+          last()
     else
       last()
   next(0)

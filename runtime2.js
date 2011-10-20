@@ -134,6 +134,7 @@
           scope = rt.scope();
           set_parms(scope, my_args);
           return rt.call(body, function(val) {
+            rt.control_flow = null;
             return cb(val);
           });
         };
@@ -162,7 +163,11 @@
         f = function(stmt, cb) {
           return rt.call(stmt, function(value) {
             val = value;
-            return cb(true);
+            if (rt.control_flow) {
+              return cb(false);
+            } else {
+              return cb(true);
+            }
           });
         };
         last = function() {
@@ -282,6 +287,16 @@
     },
     'PARENS': function(arg, block) {
       return Compile(block);
+    },
+    'RETURN': function(arg, block) {
+      var value_code;
+      value_code = Compile(block);
+      return function(rt, cb) {
+        return rt.call(value_code, function(val) {
+          rt.control_flow = 'return';
+          return cb(val);
+        });
+      };
     },
     'STRING': function(arg, block) {
       var s, value;
@@ -406,6 +421,8 @@
         return f(arr[i], function(ok) {
           if (ok) {
             return next(i + 1);
+          } else {
+            return last();
           }
         });
       } else {
