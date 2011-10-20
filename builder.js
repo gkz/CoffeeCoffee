@@ -139,9 +139,11 @@
       });
     },
     Code: function(ast) {
-      return PUT('CODE', function() {
+      var name;
+      name = ast.bound ? 'BOUND_CODE' : 'CODE';
+      return PUT(name, function() {
         PUT('PARAMS', function() {
-          var name, param, _i, _len, _ref, _results;
+          var param, _i, _len, _ref, _results;
           _ref = ast.params;
           _results = [];
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -155,7 +157,12 @@
             if (param.splat) {
               name += "...";
             }
-            _results.push(PUT(name));
+            _results.push(PUT("PARAM", function() {
+              PUT(name);
+              if (param.value) {
+                return Build(param.value);
+              }
+            }));
           }
           return _results;
         });
@@ -218,7 +225,7 @@
       var literal, value;
       value = ast.value;
       literal = function() {
-        var c, float, match, regex;
+        var c, float;
         if (value === 'false' || value === 'true' || value === 'undefined' || value === 'undefined') {
           return PUT("VALUE " + value);
         }
@@ -237,9 +244,7 @@
           return PUT("NUMBER " + float);
         }
         if (value.charAt(0) === '/') {
-          regex = /\/(.*)\/(.*)/;
-          match = regex.exec(value);
-          return RegExp(match[1], match[2]);
+          return PUT("REGEX " + value);
         }
         return PUT("EVAL " + value);
       };
@@ -263,7 +268,7 @@
       });
     },
     Op: function(ast) {
-      var class_name, is_chainable, op, operand1;
+      var class_name, is_chainable, op;
       is_chainable = function(op) {
         return op === '<' || op === '>' || op === '>=' || op === '<=' || op === '===' || op === '!==';
       };
@@ -301,10 +306,14 @@
       }
       if (ast.second) {
         if (is_chainable(op) && the_key_of(ast.first) === "Op" && is_chainable(ast.first.Op.operator)) {
-          if (!operand1) {
-            return false;
-          }
-          operand1 = Build(scope, ast.first.Op.second);
+          PUT("OP_BINARY &&", function() {
+            Build(ast.first);
+            return PUT("OP_BINARY " + op, function() {
+              Build(ast.first.Op.second);
+              return Build(ast.second);
+            });
+          });
+          return;
         }
         PUT("OP_BINARY " + op, function() {
           Build(ast.first);

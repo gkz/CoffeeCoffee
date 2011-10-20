@@ -97,7 +97,11 @@ AST =
     return
     
   Code: (ast) ->
-    PUT 'CODE', ->
+    name = if ast.bound
+      'BOUND_CODE'
+    else
+      'CODE'
+    PUT name, ->
       PUT 'PARAMS', ->
         for param in ast.params
           param = param.Param
@@ -107,7 +111,10 @@ AST =
             name = "@#{param.name.Value.properties[0].Access.name.Literal.value}"
           if param.splat
             name += "..."
-          PUT name
+          PUT "PARAM", ->
+            PUT name
+            if param.value
+              Build param.value
       Build ast.body
 
   Existence: (ast) ->
@@ -166,9 +173,7 @@ AST =
         float = parseFloat(value)
         return PUT "NUMBER #{float}"
       if value.charAt(0) == '/'
-        regex = /\/(.*)\/(.*)/
-        match = regex.exec(value)
-        return RegExp match[1], match[2]
+        return PUT "REGEX #{value}"
       PUT "EVAL #{value}"
     literal()
        
@@ -215,9 +220,13 @@ AST =
     
     if ast.second
       if is_chainable(op) && the_key_of(ast.first) == "Op" && is_chainable(ast.first.Op.operator)
-        return false if !operand1
-        operand1 = Build scope, ast.first.Op.second
-
+        PUT "OP_BINARY &&", ->
+          Build ast.first
+          PUT "OP_BINARY #{op}", ->
+            Build ast.first.Op.second
+            Build ast.second
+        return
+          
       PUT "OP_BINARY #{op}", ->
         Build ast.first
         Build ast.second

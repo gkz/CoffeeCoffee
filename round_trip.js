@@ -36,6 +36,11 @@
       value = Eval(block);
       return Join("" + my_var + " " + op, value);
     },
+    'BOUND_CODE': function(arg, block) {
+      var params;
+      params = Eval(block);
+      return Join(params + " =>", Block(block));
+    },
     'BREAK': function(arg, block) {
       return 'break';
     },
@@ -65,7 +70,7 @@
     'CODE': function(arg, block) {
       var params;
       params = Eval(block);
-      return Join(params, Block(block));
+      return Join(params + " ->", Block(block));
     },
     'COND': function(arg, block) {
       return Eval(block);
@@ -178,6 +183,9 @@
       if (op === '!==') {
         op = 'isnt';
       }
+      if (op === 'in') {
+        op = 'of';
+      }
       operand1 = Eval(block);
       operand2 = Eval(block);
       return "" + operand1 + " " + op + " " + operand2;
@@ -185,19 +193,30 @@
     'OP_UNARY': function(arg, block) {
       var op, operand;
       op = arg;
+      if (op === '!') {
+        op = "not";
+      }
       operand = Eval(block);
-      return "" + op + operand;
+      return "" + op + "(" + operand + ")";
     },
     'OTHERWISE': function(arg, block) {
       return Join("else", Eval(block));
+    },
+    'PARAM': function(arg, block) {
+      var param;
+      param = Shift(block);
+      if (block.len() > 0) {
+        param += " = " + (Eval(block));
+      }
+      return param;
     },
     'PARAMS': function(arg, block) {
       var params;
       params = [];
       while (block.len() > 0) {
-        params.push(block.shift()[1]);
+        params.push(Eval(block));
       }
-      return "(" + (Comma(params)) + ") ->";
+      return "(" + (Comma(params)) + ")";
     },
     'PARENS': function(arg, block) {
       var expr;
@@ -227,6 +246,9 @@
       low = Eval(block);
       high = Eval(block);
       return "[" + low + ".." + high + "]";
+    },
+    'REGEX': function(arg, block) {
+      return arg;
     },
     'RETURN': function(arg, block) {
       var val;

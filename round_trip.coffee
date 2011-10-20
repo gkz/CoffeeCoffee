@@ -34,6 +34,10 @@ Build =
     value = Eval block
     Join "#{my_var} #{op}", value
 
+  'BOUND_CODE': (arg, block) ->
+    params = Eval block
+    Join params + " =>", Block block
+
   'BREAK': (arg, block) ->
     'break'
 
@@ -58,7 +62,7 @@ Build =
     
   'CODE': (arg, block) ->
     params = Eval block
-    Join params, Block block
+    Join params + " ->", Block block
     
   'COND': (arg, block) ->
     Eval block
@@ -154,23 +158,31 @@ Build =
     op = arg
     op = 'is' if op == '==='
     op = 'isnt' if op == '!=='
+    op = 'of' if op == 'in'
     operand1 = Eval block
     operand2 = Eval block
     "#{operand1} #{op} #{operand2}"
 
   'OP_UNARY': (arg, block) ->
     op = arg
+    op = "not" if op == '!'
     operand = Eval block
-    "#{op}#{operand}"
+    "#{op}(#{operand})"
     
   'OTHERWISE': (arg, block) ->
     Join "else", Eval block
     
+  'PARAM': (arg, block) ->
+    param = Shift block
+    if block.len() > 0
+      param += " = #{Eval block}"
+    param
+    
   'PARAMS': (arg, block) ->
     params = []
     while block.len() > 0
-      params.push block.shift()[1]
-    "(#{Comma params}) ->"
+      params.push Eval block
+    "(#{Comma params})"
   
   'PARENS': (arg, block) ->
     expr = Eval block
@@ -196,6 +208,9 @@ Build =
     high = Eval block
     "[#{low}..#{high}]"
 
+  'REGEX': (arg, block) ->
+    arg
+    
   'RETURN': (arg, block) ->
     val = Eval block
     "return #{val}"
