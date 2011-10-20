@@ -49,23 +49,40 @@ Compiler =
     build_assign = (name, arg, block) ->
       if name == 'EVAL'
         var_name = arg
-        (scope, val) ->
-          scope.set var_name, val, context
+        (val, rt, cb) ->
+          rt.scope().set var_name, val, context
+          cb()
+          
+      else if name == 'INDEX'
+        var_code = Compile block
+        index_code = Compile block
+        (val, rt, cb) ->
+          rt.call var_code, (my_var) ->
+            rt.call index_code, (index) ->
+              my_var[index] = val 
+              cb()
+
       else if name == 'ARR'
-        arr = []
+        assigners = []
         while block.len() > 0
           [name, arg, subblock] = GetBlock block
-          arr.push build_assign(name, arg, subblock)
-        (scope, val) ->
-          for assigner, i in arr
-            assigner scope, val[i]
+          assigners.push build_assign(name, arg, subblock)
+        (val, rt, cb) ->
+          i = 0
+          f = (assigner, cb) ->
+            assigner val[i], rt, ->
+              i += 1
+              cb true
+          last = ->
+            cb()
+          iterate_callbacks f, last, assigners 
     
     assign = build_assign(name, subarg, subblock)
     
     (rt, cb) ->
       rt.call value_code, (val) ->
-        assign rt.scope(), val
-        cb null
+        assign val, rt, ->
+          cb null
 
   'CALL': (arg, block) ->
     my_var = Compile block

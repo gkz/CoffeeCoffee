@@ -60,34 +60,52 @@
       value_code = Compile(block);
       context = arg;
       build_assign = function(name, arg, block) {
-        var arr, var_name, _ref2;
+        var assigners, index_code, var_code, var_name, _ref2;
         if (name === 'EVAL') {
           var_name = arg;
-          return function(scope, val) {
-            return scope.set(var_name, val, context);
+          return function(val, rt, cb) {
+            rt.scope().set(var_name, val, context);
+            return cb();
+          };
+        } else if (name === 'INDEX') {
+          var_code = Compile(block);
+          index_code = Compile(block);
+          return function(val, rt, cb) {
+            return rt.call(var_code, function(my_var) {
+              return rt.call(index_code, function(index) {
+                my_var[index] = val;
+                return cb();
+              });
+            });
           };
         } else if (name === 'ARR') {
-          arr = [];
+          assigners = [];
           while (block.len() > 0) {
             _ref2 = GetBlock(block), name = _ref2[0], arg = _ref2[1], subblock = _ref2[2];
-            arr.push(build_assign(name, arg, subblock));
+            assigners.push(build_assign(name, arg, subblock));
           }
-          return function(scope, val) {
-            var assigner, i, _len, _results;
-            _results = [];
-            for (i = 0, _len = arr.length; i < _len; i++) {
-              assigner = arr[i];
-              _results.push(assigner(scope, val[i]));
-            }
-            return _results;
+          return function(val, rt, cb) {
+            var f, i, last;
+            i = 0;
+            f = function(assigner, cb) {
+              return assigner(val[i], rt, function() {
+                i += 1;
+                return cb(true);
+              });
+            };
+            last = function() {
+              return cb();
+            };
+            return iterate_callbacks(f, last, assigners);
           };
         }
       };
       assign = build_assign(name, subarg, subblock);
       return function(rt, cb) {
         return rt.call(value_code, function(val) {
-          assign(rt.scope(), val);
-          return cb(null);
+          return assign(val, rt, function() {
+            return cb(null);
+          });
         });
       };
     },
