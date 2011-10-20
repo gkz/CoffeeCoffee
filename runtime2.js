@@ -55,13 +55,38 @@
       };
     },
     'ASSIGN': function(arg, block) {
-      var name, subarg, subblock, value_code, var_name, _ref;
+      var assign, build_assign, context, name, subarg, subblock, value_code, _ref;
       _ref = GetBlock(block), name = _ref[0], subarg = _ref[1], subblock = _ref[2];
-      var_name = subarg;
       value_code = Compile(block);
+      context = arg;
+      build_assign = function(name, arg, block) {
+        var arr, var_name, _ref2;
+        if (name === 'EVAL') {
+          var_name = arg;
+          return function(scope, val) {
+            return scope.set(var_name, val, context);
+          };
+        } else if (name === 'ARR') {
+          arr = [];
+          while (block.len() > 0) {
+            _ref2 = GetBlock(block), name = _ref2[0], arg = _ref2[1], subblock = _ref2[2];
+            arr.push(build_assign(name, arg, subblock));
+          }
+          return function(scope, val) {
+            var assigner, i, _len, _results;
+            _results = [];
+            for (i = 0, _len = arr.length; i < _len; i++) {
+              assigner = arr[i];
+              _results.push(assigner(scope, val[i]));
+            }
+            return _results;
+          };
+        }
+      };
+      assign = build_assign(name, subarg, subblock);
       return function(rt, cb) {
         return rt.call(value_code, function(val) {
-          rt.scope().set(var_name, val, arg);
+          assign(rt.scope(), val);
           return cb(null);
         });
       };

@@ -43,11 +43,28 @@ Compiler =
     
   'ASSIGN': (arg, block) ->
     [name, subarg, subblock] = GetBlock block
-    var_name = subarg
     value_code = Compile block
+    context = arg
+    
+    build_assign = (name, arg, block) ->
+      if name == 'EVAL'
+        var_name = arg
+        (scope, val) ->
+          scope.set var_name, val, context
+      else if name == 'ARR'
+        arr = []
+        while block.len() > 0
+          [name, arg, subblock] = GetBlock block
+          arr.push build_assign(name, arg, subblock)
+        (scope, val) ->
+          for assigner, i in arr
+            assigner scope, val[i]
+    
+    assign = build_assign(name, subarg, subblock)
+    
     (rt, cb) ->
       rt.call value_code, (val) ->
-        rt.scope().set var_name, val, arg
+        assign rt.scope(), val
         cb null
 
   'CALL': (arg, block) ->
