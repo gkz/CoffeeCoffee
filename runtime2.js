@@ -178,33 +178,33 @@
       };
     },
     'CODE': function(arg, block) {
-      var body, ignore, name, param_block, params, params_block, set_parms, subarg, _ref, _ref2;
+      var body, get_parms, ignore, name, param_block, params, params_block, subarg, _ref, _ref2;
       _ref = GetBlock(block), name = _ref[0], subarg = _ref[1], params_block = _ref[2];
       params = [];
       while (params_block.len() > 0) {
         _ref2 = GetBlock(params_block), ignore = _ref2[0], ignore = _ref2[1], param_block = _ref2[2];
         params.push(Shift(param_block));
       }
-      set_parms = function(scope, my_args) {
-        var i, param, _i, _len, _results;
-        i = 0;
-        _results = [];
-        for (_i = 0, _len = params.length; _i < _len; _i++) {
-          param = params[_i];
-          scope.set(param, my_args[i]);
-          _results.push(i += 1);
+      get_parms = function(my_args) {
+        var i, param, parms, _len;
+        parms = {};
+        for (i = 0, _len = params.length; i < _len; i++) {
+          param = params[i];
+          parms[param] = my_args[i];
         }
-        return _results;
+        return parms;
       };
       body = Compile(block);
       return function(rt, cb) {
-        var f;
+        var f, lexical_outer_scope;
+        lexical_outer_scope = rt.scope();
         f = function(rt, cb, my_args) {
-          var scope;
-          scope = rt.scope();
-          set_parms(scope, my_args);
+          var sub_scope;
+          sub_scope = Scope(get_parms(my_args), lexical_outer_scope, this, my_args);
+          rt.push_scope(sub_scope);
           return rt.call(body, function(val) {
             rt.control_flow = null;
+            rt.pop_scope();
             return cb(val);
           });
         };
@@ -564,8 +564,8 @@
     return block.shift()[1];
   };
   RunTime = function() {
-    var scope, self;
-    scope = Scope();
+    var scopes, self;
+    scopes = [Scope()];
     return self = {
       call_extra: function(code, extra, cb) {
         return code(self, extra, function(val) {
@@ -577,7 +577,13 @@
         });
       },
       scope: function() {
-        return scope;
+        return scopes[0];
+      },
+      push_scope: function(scope) {
+        return scopes.unshift(scope);
+      },
+      pop_scope: function() {
+        return scopes.shift();
       },
       call: function(code, cb) {
         return code(self, function(val) {
@@ -775,7 +781,8 @@
         } else {
           val = window[var_name];
         }
-        if (!((val != null) || forgiving)) {
+        if (!(val != null) && !forgiving) {
+          console.log(var_name, vars);
           internal_throw("reference", "ReferenceError: " + var_name + " is not defined");
         }
         return val;

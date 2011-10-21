@@ -138,19 +138,26 @@ Compiler =
       [ignore, ignore, param_block] = GetBlock params_block
       params.push Shift param_block
     
-    set_parms = (scope, my_args) ->
-      i = 0
-      for param in params
-        scope.set param, my_args[i]
-        i += 1
+    get_parms = (my_args) ->
+      parms = {}
+      for param, i in params
+        parms[param] = my_args[i]
+      parms
     
     body = Compile block
     (rt, cb) ->
+      lexical_outer_scope = rt.scope()
       f = (rt, cb, my_args) ->
-        scope = rt.scope()
-        set_parms(scope, my_args)
+        sub_scope = Scope(
+          get_parms(my_args),
+          lexical_outer_scope,
+          this,
+          my_args
+        )
+        rt.push_scope(sub_scope)
         rt.call body, (val) ->
           rt.control_flow = null
+          rt.pop_scope()
           cb val
       f.__coffeecoffee__ = true
       cb f
@@ -398,15 +405,21 @@ Shift = (block) ->
   block.shift()[1]
 
 RunTime = ->
-  scope = Scope()
+  scopes = [Scope()]
   self =
     call_extra: (code, extra, cb) ->
       code self, extra, (val) ->
         f = -> cb(val)
         setTimeout(f, 0)
 
-    scope: -> scope
+    scope: -> scopes[0]
     
+    push_scope: (scope) ->
+      scopes.unshift scope
+      
+    pop_scope: ->
+      scopes.shift()
+      
     call: (code, cb) ->
       code self, (val) ->
         f = -> cb(val)
@@ -545,7 +558,9 @@ Scope = (params, parent_scope, this_value, args) ->
         val = root[var_name]
       else
         val = window[var_name]
-      internal_throw "reference", "ReferenceError: #{var_name} is not defined" unless val? || forgiving
+      if !val? && !forgiving
+        console.log var_name, vars
+        internal_throw "reference", "ReferenceError: #{var_name} is not defined"
       val
       
 update_variable_reference = (hash, key, value, context) ->
