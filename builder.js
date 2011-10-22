@@ -177,7 +177,7 @@
       });
     },
     For: function(ast) {
-      if (ast.index) {
+      if (ast.object) {
         return PUT("FOR_OF", function() {
           PUT("VARS", function() {
             PUT(ast.index.Literal.value);
@@ -192,7 +192,11 @@
         });
       } else {
         return PUT("FOR_IN", function() {
-          PUT(ast.name.Literal.value);
+          if (ast.name.Literal) {
+            PUT(ast.name.Literal.value);
+          } else {
+            PUT("Punting on arrays for now");
+          }
           Build(ast.source);
           return PUT("DO", function() {
             return Build(ast.body);

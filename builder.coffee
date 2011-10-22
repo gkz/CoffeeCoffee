@@ -120,7 +120,7 @@ AST =
       Build ast.expression
 
   For: (ast) ->
-    if ast.index
+    if ast.object
       PUT "FOR_OF", ->
         PUT "VARS", ->
           PUT ast.index.Literal.value
@@ -130,7 +130,10 @@ AST =
           Build ast.body
     else
       PUT "FOR_IN", ->
-        PUT ast.name.Literal.value
+        if ast.name.Literal
+          PUT ast.name.Literal.value
+        else
+          PUT "Punting on arrays for now"
         Build ast.source
         PUT "DO", ->
           Build ast.body
