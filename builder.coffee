@@ -263,7 +263,10 @@ AST =
 
   Return: (ast) ->
     PUT "RETURN", ->
-      Build ast.expression
+      if ast.expression
+        Build ast.expression
+      else
+        PUT "VALUE undefined"
 
   Splat: (ast) ->
     PUT "SPLAT", ->

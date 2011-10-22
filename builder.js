@@ -368,7 +368,11 @@
     },
     Return: function(ast) {
       return PUT("RETURN", function() {
-        return Build(ast.expression);
+        if (ast.expression) {
+          return Build(ast.expression);
+        } else {
+          return PUT("VALUE undefined");
+        }
       });
     },
     Splat: function(ast) {
