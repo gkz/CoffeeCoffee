@@ -17,7 +17,8 @@ Build = (ast) ->
   method = AST[name]
   if method
     node = ast[name]
-    return method node  
+    return method node
+  console.log ast  
   throw "#{name} not supported yet"
 
 TAB = ''
@@ -73,27 +74,23 @@ AST =
     PUT "CLASS", ->
       PUT class_name
 
-      expressions = ast.body.Block.expressions
-      if expressions.length == 0
-        class_code = null
-        block_ast = null
-      else if expressions.length == 1
-        class_code = null
-        block_ast = expressions[0]
-      else
-        [class_code, block_ast] = expressions
-        
       PUT "PARENTS", ->
         if ast.parent
           Build ast.parent
 
-      # if class_code
-      #   Build class_code
+      # slightly broken, trying to lump properties together, and
+      # skipping over other statements for now
+      methods = []
+      expressions = ast.body.Block.expressions
+      for expression in expressions
+        if expression.Value
+          for method in expression.Value.base.Obj.properties
+            methods.push method
+
       PUT "METHODS", ->
-        if block_ast
-          for method in block_ast.Value.base.Obj.properties
-            PUT method.Assign.variable.Value.base.Literal.value
-            Build method.Assign.value
+        for method in methods
+          PUT method.Assign.variable.Value.base.Literal.value
+          Build method.Assign.value
     return
     
   Code: (ast) ->
@@ -254,8 +251,12 @@ AST =
     else
       stmt = "RANGE_INCLUSIVE"
     PUT stmt, ->
-      Build ast.from
-      Build ast.to
+      if ast.from
+        Build ast.from
+      else
+        PUT "LITERAL 0"
+      if ast.to
+        Build ast.to
 
   Return: (ast) ->
     PUT "RETURN", ->

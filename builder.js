@@ -22,6 +22,7 @@
       node = ast[name];
       return method(node);
     }
+    console.log(ast);
     throw "" + name + " not supported yet";
   };
   TAB = '';
@@ -106,35 +107,34 @@
       var class_name;
       class_name = ast.variable.Value.base.Literal.value;
       PUT("CLASS", function() {
-        var block_ast, class_code, expressions;
+        var expression, expressions, method, methods, _i, _j, _len, _len2, _ref;
         PUT(class_name);
-        expressions = ast.body.Block.expressions;
-        if (expressions.length === 0) {
-          class_code = null;
-          block_ast = null;
-        } else if (expressions.length === 1) {
-          class_code = null;
-          block_ast = expressions[0];
-        } else {
-          class_code = expressions[0], block_ast = expressions[1];
-        }
         PUT("PARENTS", function() {
           if (ast.parent) {
             return Build(ast.parent);
           }
         });
-        return PUT("METHODS", function() {
-          var method, _i, _len, _ref, _results;
-          if (block_ast) {
-            _ref = block_ast.Value.base.Obj.properties;
-            _results = [];
-            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-              method = _ref[_i];
-              PUT(method.Assign.variable.Value.base.Literal.value);
-              _results.push(Build(method.Assign.value));
+        methods = [];
+        expressions = ast.body.Block.expressions;
+        for (_i = 0, _len = expressions.length; _i < _len; _i++) {
+          expression = expressions[_i];
+          if (expression.Value) {
+            _ref = expression.Value.base.Obj.properties;
+            for (_j = 0, _len2 = _ref.length; _j < _len2; _j++) {
+              method = _ref[_j];
+              methods.push(method);
             }
-            return _results;
           }
+        }
+        return PUT("METHODS", function() {
+          var method, _k, _len3, _results;
+          _results = [];
+          for (_k = 0, _len3 = methods.length; _k < _len3; _k++) {
+            method = methods[_k];
+            PUT(method.Assign.variable.Value.base.Literal.value);
+            _results.push(Build(method.Assign.value));
+          }
+          return _results;
         });
       });
     },
@@ -352,8 +352,14 @@
         stmt = "RANGE_INCLUSIVE";
       }
       return PUT(stmt, function() {
-        Build(ast.from);
-        return Build(ast.to);
+        if (ast.from) {
+          Build(ast.from);
+        } else {
+          PUT("LITERAL 0");
+        }
+        if (ast.to) {
+          return Build(ast.to);
+        }
       });
     },
     Return: function(ast) {
