@@ -846,13 +846,15 @@
       return child;
     };
     X = function() {
+      var cb;
       this.__super__ = X.__super__;
       if (Object.prototype.hasOwnProperty.call(proto, "constructor")) {
         return proto.constructor.apply(this, arguments);
       } else if (superclass) {
         return X.__super__.constructor.apply(this, arguments);
       } else {
-        return;
+        cb = arguments[1];
+        return cb(void 0);
       }
     };
     if (superclass) {
@@ -869,14 +871,12 @@
     ctor.prototype = func.prototype;
     child = new ctor;
     callback = function(result) {
-      console.log("in callback", result);
       if (typeof result === "object") {
         return cb(result);
       } else {
         return cb(child);
       }
     };
-    console.log("here in newify");
     return func.call.apply(func, [child, rt, callback].concat(__slice.call(args)));
   };
   if (typeof window !== "undefined" && window !== null) {

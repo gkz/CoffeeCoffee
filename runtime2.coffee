@@ -603,24 +603,23 @@ build_class = (proto, superclass)->
     else if superclass
       X.__super__.constructor.apply this, arguments
     else
-      undefined
+      cb = arguments[1]
+      cb undefined
   if superclass
     extendify(X, superclass)
   for key of proto
     X.prototype[key] = proto[key]
   X
-
+      
 newify = (func, rt, cb, args) ->
   ctor = ->
   ctor.prototype = func.prototype
   child = new ctor
   callback = (result) ->
-    console.log "in callback", result
     if typeof result is "object"
       cb result
     else
       cb child
-  console.log "here in newify"
   func.call child, rt, callback, args...
 
 if window?
