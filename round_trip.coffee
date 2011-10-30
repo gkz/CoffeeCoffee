@@ -174,6 +174,11 @@ Build =
     
   'PARAM': (arg, block) ->
     param = Shift block
+    features = SubBlock block
+    while features.len() > 0
+      feature = Shift features
+      if feature == 'autoassign'
+        param = '@' + param
     if block.len() > 0
       param += " = #{Eval block}"
     param
@@ -271,6 +276,10 @@ Eval = (block) ->
     Build[name](arg, block)
   else
     console.log "unknown #{name}"
+
+SubBlock = (block) ->
+  [prefix, line, block] = indenter.small_block(block)
+  block
 
 Join = (s1, s2) ->
   lines = s2.split '\n'

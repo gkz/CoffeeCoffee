@@ -877,7 +877,7 @@
         return cb(child);
       }
     };
-    return func.call.apply(func, [child, rt, callback].concat(__slice.call(args)));
+    return func.call(child, rt, callback, args);
   };
   if (typeof window !== "undefined" && window !== null) {
     window.transcompile = transcompile;

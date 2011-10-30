@@ -1,5 +1,5 @@
 (function() {
-  var Block, Build, Comma, Eval, Indent, Join, Shift, data, fn, fs, handle_data, indenter, parser, stdin;
+  var Block, Build, Comma, Eval, Indent, Join, Shift, SubBlock, data, fn, fs, handle_data, indenter, parser, stdin;
   Build = {
     'ACCESS': function(arg, block) {
       var access, val;
@@ -203,8 +203,15 @@
       return Join("else", Eval(block));
     },
     'PARAM': function(arg, block) {
-      var param;
+      var feature, features, param;
       param = Shift(block);
+      features = SubBlock(block);
+      while (features.len() > 0) {
+        feature = Shift(features);
+        if (feature === 'autoassign') {
+          param = '@' + param;
+        }
+      }
       if (block.len() > 0) {
         param += " = " + (Eval(block));
       }
@@ -326,6 +333,11 @@
     } else {
       return console.log("unknown " + name);
     }
+  };
+  SubBlock = function(block) {
+    var line, prefix, _ref;
+    _ref = indenter.small_block(block), prefix = _ref[0], line = _ref[1], block = _ref[2];
+    return block;
   };
   Join = function(s1, s2) {
     var lines;

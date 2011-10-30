@@ -620,7 +620,7 @@ newify = (func, rt, cb, args) ->
       cb result
     else
       cb child
-  func.call child, rt, callback, args...
+  func.call child, rt, callback, args
 
 if window?
   window.transcompile = transcompile

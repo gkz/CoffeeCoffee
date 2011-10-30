@@ -143,7 +143,7 @@
       name = ast.bound ? 'BOUND_CODE' : 'CODE';
       return PUT(name, function() {
         PUT('PARAMS', function() {
-          var param, _i, _len, _ref, _results;
+          var autoassign, param, _i, _len, _ref, _results;
           _ref = ast.params;
           _results = [];
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -151,14 +151,21 @@
             param = param.Param;
             if (param.name.Literal) {
               name = param.name.Literal.value;
+              autoassign = false;
             } else {
-              name = "@" + param.name.Value.properties[0].Access.name.Literal.value;
+              name = "" + param.name.Value.properties[0].Access.name.Literal.value;
+              autoassign = true;
             }
             if (param.splat) {
               name += "...";
             }
             _results.push(PUT("PARAM", function() {
               PUT(name);
+              PUT("FEATURES", function() {
+                if (autoassign) {
+                  return PUT("autoassign");
+                }
+              });
               if (param.value) {
                 return Build(param.value);
               }

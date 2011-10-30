@@ -104,12 +104,16 @@ AST =
           param = param.Param
           if param.name.Literal
             name = param.name.Literal.value
+            autoassign = false
           else
-            name = "@#{param.name.Value.properties[0].Access.name.Literal.value}"
+            name = "#{param.name.Value.properties[0].Access.name.Literal.value}"
+            autoassign = true
           if param.splat
             name += "..."
           PUT "PARAM", ->
             PUT name
+            PUT "FEATURES", ->
+              PUT "autoassign" if autoassign
             if param.value
               Build param.value
       PUT "DO", ->
