@@ -1,0 +1,8 @@
+#!/bin/sh
+filename=$1
+shift
+echo "--------- $filename"
+node nodes_to_json.js "$filename" | node builder.js - | node round_trip.js - > /tmp/foo.coffee
+coffee "$filename" $@ > /tmp/OLD
+coffee /tmp/foo.coffee $@ > /tmp/NEW
+diff /tmp/OLD /tmp/NEW
