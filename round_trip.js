@@ -1,5 +1,6 @@
 (function() {
   var Block, Build, Comma, Eval, Indent, Join, Shift, SubBlock, data, fn, fs, handle_data, indenter, parser, stdin;
+  indenter = window.CoffeeCoffee.indenter;
   Build = {
     'ACCESS': function(arg, block) {
       var access, val;
@@ -377,12 +378,16 @@
     return arr.join(', ');
   };
   parser = function(indented_lines) {
-    var _results;
-    _results = [];
+    var data;
+    data = [];
     while (indented_lines.len() > 0) {
-      _results.push(console.log(Eval(indented_lines)));
+      if (typeof window !== "undefined" && window !== null) {
+        data.push(Eval(indented_lines));
+      } else {
+        console.log(Eval(indented_lines));
+      }
     }
-    return _results;
+    return data.join('\n');
   };
   handle_data = function(s) {
     var prefix_line_array;
@@ -390,8 +395,7 @@
     return parser(prefix_line_array);
   };
   if (typeof window !== "undefined" && window !== null) {
-    window.transcompile = transcompile;
-    window.Debugger = Debugger;
+    window.CoffeeCoffee.to_coffee = handle_data;
   } else {
     fs = require('fs');
     indenter = require('./indenter');

@@ -430,7 +430,7 @@
               _results = [];
               for (var _i = low; low <= high ? _i <= high : _i >= high; low <= high ? _i++ : _i--){ _results.push(_i); }
               return _results;
-            }).apply(this, arguments));
+            }).apply(this));
           });
         });
       };
@@ -447,7 +447,7 @@
               _results = [];
               for (var _i = low; low <= high ? _i < high : _i > high; low <= high ? _i++ : _i--){ _results.push(_i); }
               return _results;
-            }).apply(this, arguments));
+            }).apply(this));
           });
         });
       };
@@ -879,10 +879,7 @@
     };
     return func.call(child, rt, callback, args);
   };
-  if (typeof window !== "undefined" && window !== null) {
-    window.transcompile = transcompile;
-    window.Debugger = Debugger;
-  } else {
+  if (typeof window !== "undefined" && window !== null) {} else {
     fs = require('fs');
     indenter = require('./indenter');
     fn = process.argv.splice(2, 1)[0];

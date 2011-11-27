@@ -10,9 +10,9 @@
 # using Scope to manage our variables.
 handle_data = (data) ->
   program = JSON.parse data
-  coffeecoffee(program)
+  main(program)
   
-coffeecoffee = (program) ->
+main = (program) ->
   scope = Scope()
   for stmt in program
     Eval scope, stmt
@@ -634,7 +634,7 @@ Debugger =
     # console.log "(interpreter) line = #{line_number}"
 
 if window?
-  window.coffeecoffee = coffeecoffee
+  window.CoffeeCoffee.main = main
   window.Debugger = Debugger
 else
   # assume we're running node side for now

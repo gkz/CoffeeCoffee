@@ -119,8 +119,8 @@
       timeline_tracker = Timeline_tracker();
       Debugger.highlight_line = timeline_tracker.highlight_line;
       Debugger.info = timeline_tracker.chart.info;
-      ast = window.nodes_to_json(code);
-      window.coffeecoffee(ast);
+      ast = window.CoffeeCoffee.nodes_to_json(code);
+      window.CoffeeCoffee.main(ast);
       activate_code_view_window(code, timeline_tracker.num_visits);
       return timeline_tracker.chart.draw_graph();
     } catch (e) {

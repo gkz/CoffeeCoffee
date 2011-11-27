@@ -55,10 +55,17 @@
     return console.log(JSON.stringify(wrap(expressions), null, "  "));
   };
   if (typeof window !== "undefined" && window !== null) {
-    window.nodes_to_json = function(code) {
+    window.CoffeeCoffee.nodes_to_json = function(code) {
       var expressions;
       expressions = window.CoffeeScript.nodes(code).expressions;
       return wrap(expressions);
+    };
+    window.CoffeeCoffee.ast_to_json = function(ast) {
+      if (ast.expressions != null) {
+        return wrap(ast.expressions);
+      } else {
+        return [wrap_obj(ast)];
+      }
     };
   } else {
     fs = require('fs');

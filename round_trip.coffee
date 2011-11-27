@@ -5,6 +5,8 @@
 # Example usage:
 #  coffee nodes_to_json.coffee test/cubes.coffee | node builder.js - | node round_trip.js - 
 
+indenter = window.CoffeeCoffee.indenter
+
 Build =
   'ACCESS': (arg, block) ->
     val = Eval block
@@ -307,16 +309,21 @@ Comma = (arr) ->
 
 
 parser = (indented_lines) ->
+  data = []
   while indented_lines.len() > 0
-    console.log Eval(indented_lines)
+    if window?
+      data.push(Eval(indented_lines))
+    else
+      console.log Eval(indented_lines)
+
+  data.join('\n')
 
 handle_data = (s) ->
   prefix_line_array = indenter.big_block(s)
   parser(prefix_line_array)  
 
 if window?
-  window.transcompile = transcompile
-  window.Debugger = Debugger
+  window.CoffeeCoffee.to_coffee = handle_data
 else
   # assume we're running node side for now
   fs = require 'fs'

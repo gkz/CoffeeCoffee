@@ -72,9 +72,18 @@ handle_data = (data) ->
   console.log JSON.stringify wrap(expressions), null, "  "
 
 if window?
-  window.nodes_to_json = (code) ->
+  # turns coffeescript code into json
+  window.CoffeeCoffee.nodes_to_json = (code) ->
     expressions = window.CoffeeScript.nodes(code).expressions
     wrap(expressions)
+
+  # turns the ast CoffeeScript.nodes output to json
+  window.CoffeeCoffee.ast_to_json = (ast) ->
+    if ast.expressions?
+      wrap(ast.expressions)
+    else
+      [wrap_obj(ast)]
+
 else
   fs = require 'fs'
   fn = process.argv[2]

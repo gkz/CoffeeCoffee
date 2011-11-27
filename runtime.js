@@ -1,5 +1,5 @@
 (function() {
-  var AST, CURRENT_OBJECT_METHOD_NAME, Debugger, Eval, Scope, build_class, coffeecoffee, data, fn, fs, handle_data, internal_throw, newify, pp, stdin, the_key_of, update_variable_reference;
+  var AST, CURRENT_OBJECT_METHOD_NAME, Debugger, Eval, Scope, build_class, data, fn, fs, handle_data, internal_throw, main, newify, pp, stdin, the_key_of, update_variable_reference;
   var __slice = Array.prototype.slice, __indexOf = Array.prototype.indexOf || function(item) {
     for (var i = 0, l = this.length; i < l; i++) {
       if (this[i] === item) return i;
@@ -9,9 +9,9 @@
   handle_data = function(data) {
     var program;
     program = JSON.parse(data);
-    return coffeecoffee(program);
+    return main(program);
   };
-  coffeecoffee = function(program) {
+  main = function(program) {
     var scope, stmt, _i, _len, _results;
     scope = Scope();
     _results = [];
@@ -569,13 +569,13 @@
           _results = [];
           for (var _i = from_val; from_val <= to_val ? _i < to_val : _i > to_val; from_val <= to_val ? _i++ : _i--){ _results.push(_i); }
           return _results;
-        }).apply(this, arguments);
+        }).apply(this);
       } else {
         return (function() {
           _results2 = [];
           for (var _j = from_val; from_val <= to_val ? _j <= to_val : _j >= to_val; from_val <= to_val ? _j++ : _j--){ _results2.push(_j); }
           return _results2;
-        }).apply(this, arguments);
+        }).apply(this);
       }
     },
     Return: function(scope, ast) {
@@ -884,7 +884,7 @@
     highlight_line: function(line_number) {}
   };
   if (typeof window !== "undefined" && window !== null) {
-    window.coffeecoffee = coffeecoffee;
+    window.CoffeeCoffee.main = main;
     window.Debugger = Debugger;
   } else {
     fs = require('fs');

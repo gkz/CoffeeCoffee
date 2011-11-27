@@ -5,14 +5,15 @@
     program = JSON.parse(data);
     return transcompile(program);
   };
+  data = [];
   transcompile = function(program) {
-    var stmt, _i, _len, _results;
-    _results = [];
+    var stmt, _i, _len;
+    data = [];
     for (_i = 0, _len = program.length; _i < _len; _i++) {
       stmt = program[_i];
-      _results.push(Build(stmt));
+      Build(stmt);
     }
-    return _results;
+    return data.join('\n');
   };
   Build = function(ast) {
     var method, name, node;
@@ -27,7 +28,11 @@
   };
   TAB = '';
   PUT = function(s, f) {
-    console.log(TAB, s);
+    if (typeof window !== "undefined" && window !== null) {
+      data.push(TAB + s);
+    } else {
+      console.log(TAB, s);
+    }
     if (f) {
       INDENT();
       f();
@@ -497,8 +502,7 @@
     return util.debug(JSON.stringify(obj, null, "  "));
   };
   if (typeof window !== "undefined" && window !== null) {
-    window.transcompile = transcompile;
-    window.Debugger = Debugger;
+    window.CoffeeCoffee.transcompile = transcompile;
   } else {
     fs = require('fs');
     fn = process.argv.splice(2, 1)[0];

@@ -1,5 +1,5 @@
 (function() {
-  var ArrayView, IndentationHelper, big_block, small_block;
+  var ArrayView, IndentationHelper, big_block, indenter, small_block;
   ArrayView = function(list, first, last) {
     var index, self;
     if (first == null) {
@@ -102,5 +102,12 @@
   if (typeof exports !== "undefined" && exports !== null) {
     exports.small_block = small_block;
     exports.big_block = big_block;
+  }
+  if (typeof window !== "undefined" && window !== null) {
+    indenter = {
+      small_block: small_block,
+      big_block: big_block
+    };
+    window.CoffeeCoffee.indenter = indenter;
   }
 }).call(this);

@@ -8,9 +8,15 @@ handle_data = (data) ->
   program = JSON.parse data
   transcompile(program)
   
+
+data = []
+
 transcompile = (program) ->
+  data = []
   for stmt in program
     Build stmt
+
+  data.join('\n')
 
 Build = (ast) ->
   name = the_key_of(ast)
@@ -24,7 +30,11 @@ Build = (ast) ->
 TAB = ''
 
 PUT = (s, f) ->
-  console.log TAB, s
+  if window?
+      data.push(TAB + s)
+  else
+      console.log TAB, s
+
   if f
     INDENT()
     f()
@@ -358,8 +368,7 @@ pp = (obj, description) ->
   util.debug JSON.stringify obj, null, "  "
 
 if window?
-  window.transcompile = transcompile
-  window.Debugger = Debugger
+  window.CoffeeCoffee.transcompile = transcompile
 else
   # assume we're running node side for now
   fs = require 'fs'

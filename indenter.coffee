@@ -79,7 +79,14 @@ big_block = (s) -> ArrayView (IndentationHelper.find_indentation(line) for line 
 if exports?    
   exports.small_block = small_block
   exports.big_block = big_block
+
+if window?
+  indenter =
+    small_block: small_block
+    big_block: big_block
     
+  window.CoffeeCoffee.indenter = indenter
+
 # if exports?
 #   # node.js has require mechanism
 #   exports.convert = convert

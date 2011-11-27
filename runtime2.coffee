@@ -623,8 +623,7 @@ newify = (func, rt, cb, args) ->
   func.call child, rt, callback, args
 
 if window?
-  window.transcompile = transcompile
-  window.Debugger = Debugger
+  # do nothing?
 else
   # assume we're running node side for now
   fs = require 'fs'
