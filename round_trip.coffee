@@ -192,8 +192,8 @@ Build =
     "(#{Comma params})"
   
   'PARENS': (arg, block) ->
-    expr = Eval block
-    "(#{expr})"
+    expr = Block block
+    "(#{_.trim(expr)})"
     
   'PARENTS': (arg, block) ->
     if block.len() > 0

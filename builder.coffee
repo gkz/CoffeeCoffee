@@ -20,11 +20,17 @@ transcompile = (program) ->
 
 Build = (ast) ->
   name = the_key_of(ast)
-  method = AST[name]
+
+  if name == 'expressions'
+      method = AST.Block
+    else
+      method = AST[name]
+
   if method
     node = ast[name]
     return method node
-  console.log ast  
+
+  console.log ast
   throw "#{name} not supported yet"
 
 TAB = ''
@@ -59,6 +65,8 @@ AST =
 
   Block: (ast) ->
     code = ast.expressions
+    code ?= ast
+
     for stmt in code
       Build stmt
     
@@ -258,7 +266,7 @@ AST =
       body = body.Block
     if body.expressions
       PUT "PARENS", ->
-        return Build body.expressions[0]
+        return Build body
     else
       return Build body
 

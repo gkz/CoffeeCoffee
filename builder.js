@@ -18,7 +18,11 @@
   Build = function(ast) {
     var method, name, node;
     name = the_key_of(ast);
-    method = AST[name];
+    if (name === 'expressions') {
+      method = AST.Block;
+    } else {
+      method = AST[name];
+    }
     if (method) {
       node = ast[name];
       return method(node);
@@ -69,6 +73,9 @@
     Block: function(ast) {
       var code, stmt, _i, _len, _results;
       code = ast.expressions;
+      if (code == null) {
+        code = ast;
+      }
       _results = [];
       for (_i = 0, _len = code.length; _i < _len; _i++) {
         stmt = code[_i];
@@ -354,7 +361,7 @@
       }
       if (body.expressions) {
         return PUT("PARENS", function() {
-          return Build(body.expressions[0]);
+          return Build(body);
         });
       } else {
         return Build(body);

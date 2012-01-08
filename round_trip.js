@@ -228,8 +228,8 @@
     },
     'PARENS': function(arg, block) {
       var expr;
-      expr = Eval(block);
-      return "(" + expr + ")";
+      expr = Block(block);
+      return "(" + (_.trim(expr)) + ")";
     },
     'PARENTS': function(arg, block) {
       if (block.len() > 0) {
