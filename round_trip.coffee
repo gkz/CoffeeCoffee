@@ -193,7 +193,9 @@ Build =
   
   'PARENS': (arg, block) ->
     expr = Block block
-    "(#{_.trim(expr)})"
+
+    # slice that ending newline away from the expr
+    "(#{expr[0..-2]})"
     
   'PARENTS': (arg, block) ->
     if block.len() > 0

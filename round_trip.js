@@ -229,7 +229,7 @@
     'PARENS': function(arg, block) {
       var expr;
       expr = Block(block);
-      return "(" + (_.trim(expr)) + ")";
+      return "(" + expr.slice(0, -1) + ")";
     },
     'PARENTS': function(arg, block) {
       if (block.len() > 0) {
